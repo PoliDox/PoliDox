@@ -1,8 +1,12 @@
 #pragma once
 class CRDT
 {
-public:
+protected:
 	CRDT();
+
+private:
+
+public:
 	~CRDT();
 };
 

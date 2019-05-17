@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\PoliDocs",
+    "\\PoliDocs\\PoliDocs",
+    "\\PoliDocs\\PoliDocs\\Debug"
   ],
+  "SelectedNode": "\\PoliDocs\\PoliDocs\\PoliDocs.vcxproj",
   "PreviewInSolutionExplorer": false
 }
