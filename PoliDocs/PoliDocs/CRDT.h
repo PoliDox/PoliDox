@@ -1,8 +1,11 @@
 #pragma once
-class CRDT
+class virtual CRDT
 {
 public:
 	CRDT();
 	~CRDT();
+
+private:
+
 };
 
