@@ -8,6 +8,9 @@
 
 class CRDTserver {
 
+public:
+    dispatchMessages();
+
 };
 
 
