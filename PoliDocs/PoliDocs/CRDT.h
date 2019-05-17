@@ -1,14 +1,12 @@
 #pragma once
-class virtual CRDT
+class CRDT
 {
-
 protected:
-    CRDT();
-public:
-	~CRDT();
+	CRDT();
 
 private:
 
-
+public:
+	~CRDT();
 };
 

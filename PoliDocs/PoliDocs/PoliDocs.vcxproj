@@ -151,11 +151,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Account.cpp" />
+    <ClCompile Include="CLIENTcontroller.cpp" />
     <ClCompile Include="CRDT.cpp" />
+    <ClCompile Include="CRDTclient.cpp" />
+    <ClCompile Include="EDITOR.cpp" />
     <ClCompile Include="PoliDocs.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="CLIENTcontroller.h" />
     <ClInclude Include="CRDT.h" />
+    <ClInclude Include="CRDTclient.h" />
+    <ClInclude Include="EDITOR.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

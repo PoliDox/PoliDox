@@ -9,7 +9,7 @@
 class CRDTserver {
 
 public:
-    dispatchMessages();
+    void dispatchMessages();
 
 };
 

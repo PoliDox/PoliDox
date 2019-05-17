@@ -8,6 +8,9 @@
 
 class SERVERcontroller {
 
+public:
+    void handleOperation();
+
 };
 
 
