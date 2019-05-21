@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Account.cpp" />
+    <ClCompile Include="Char.cpp" />
     <ClCompile Include="CLIENTcontroller.cpp" />
     <ClCompile Include="CRDT.cpp" />
     <ClCompile Include="CRDTclient.cpp" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Account.h" />
+    <ClInclude Include="Char.h" />
     <ClInclude Include="CLIENTcontroller.h" />
     <ClInclude Include="CRDT.h" />
     <ClInclude Include="CRDTclient.h" />

@@ -152,8 +152,8 @@ void SharedEditor::localInsert(int index, char value) {
     Symbol newSymbol=Symbol(value,uniqueID,fractionPos);    //uniqueID as siteID + counter
     _symbols.insert(_symbols.begin()+index,newSymbol);
 
-    Message mex=Message("INSERT",newSymbol,this->_siteId);
-    this->_server.send(mex);
+    //Message mex=Message("INSERT",newSymbol,this->_siteId);
+    //this->_server.send(mex);
 
 }
 
