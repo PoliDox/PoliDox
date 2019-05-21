@@ -11,7 +11,7 @@ CRDTclient::~CRDTclient()
 {
 }
 
-void CRDTclient::LocalInsert(int row,int index, Char value) {
+void CRDTclient::LocalInsert(int row,int index, Symbol value) {
 
     vector<int>fractionPos;
 
@@ -32,12 +32,12 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
         if(_symbols[row].size()>=1){
 
             Symbol left = _symbols[row].at(index - 1);
-            int l = *(left.position.begin());       /* deferenzio iteratore ad inizio posizione */
+            int l = *(left.getPosition().begin());       /* deferenzio iteratore ad inizio posizione */
 
             /* if the first element of the last symbol's position is the greates value ... */
             if(l==100){
                 /* if it is the only element in position[], need to fraction */
-                if(left.position.size()==1){
+                if(left.getPosition().size()==1){
                     fractionPos.push_back(l);   /* copy base of the number */
                     pos = (rand() % 100) + 1;
                     fractionPos.push_back(pos); /* add a decimal value */
@@ -46,13 +46,13 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
                 else {
                     auto it=_symbols[row].end()-1;
 
-                    if(*(it->position.end()-1)==100){
-                        fractionPos.assign(it->position.begin(),it->position.end());
+                    if(*(it->getPosition().end()-1)==100){
+                        fractionPos.assign(it->getPosition().begin(),it->getPosition().end());
                         pos = (rand() % 100) + 1;
                         fractionPos.push_back(pos);
                     }else{
-                        fractionPos.assign(it->position.begin(),it->position.end()-1);
-                        while((pos=(rand()%100)+1)<=*(it->position.end()-1)){}
+                        fractionPos.assign(it->getPosition().begin(),it->getPosition().end()-1);
+                        while((pos=(rand()%100)+1)<=*(it->getPosition().end()-1)){}
                         fractionPos.push_back(pos);
                     }
                 }
@@ -69,14 +69,14 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
         Symbol left = _symbols[row].at(index - 1);
         Symbol right = _symbols[row].at(index);
 
-        auto l_start=left.position.begin();
-        auto r_start=right.position.begin();
+        auto l_start=left.getPosition().begin();
+        auto r_start=right.getPosition().begin();
 
-        auto l_end=left.position.end();
-        auto r_end=right.position.end();
+        auto l_end=left.getPosition().end();
+        auto r_end=right.getPosition().end();
 
-        int l = *left.position.begin();
-        int r = *right.position.begin();
+        int l = *left.getPosition().begin();
+        int r = *right.getPosition().begin();
 
         while (1) {
             if(r==l&&!leftMiss&&!rightMiss){
@@ -146,11 +146,9 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
         }
         fractionPos.push_back(pos);
     }
-    vector<int> uniqueID;
-    uniqueID.push_back(_siteId);
-    uniqueID.push_back(_counter);
-    Symbol newSymbol=Symbol(value,uniqueID,fractionPos);    //uniqueID as siteID + counter
-    _symbols.insert(_symbols.begin()+index,newSymbol);
+
+    Symbol newSymbol=Symbol(_siteID,_counter,value.getValue());    //uniqueID as siteID + counter
+    _symbols[row].insert(_symbols[row].begin()+index,newSymbol);
 
     //Message mex=Message("INSERT",newSymbol,this->_siteId);
     //this->_server.send(mex);

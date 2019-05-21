@@ -1,7 +1,7 @@
 #pragma once
 #include "CRDT.h"
 #include "CLIENTcontroller.h"
-#include "Char.h"
+#include "Symbol.h"
 
 #include <vector>
 
@@ -12,14 +12,15 @@ class CRDTclient :
 {
 private:
 	CLIENTcontroller c_controller;
-    vector<vector<Char>> _symbols;
+    vector<vector<Symbol>> _symbols;
     int _counter;
+    int _siteID;
 
 
 public:
 	CRDTclient();
 	~CRDTclient();
-	void LocalInsert(int row,int index, Char value);
+	void LocalInsert(int row,int index, Symbol value);
 	void LocalDelete();
 
 };
