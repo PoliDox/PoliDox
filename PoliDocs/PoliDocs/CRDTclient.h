@@ -13,6 +13,7 @@ class CRDTclient :
 private:
 	CLIENTcontroller c_controller;
     vector<vector<Char>> _symbols;
+    int _counter;
 
 
 public:

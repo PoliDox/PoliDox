@@ -11,7 +11,7 @@ CRDTclient::~CRDTclient()
 {
 }
 
-void CRDTclient::LocalInsert(int row,int index, char value) {
+void CRDTclient::LocalInsert(int row,int index, Char value) {
 
     vector<int>fractionPos;
 
@@ -26,12 +26,12 @@ void CRDTclient::LocalInsert(int row,int index, char value) {
     _counter++;
 
     /* GESTIONE INSERIMENTO AL FONDO */
-    if(_symbols.empty()||index==_symbols.size()) {
+    if(_symbols[row].empty()||index==_symbols[row].size()) {
 
         /* i'm at the end and the vector is not empty */
-        if(_symbols.size()>=1){
+        if(_symbols[row].size()>=1){
 
-            Symbol left = _symbols.at(index - 1);
+            Symbol left = _symbols[row].at(index - 1);
             int l = *(left.position.begin());       /* deferenzio iteratore ad inizio posizione */
 
             /* if the first element of the last symbol's position is the greates value ... */
@@ -44,7 +44,7 @@ void CRDTclient::LocalInsert(int row,int index, char value) {
                 }
                     /* otherwise copy until end-1 and find a new valure greater than end-1 */
                 else {
-                    auto it=_symbols.end()-1;
+                    auto it=_symbols[row].end()-1;
 
                     if(*(it->position.end()-1)==100){
                         fractionPos.assign(it->position.begin(),it->position.end());
@@ -60,14 +60,14 @@ void CRDTclient::LocalInsert(int row,int index, char value) {
                 while((pos = (rand() % 100) + 1)<=l){}
                 fractionPos.push_back(pos);}
 
-        }else if(_symbols.size()==0){
+        }else if(_symbols[row].size()==0){
             pos = rand() % 100+ 1;
             fractionPos.push_back(pos);
         }
         /* FINE GESTIONE INSERIMENTO AL FODNO */
     }else {
-        Symbol left = _symbols.at(index - 1);
-        Symbol right = _symbols.at(index);
+        Symbol left = _symbols[row].at(index - 1);
+        Symbol right = _symbols[row].at(index);
 
         auto l_start=left.position.begin();
         auto r_start=right.position.begin();
