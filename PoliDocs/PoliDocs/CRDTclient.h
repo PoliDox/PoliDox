@@ -7,7 +7,7 @@ class CRDTclient :
 {
 private:
 	CLIENTcontroller c_controller;
-    vector<Symbol> _symbols;
+    vector<vector<Symbol>> _symbols;
 
 
 public:
