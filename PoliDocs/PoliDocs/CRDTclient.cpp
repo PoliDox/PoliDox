@@ -11,7 +11,7 @@ CRDTclient::~CRDTclient()
 {
 }
 
-void SharedEditor::localInsert(int index, char value) {
+void CRDTclient::LocalInsert(int row,int index, char value) {
 
     vector<int>fractionPos;
 
