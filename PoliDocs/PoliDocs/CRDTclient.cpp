@@ -11,7 +11,7 @@ CRDTclient::~CRDTclient()
 {
 }
 
-void CRDTclient::LocalInsert(int row,int index, Symbol value) {
+void CRDTclient::LocalInsert(int row,int index, Char value) {
 
     vector<int>fractionPos;
 
@@ -31,7 +31,7 @@ void CRDTclient::LocalInsert(int row,int index, Symbol value) {
         /* i'm at the end and the vector is not empty */
         if(_symbols[row].size()>=1){
 
-            Symbol left = _symbols[row].at(index - 1);
+            Char left = _symbols[row].at(index - 1);
             int l = *(left.getPosition().begin());       /* deferenzio iteratore ad inizio posizione */
 
             /* if the first element of the last symbol's position is the greates value ... */
@@ -66,8 +66,8 @@ void CRDTclient::LocalInsert(int row,int index, Symbol value) {
         }
         /* FINE GESTIONE INSERIMENTO AL FODNO */
     }else {
-        Symbol left = _symbols[row].at(index - 1);
-        Symbol right = _symbols[row].at(index);
+        Char left = _symbols[row].at(index - 1);
+        Char right = _symbols[row].at(index);
 
         auto l_start=left.getPosition().begin();
         auto r_start=right.getPosition().begin();
@@ -147,8 +147,8 @@ void CRDTclient::LocalInsert(int row,int index, Symbol value) {
         fractionPos.push_back(pos);
     }
 
-    Symbol newSymbol=Symbol(_siteID,_counter,value.getValue());    //uniqueID as siteID + counter
-    _symbols[row].insert(_symbols[row].begin()+index,newSymbol);
+    Char newChar=Char(_siteID,_counter,value.getValue());    //uniqueID as siteID + counter
+    _symbols[row].insert(_symbols[row].begin()+index,newChar);
 
     //Message mex=Message("INSERT",newSymbol,this->_siteId);
     //this->_server.send(mex);
