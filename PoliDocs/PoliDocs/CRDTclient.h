@@ -8,15 +8,16 @@
 #include <ctime>
 #include <cstdlib>
 
+
 using namespace std;
 class CRDTclient :
 	public CRDT
 {
 private:
 	CLIENTcontroller c_controller;
-    static vector<vector<Char>> _symbols;
-    static int _counter;
-    static int _siteID;
+    vector<vector<Char>> _symbols;
+    int _counter;
+    int _siteID;
 
 
 public:
