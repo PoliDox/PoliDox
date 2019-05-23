@@ -172,7 +172,7 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
         fractionPos.push_back(pos);
     }
 
-    Char newChar=Char(_siteID,_counter,value);    //uniqueID as siteID + counter
+    Char newChar=Char(_siteID,_counter,value,fractionPos);    //uniqueID as siteID + counter
     _symbols[row]->insert(_symbols[row]->begin()+index,newChar);
 
     //Message mex=Message("INSERT",newSymbol,this->_siteId);
