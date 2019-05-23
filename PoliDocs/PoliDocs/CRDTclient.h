@@ -4,6 +4,9 @@
 #include "Char.h"
 
 #include <vector>
+#include <iterator>
+#include <ctime>
+#include <cstdlib>
 
 
 using namespace std;
@@ -20,7 +23,7 @@ private:
 public:
 	CRDTclient();
 	~CRDTclient();
-	void LocalInsert(int row,int index, Char value);
+	void LocalInsert(int row,int index, char value);
 	void LocalDelete();
 
 };

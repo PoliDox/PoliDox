@@ -1,5 +1,6 @@
 #include "CRDTclient.h"
 
+#define MAXVAL 100
 
 
 CRDTclient::CRDTclient()
@@ -11,7 +12,7 @@ CRDTclient::~CRDTclient()
 {
 }
 
-void CRDTclient::LocalInsert(int row,int index, Char value) {
+void CRDTclient::LocalInsert(int row, int index, char value) {
 
     vector<int>fractionPos;
 
@@ -21,12 +22,33 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
             deep=0,
             leftMiss=0,
             rightMiss=0,
-            equal=-1;
+            equal=-1,
+            i = 0;
 
     _counter++;
 
-    /* GESTIONE INSERIMENTO AL FONDO */
-    if(_symbols[row].empty()||index==_symbols[row].size()) {
+    if (0 == index) {		//primo inserimento. non ho preceding e se primo inserimento non ho following
+        //ho following?
+        if (this->_symbols[row].empty()) {	//primo inserimento - non ho following
+            fractionPos.push_back(MAXVAL / 4);
+        }
+        else {								//qui ho il following
+            for ( i = 0; i < this->_symbols[row][0].getPosition().size(); i++) {	//scorro tutto il following alla ricerca del primo diverso da 0
+                if (this->_symbols[row][0].getPosition()[i] <= 1) {
+                    fractionPos.push_back(0);
+                    if (i == (this->_symbols[row][0].getPosition().size() - 1)) {		//se è l'ultimo (ed è 0) allora inserisco una foglia e posso uscire
+                        fractionPos.push_back(MAXVAL / 4);
+                        break;
+                    }
+                }
+                else {
+                    while(((pos = rand() % MAXVAL) + 1) > this->_symbols[row][0].getPosition()[i]){}
+                    fractionPos.push_back(pos);
+                    break;
+                }
+            }
+        }
+    }else if(_symbols[row].empty()||index==_symbols[row].size()) {    /* GESTIONE INSERIMENTO AL FONDO */
 
         /* i'm at the end and the vector is not empty */
         if(_symbols[row].size()>=1){
@@ -135,7 +157,7 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
                     if(leftMiss||rightMiss)  /* copy fraction position only if has been fractioned */
                         fractionPos.assign(l_start,l_end);
                     while(1) {
-                        pos = (rand() % 100) + 1;
+                        pos = ( rand() % 100) + 1;
                         if( pos<r && pos>l) /* don't need to fraction */
                             break;
                     }
@@ -147,7 +169,7 @@ void CRDTclient::LocalInsert(int row,int index, Char value) {
         fractionPos.push_back(pos);
     }
 
-    Char newChar=Char(_siteID,_counter,value.getValue());    //uniqueID as siteID + counter
+    Char newChar=Char(_siteID,_counter,value);    //uniqueID as siteID + counter
     _symbols[row].insert(_symbols[row].begin()+index,newChar);
 
     //Message mex=Message("INSERT",newSymbol,this->_siteId);
