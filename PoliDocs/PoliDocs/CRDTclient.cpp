@@ -5,6 +5,9 @@
 
 CRDTclient::CRDTclient()
 {
+    for(int i=0;i<100;i++){
+        this->_symbols.push_back(new vector<Char>());
+    }
 }
 
 
@@ -29,31 +32,31 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
 
     if (0 == index) {		//primo inserimento. non ho preceding e se primo inserimento non ho following
         //ho following?
-        if (this->_symbols[row].empty()) {	//primo inserimento - non ho following
+        if (this->_symbols[row]->empty()) {	//primo inserimento - non ho following
             fractionPos.push_back(MAXVAL / 4);
         }
         else {								//qui ho il following
-            for ( i = 0; i < this->_symbols[row][0].getPosition().size(); i++) {	//scorro tutto il following alla ricerca del primo diverso da 0
-                if (this->_symbols[row][0].getPosition()[i] <= 1) {
+            for ( i = 0; i < this->_symbols[row]->at(0).getPosition().size(); i++) {	//scorro tutto il following alla ricerca del primo diverso da 0
+                if (this->_symbols[row]->at(0).getPosition()[i] <= 1) {
                     fractionPos.push_back(0);
-                    if (i == (this->_symbols[row][0].getPosition().size() - 1)) {		//se è l'ultimo (ed è 0) allora inserisco una foglia e posso uscire
+                    if (i == (this->_symbols[row]->at(0).getPosition().size() - 1)) {		//se è l'ultimo (ed è 0) allora inserisco una foglia e posso uscire
                         fractionPos.push_back(MAXVAL / 4);
                         break;
                     }
                 }
                 else {
-                    while(((pos = rand() % MAXVAL) + 1) > this->_symbols[row][0].getPosition()[i]){}
+                    while(((pos = rand() % MAXVAL) + 1) > this->_symbols[row]->at(0).getPosition()[i]){}
                     fractionPos.push_back(pos);
                     break;
                 }
             }
         }
-    }else if(_symbols[row].empty()||index==_symbols[row].size()) {    /* GESTIONE INSERIMENTO AL FONDO */
+    }else if(_symbols[row]->empty()||index==_symbols[row]->size()) {    /* GESTIONE INSERIMENTO AL FONDO */
 
         /* i'm at the end and the vector is not empty */
-        if(_symbols[row].size()>=1){
+        if(_symbols[row]->size()>=1){
 
-            Char left = _symbols[row].at(index - 1);
+            Char left = _symbols[row]->at(index - 1);
             int l = *(left.getPosition().begin());       /* deferenzio iteratore ad inizio posizione */
 
             /* if the first element of the last symbol's position is the greates value ... */
@@ -66,7 +69,7 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
                 }
                     /* otherwise copy until end-1 and find a new valure greater than end-1 */
                 else {
-                    auto it=_symbols[row].end()-1;
+                    auto it=_symbols[row]->end()-1;
 
                     if(*(it->getPosition().end()-1)==100){
                         fractionPos.assign(it->getPosition().begin(),it->getPosition().end());
@@ -82,14 +85,14 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
                 while((pos = (rand() % 100) + 1)<=l){}
                 fractionPos.push_back(pos);}
 
-        }else if(_symbols[row].size()==0){
+        }else if(_symbols[row]->size()==0){
             pos = rand() % 100+ 1;
             fractionPos.push_back(pos);
         }
         /* FINE GESTIONE INSERIMENTO AL FODNO */
     }else {
-        Char left = _symbols[row].at(index - 1);
-        Char right = _symbols[row].at(index);
+        Char left = _symbols[row]->at(index - 1);
+        Char right = _symbols[row]->at(index);
 
         auto l_start=left.getPosition().begin();
         auto r_start=right.getPosition().begin();
@@ -170,7 +173,7 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
     }
 
     Char newChar=Char(_siteID,_counter,value);    //uniqueID as siteID + counter
-    _symbols[row].insert(_symbols[row].begin()+index,newChar);
+    _symbols[row]->insert(_symbols[row]->begin()+index,newChar);
 
     //Message mex=Message("INSERT",newSymbol,this->_siteId);
     //this->_server.send(mex);
