@@ -1,5 +1,6 @@
 #include "editor.h"
 #include <QDebug>
+#include <QChar>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent)
 {
@@ -9,6 +10,8 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent)
     connect(m_textDoc, &QTextDocument::contentsChange, [=] (int position, int charsRemoved, int charsAdded) {
         if (charsAdded) {
             qDebug() << "Added" << charsAdded << "chars at position" << position;
+            QChar car =  m_textDoc->characterAt(position);
+            this->ed.localInsert(position, car.toLatin1());
         } else {
             qDebug() << "Removed" << charsRemoved << "chars at position" << position;
         }
