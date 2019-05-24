@@ -7,6 +7,7 @@
 #include <iterator>
 #include <ctime>
 #include <cstdlib>
+#include <iostream>
 
 
 using namespace std;
@@ -25,6 +26,7 @@ public:
 	~CRDTclient();
 	void LocalInsert(int row,int index, char value);
 	void LocalDelete();
+    void CRDTprintText();
 
 };
 

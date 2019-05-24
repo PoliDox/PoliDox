@@ -5,9 +5,11 @@
 
 CRDTclient::CRDTclient()
 {
-    for(int i=0;i<100;i++){
+   /* for(int i=0;i<100;i++){
         this->_symbols.push_back(new vector<Char>());
-    }
+    }*/
+
+    this->_symbols.push_back(new vector<Char>());
 }
 
 
@@ -15,171 +17,185 @@ CRDTclient::~CRDTclient()
 {
 }
 
-void CRDTclient::LocalInsert(int row, int index, char value) {
+#define MAXNUM 100
 
-    vector<int>fractionPos;
+bool existsPositionInVector(int position, std::vector<int> vector) {
+    if(position < vector.size())
+        return true;
+    return false;
+}
 
-    srand(time(0));
 
-    int pos,
-            deep=0,
-            leftMiss=0,
-            rightMiss=0,
-            equal=-1,
-            i = 0;
+/* assumo che sia preceding che following
+ * abbiamo almeno un elemento    */
+std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::vector<int> following){
+    std::vector<int> middle;
 
-    _counter++;
+    int moreSmallVector, precedingSize=preceding.size(), followingSize=following.size();
+    if(precedingSize < followingSize)
+        moreSmallVector = precedingSize;
+    else
+        moreSmallVector = followingSize;
 
-    if (0 == index) {		//primo inserimento. non ho preceding e se primo inserimento non ho following
-        //ho following?
-        if (this->_symbols[row]->empty()) {	//primo inserimento - non ho following
-            fractionPos.push_back(MAXVAL / 4);
+    int i;
+    for(i=0; i<moreSmallVector; i++){
+
+        int difference = following[i] - preceding[i];
+        if(difference > 1) {
+            int middleElement = (difference) / 2;
+            middleElement = middleElement + preceding[i];
+            middle.push_back(middleElement);
+            return middle;
         }
-        else {								//qui ho il following
-            for ( i = 0; i < this->_symbols[row]->at(0).getPosition().size(); i++) {	//scorro tutto il following alla ricerca del primo diverso da 0
-                if (this->_symbols[row]->at(0).getPosition()[i] <= 1) {
-                    fractionPos.push_back(0);
-                    if (i == (this->_symbols[row]->at(0).getPosition().size() - 1)) {		//se è l'ultimo (ed è 0) allora inserisco una foglia e posso uscire
-                        fractionPos.push_back(MAXVAL / 4);
-                        break;
-                    }
-                }
-                else {
-                    while(((pos = rand() % MAXVAL) + 1) > this->_symbols[row]->at(0).getPosition()[i]){}
-                    fractionPos.push_back(pos);
-                    break;
-                }
-            }
-        }
-    }else if(_symbols[row]->empty()||index==_symbols[row]->size()) {    /* GESTIONE INSERIMENTO AL FONDO */
-
-        /* i'm at the end and the vector is not empty */
-        if(_symbols[row]->size()>=1){
-
-            Char left = _symbols[row]->at(index - 1);
-            int l = *(left.getPosition().begin());       /* deferenzio iteratore ad inizio posizione */
-
-            /* if the first element of the last symbol's position is the greates value ... */
-            if(l==100){
-                /* if it is the only element in position[], need to fraction */
-                if(left.getPosition().size()==1){
-                    fractionPos.push_back(l);   /* copy base of the number */
-                    pos = (rand() % 100) + 1;
-                    fractionPos.push_back(pos); /* add a decimal value */
-                }
-                    /* otherwise copy until end-1 and find a new valure greater than end-1 */
-                else {
-                    auto it=_symbols[row]->end()-1;
-
-                    if(*(it->getPosition().end()-1)==100){
-                        fractionPos.assign(it->getPosition().begin(),it->getPosition().end());
-                        pos = (rand() % 100) + 1;
-                        fractionPos.push_back(pos);
-                    }else{
-                        fractionPos.assign(it->getPosition().begin(),it->getPosition().end()-1);
-                        while((pos=(rand()%100)+1)<=*(it->getPosition().end()-1)){}
-                        fractionPos.push_back(pos);
-                    }
-                }
-            }else{
-                while((pos = (rand() % 100) + 1)<=l){}
-                fractionPos.push_back(pos);}
-
-        }else if(_symbols[row]->size()==0){
-            pos = rand() % 100+ 1;
-            fractionPos.push_back(pos);
-        }
-        /* FINE GESTIONE INSERIMENTO AL FODNO */
-    }else {
-        Char left = _symbols[row]->at(index - 1);
-        Char right = _symbols[row]->at(index);
-
-        auto l_start=left.getPosition().begin();
-        auto r_start=right.getPosition().begin();
-
-        auto l_end=left.getPosition().end();
-        auto r_end=right.getPosition().end();
-
-        int l = *left.getPosition().begin();
-        int r = *right.getPosition().begin();
-
-        while (1) {
-            if(r==l&&!leftMiss&&!rightMiss){
-                equal=1;
-                /* if number are equal the have been already fractioned*/
-                deep++;
-                /* start filling positions */
-                fractionPos.push_back(l);
-                /* right doesn't mattter, need to fill only position with left part */
-                if(*(l_start+deep)!=*(l_end)&&*(r_start+deep)!=*(r_end)){
-                    l=*(l_start+deep);
-                    r=*(r_start+deep);
-                    continue;
-                }else if(*(l_start+deep)==*(l_end)&&*(r_start+deep)!=*(r_end)){
-                    leftMiss=1;     /* element on the right has one extra decimal number than the one on the left */
-                    r=*(r_start+deep);
-                    l=0; // because of left_miss
-                    continue;
-                }else if(*(l_start+deep)!=*(l_end)&&*(r_start+deep)==*(r_end)){
-                    rightMiss=1;     /* element on the right has one extra decimal number than the one on the left */
-                    l=*(l_start+deep);
-                    r=0; //because of right_miss
-                    continue;
-                }
-                /* The case r==l and l.next=nul and r.next=null is not possible*/
-            }
-
-            /* if the range is equal to 1 need to fraction adding a decimal */
-            if ((r - l)==1)  {
-                equal=0;
-                fractionPos.assign(l_start,l_end);
-                if(leftMiss||rightMiss){
-                    if(leftMiss==1){
-                        if(r!=1)
-                            while((pos = (rand() % 100) + 1)>=r){}
-                        else{
-                            fractionPos.push_back(0);
-                            pos = (rand() % 100) + 1;
+        else {
+            middle.push_back(preceding[i]);
+            if(difference == 1){
+                //qui terminerò sicuro, devo solo trovare un numero più
+                //grande di preceding da poter inserire
+                if( existsPositionInVector(i+1, preceding) ) {
+                    for(int j=i+1; j<precedingSize; j++) {
+                        if (preceding[j] <= (MAXNUM - 2)) {
+                            int middleElement = (MAXNUM - preceding[j]) / 2;
+                            middleElement = middleElement + preceding[j];
+                            middle.push_back(middleElement);
+                            return middle;
+                        } else {
+                            //copia preceding finché non trovi
+                            //un elemento i-esimo più grande da poter inserire.
+                            middle.push_back(preceding[j]);
                         }
                     }
-                    else if( rightMiss == 1)
-                        while((pos = (rand() % 100) + 1)<=l){}
-
-                    break;}
-                else{
-                    pos = rand() % (r - l)+ l+1;
-                    break;
+                    middle.push_back(MAXNUM/2);
+                    return middle;
+                }
+                else {
+                    middle.push_back(MAXNUM/2);
+                    return middle;
                 }
             }
-            else if(r-l!=1){
-                if(r==l){
-                    fractionPos.assign(l_start,l_end);
-                    fractionPos.push_back(0);
-                    pos = (rand() % 100) + 1;
-                }else{
-                    if(leftMiss||rightMiss)  /* copy fraction position only if has been fractioned */
-                        fractionPos.assign(l_start,l_end);
-                    while(1) {
-                        pos = ( rand() % 100) + 1;
-                        if( pos<r && pos>l) /* don't need to fraction */
-                            break;
-                    }
-                }
-                break;
-            }
-
         }
-        fractionPos.push_back(pos);
+
     }
 
-    Char newChar=Char(_siteID,_counter,value,fractionPos);    //uniqueID as siteID + counter
-    _symbols[row]->insert(_symbols[row]->begin()+index,newChar);
+    //se arrivo qui è perché sicuramente
+    //preceding è finito e following ancora no!!
+    //TODO da confermare se è vero
 
-    //Message mex=Message("INSERT",newSymbol,this->_siteId);
-    //this->_server.send(mex);
+    bool precedingIsFinish = i==precedingSize;
+    bool followingIsFinish = i==followingSize;
+
+    if( precedingIsFinish && followingIsFinish){
+        std::cout << "ERRORE\n"; //NON DOVREI MIA ENTRARE QUI
+        exit(10);  //10: numero a caso
+    }
+
+    if(precedingIsFinish){
+        //preceding è finito e following no
+        for(i; i<followingSize; i++) {
+            if (following[i] == 0) {  //può essere sia 1 che zero
+                middle.push_back(following[i]);
+            }
+            else {
+                if(following[i] == 1){
+                    middle.push_back(0);
+                    middle.push_back(MAXNUM/2);
+                    return middle;
+                }
+                else {
+                    int middleElement = following[i] / 2;
+                    middle.push_back(middleElement);
+                    return middle;
+                }
+            }
+        }
+    }
+
+    //NON DOVREI MAI ARRIVARE QUI
+    std::cout << "ERRORE\n"; //NON DOVREI MIA ENTRARE QUI
+    exit(10);  //10: numero a caso
 
 }
 
+/* 1- costruisco un symbol e genero la sua fractionalPosition */
+void CRDTclient::LocalInsert(int row, int index, char value) {
+    Char symbolToInsert(value, this->_siteID, this->_counter);
+    int symbolsSize = this->_symbols[row]->size();
+    int middleNewLine=0;
+
+    if(value=='\n') {
+        if (index == this->_symbols[row]->size() - 1)
+            this->_symbols.insert(this->_symbols.begin() + (row + 1),new vector<Char>());  /* allocate pointer for new line */
+        else{
+            middleNewLine=1;
+        }
+    }
+
+
+
+    if(index == 0){
+        if(symbolsSize == 0){
+            //è il primo elemento che inserisco
+            std::vector<int> firstElem{MAXNUM/2};
+
+            symbolToInsert.setFractionalPosition(firstElem);
+            this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
+        }
+        else {
+            //ho degli elementi dopo di me
+            std::vector<int> followingFractionalNumber = this->_symbols[0]->at(0).getFractionalPosition();
+            std::vector<int> fakeVector{0};
+            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(fakeVector, followingFractionalNumber);
+
+            symbolToInsert.setFractionalPosition(newFractionalPosition);
+            this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
+        }
+    }
+    else {
+        //sicuramente avrò un simbolo prima di me
+        if(index >= symbolsSize){  //TODO controllare bene il confronto
+            //non ho nessuno dopo di me
+            index = symbolsSize;  //inserisco in append
+            std::vector<int> precedingFractionalNumber = this->_symbols[row]->at(index-1).getFractionalPosition();
+            std::vector<int> fakeVector{MAXNUM};
+
+            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, fakeVector);
+            symbolToInsert.setFractionalPosition(newFractionalPosition);
+            this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
+        }
+        else {
+            //sono fra due simboli
+            std::vector<int> precedingFractionalNumber = this->_symbols[row]->at(index-1).getFractionalPosition();
+            std::vector<int> followingFractionalNumber = this->_symbols[row]->at(index).getFractionalPosition();
+
+            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
+            symbolToInsert.setFractionalPosition(newFractionalPosition);
+            this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
+        }
+    }
+
+    if(middleNewLine==1) {
+       /* this->_symbols.insert(this->_symbols.begin() + (row + 1),
+                              new vector<Char>(this->_symbols[row]->begin() + index + 1, this->_symbols[row]->end())); */
+        this->_symbols[row]->resize(index + 1);
+    }
+
+
+    /* Numero frazionario generato e simbolo inserito.
+     * Generare ora il Message da spedire */
+    //Message messageToSend(true, symbolToInsert, this);
+    //this->server.send(messageToSend);
+}
 void CRDTclient::LocalDelete()
 {
+}
+
+void CRDTclient::CRDTprintText(){
+    for(auto x : _symbols){
+        for(auto y : *x){
+            for(auto k : y.getPosition())
+                  cout << k << " ";
+             cout<<endl;
+        }
+        cout<< "_____NUOVA_RIGA______\n";
+    }
 }

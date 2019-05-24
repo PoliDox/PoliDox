@@ -17,3 +17,11 @@ vector<int> Char::getPosition() {
 char Char::getValue() {
     return value;
 }
+
+void Char::setFractionalPosition(vector<int> fractionalPosition) {
+        this->position = fractionalPosition;
+}
+
+vector<int> Char::getFractionalPosition() {
+    return position;
+}

@@ -17,13 +17,13 @@ private:
     vector<int> position;
 
 public:
-    Char(int siteId, int counter, char value, vector<int> pos) : siteId(siteId), counter(counter), value(value) {
-        this->position=pos;
-    };
+    Char(int siteId, int counter, char value) : siteId(siteId), counter(counter), value(value){};
     ~Char();
     void setPosition(std::vector<int> x);
     vector<int> getPosition();
     char getValue();
+    void setFractionalPosition(vector<int> fractionalPosition);
+    vector<int> getFractionalPosition();
 };
 
 
