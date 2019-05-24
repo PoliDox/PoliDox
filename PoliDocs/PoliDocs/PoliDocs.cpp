@@ -22,9 +22,20 @@ int main()
     test->LocalInsert(1,2,a);
     test->LocalInsert(1,3,a);
     test->LocalInsert(1,1,end);
+
     test->LocalInsert(2,0,a);
     test->LocalInsert(2,1,a);
-    test->LocalInsert(2,2,a);
+    test->LocalInsert(2,2,end);
+
+    test->LocalInsert(3,0,a);
+    test->LocalInsert(3,1,a);
+    test->LocalInsert(3,2,a);
+    test->LocalInsert(3,3,a);
+    test->LocalInsert(3,1,end);
+
+    test->LocalInsert(4,0,a);
+    test->LocalInsert(4,1,a);
+    test->LocalInsert(4,2,a);
 
     test->CRDTprintText();
 

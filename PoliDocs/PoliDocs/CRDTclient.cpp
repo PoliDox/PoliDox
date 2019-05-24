@@ -115,10 +115,11 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 /* 1- costruisco un symbol e genero la sua fractionalPosition */
 void CRDTclient::LocalInsert(int row, int index, char value) {
     Char symbolToInsert(value, this->_siteID, this->_counter);
-    int symbolsSize = this->_symbols[row]->size();
+    //int symbolsSize = this->_symbols[row]->size();
 
-    /*     AGGIUNTO PER SUPPORTO
+    /*     AGGIUNTO PER SUPPORTO      */
     int symbolsSize=0;
+    int rowSize=this->_symbols[row]->size();
     for(int j=0;j<this->_symbols.size();j++)
             symbolsSize+=this->_symbols.at(j)->size();
 
@@ -136,28 +137,40 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
 
 
     if(index == 0){
-        if(symbolsSize == 0){
+        if(rowSize == 0){
+            std::vector<int> precedingFractionalNumber;
             //è il primo elemento che inserisco
             std::vector<int> firstElem{MAXNUM/2};
+            std::vector<int> fakeVector{MAXNUM};
+            if(row!=0){
+                precedingFractionalNumber = this->_symbols[row - 1]->at(this->_symbols[row - 1]->size() - 1).getFractionalPosition();
+                std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber,fakeVector);
+                symbolToInsert.setFractionalPosition(newFractionalPosition);
+                this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
 
+            }else{
             symbolToInsert.setFractionalPosition(firstElem);
-            this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
+            this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);}
         }
         else {
             //ho degli elementi dopo di me
-            std::vector<int> followingFractionalNumber = this->_symbols[row]->at(0).getFractionalPosition();
-            std::vector<int> fakeVector{0};
-            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(fakeVector, followingFractionalNumber);
+            std::vector<int> precedingFractionalNumber;
+            if(row!=0)
+                precedingFractionalNumber = this->_symbols[row-1]->at(this->_symbols[row-1]->size()-1).getFractionalPosition();
+            else
+                 precedingFractionalNumber.push_back(0); //sarebbe il fake vector
 
+            std::vector<int> followingFractionalNumber = this->_symbols[row]->at(0).getFractionalPosition();
+            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
             this->_symbols[row]->insert(this->_symbols[row]->begin()+index, symbolToInsert);
         }
     }
     else {
         //sicuramente avrò un simbolo prima di me
-        if(index >= symbolsSize){  //TODO controllare bene il confronto
+        if(index >= rowSize){  //TODO controllare bene il confronto
             //non ho nessuno dopo di me
-            index = symbolsSize;  //inserisco in append
+            index = rowSize;  //inserisco in append
             std::vector<int> precedingFractionalNumber = this->_symbols[row]->at(index-1).getFractionalPosition();
             std::vector<int> fakeVector{MAXNUM};
 
@@ -197,7 +210,6 @@ void CRDTclient::CRDTprintText(){
     for(auto x : _symbols){
         for(auto y : *x){
             for(auto k : y.getPosition()){
-                cout << y.getValue();
                 cout <<" "<<k << " ";}
              cout<<endl;
         }
