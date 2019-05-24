@@ -6,7 +6,7 @@
 
 int main()
 {
-    std::cout << "Hello World!\n";
+
 
     CRDTclient *test= new CRDTclient();
     char a='a',

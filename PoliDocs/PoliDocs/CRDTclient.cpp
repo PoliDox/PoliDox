@@ -5,10 +5,6 @@
 
 CRDTclient::CRDTclient()
 {
-   /* for(int i=0;i<100;i++){
-        this->_symbols.push_back(new vector<Char>());
-    }*/
-
     this->_symbols.push_back(new vector<Char>());
 }
 
@@ -120,6 +116,13 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 void CRDTclient::LocalInsert(int row, int index, char value) {
     Char symbolToInsert(value, this->_siteID, this->_counter);
     int symbolsSize = this->_symbols[row]->size();
+
+    /*     AGGIUNTO PER SUPPORTO
+    int symbolsSize=0;
+    for(int j=0;j<this->_symbols.size();j++)
+            symbolsSize+=this->_symbols.at(j)->size();
+
+    /************************************ */
     int middleNewLine=0;
 
     if(value=='\n') {
@@ -142,7 +145,7 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
         }
         else {
             //ho degli elementi dopo di me
-            std::vector<int> followingFractionalNumber = this->_symbols[0]->at(0).getFractionalPosition();
+            std::vector<int> followingFractionalNumber = this->_symbols[row]->at(0).getFractionalPosition();
             std::vector<int> fakeVector{0};
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(fakeVector, followingFractionalNumber);
 
@@ -174,11 +177,11 @@ void CRDTclient::LocalInsert(int row, int index, char value) {
     }
 
     if(middleNewLine==1) {
-       /* this->_symbols.insert(this->_symbols.begin() + (row + 1),
-                              new vector<Char>(this->_symbols[row]->begin() + index + 1, this->_symbols[row]->end())); */
-        this->_symbols[row]->resize(index + 1);
-    }
+        this->_symbols.insert(this->_symbols.begin() + (row + 1),
+                              new vector<Char>(this->_symbols[row]->begin() + index + 1, this->_symbols[row]->end()));
+        this->_symbols[row]->erase(this->_symbols[row]->begin() + index + 1, this->_symbols[row]->end());
 
+    }
 
     /* Numero frazionario generato e simbolo inserito.
      * Generare ora il Message da spedire */
@@ -190,10 +193,12 @@ void CRDTclient::LocalDelete()
 }
 
 void CRDTclient::CRDTprintText(){
+    cout<< "_____NUOVA_RIGA______\n";
     for(auto x : _symbols){
         for(auto y : *x){
-            for(auto k : y.getPosition())
-                  cout << k << " ";
+            for(auto k : y.getPosition()){
+                cout << y.getValue();
+                cout <<" "<<k << " ";}
              cout<<endl;
         }
         cout<< "_____NUOVA_RIGA______\n";
