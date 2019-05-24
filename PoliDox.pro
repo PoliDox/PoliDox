@@ -8,9 +8,11 @@ INSTALLS += target
 
 HEADERS += \
     CRDTclient.h \
-    editor.h
+    editor.h \
+    symbol.h
 
 SOURCES += \
     CRDTclient.cpp \
     editor.cpp \
-    main.cpp
+    main.cpp \
+    symbol.cpp
