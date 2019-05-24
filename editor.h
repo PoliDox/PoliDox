@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QTextDocument>
-#include "clientcrdt.h"
+#include "CRDTclient.h"
 
 
 class Editor : public QMainWindow
@@ -20,7 +20,7 @@ public slots:
 private:
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
-    ClientCRDT ed;
+    CRDTclient ed;
 };
 
 #endif // EDITOR_H

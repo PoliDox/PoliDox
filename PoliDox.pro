@@ -7,10 +7,10 @@ QT += gui
 INSTALLS += target
 
 HEADERS += \
-    clientcrdt.h \
+    CRDTclient.h \
     editor.h
 
 SOURCES += \
-    clientcrdt.cpp \
+    CRDTclient.cpp \
     editor.cpp \
     main.cpp

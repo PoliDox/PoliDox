@@ -2,10 +2,10 @@
 #define CLIENTCRDT_H
 
 
-class ClientCRDT
+class CRDTclient
 {
 public:
-    ClientCRDT();
+    CRDTclient();
 
     void localInsert(int position, char character);
 };
