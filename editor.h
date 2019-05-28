@@ -20,7 +20,9 @@ public slots:
 private:
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
-    CRDTclient ed;
+    CRDTclient m_crdt;
+
+    QTextCursor *m_remoteCursor;
 };
 
 #endif // EDITOR_H

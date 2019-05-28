@@ -23,7 +23,7 @@ public:
     CRDTclient();
 
     void localInsert(int index, char value);
-    void localErase(int index);
+    void localDelete(int index);
     //void process(const Message& m);
     std::string toString();
 

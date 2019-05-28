@@ -159,12 +159,13 @@ void CRDTclient::localInsert(int index, char value) {
 
 }
 
-void CRDTclient::localErase(int index) {
+void CRDTclient::localDelete(int index) {
     /* TODO -controllare se effettivamente il Symbol(l'oggetto) viene
      * TODO cancellato. Controllare anche nelle altre parti del codice
      * TODO se ci sono memory leak o cose simili. */
     Symbol symbolErased = this->symbols[index];
     this->symbols.erase(this->symbols.begin()+index);
+    printSymbols();
 }
 
 /*
@@ -232,7 +233,7 @@ std::string CRDTclient::toString() {
 
 void CRDTclient::printSymbols()
 {
-    qDebug() << "-------------";
+    std::cout << "-------------" << std::endl;
     for (int i=0; i<symbols.size(); i++)
     {
         std::cout << "'" << symbols.at(i).getValue() << "' |";
