@@ -109,8 +109,6 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 /* 1- costruisco un symbol e genero la sua fractionalPosition */
 void CRDTclient::localInsert(int index, char value) {
 
-    qDebug() << "Ciao Nino";
-
     Symbol symbolToInsert(value, this->getSiteId(), this->getCounterAndIncrement());
     int symbolsSize = this->symbols.size();
     if(index == 0){
@@ -153,6 +151,12 @@ void CRDTclient::localInsert(int index, char value) {
             this->symbols.insert(this->symbols.begin()+index, symbolToInsert);
         }
     }
+
+
+    // only for debug purposes
+    printSymbols();
+
+
 }
 
 void CRDTclient::localErase(int index) {
@@ -226,11 +230,21 @@ std::string CRDTclient::toString() {
 }
 
 
+void CRDTclient::printSymbols()
+{
+    qDebug() << "-------------";
+    for (int i=0; i<symbols.size(); i++)
+    {
+        std::cout << "'" << symbols.at(i).getValue() << "' |";
+        std::vector<int> l_pos = symbols.at(i).getFractionalPosition();
+        for (int j=0; j<l_pos.size(); j++)
+        {
+            std::cout << " " << l_pos.at(j);
+        }
+        std::cout << std::endl;
+    }
+}
 
-/* ATTENZIONE: Il server va inizializzato per
- * forza in questo modo, non posso fare
- * this->server=server nel costruttore, perché
- * essendo reference questo non mi è concesso */
 CRDTclient::CRDTclient() {
     //TODO il vettore di simboli inizialmente è vuoto??
     this->counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?

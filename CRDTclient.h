@@ -17,6 +17,8 @@ private:
     int counter;
     std::vector<Symbol> symbols;
 
+    void printSymbols();
+
 public:
     CRDTclient();
 
