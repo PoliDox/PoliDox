@@ -15,7 +15,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent)
             m_crdt.localInsert(position, car.toLatin1());
         } else {            
             //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            m_crdt.localDelete(position);
+            //m_crdt.localDelete(position);
         }
     });
 

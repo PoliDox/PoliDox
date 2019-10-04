@@ -8,21 +8,24 @@
 
 #include <string>
 #include <vector>
-#include "symbol.h"
+#include "Char.h"
 
 /* modella un'istanza di un editor condiviso */
 class CRDTclient {
-private:
-    int siteId;
-    int counter;
-    std::vector<Symbol> symbols;
 
+private:
+    int _siteID;
+    int _counter;
+    std::vector<std::vector<Char>> _symbols;
+
+    void _toMatrix(int position,int* row,int* index);
     void printSymbols();
 
 public:
     CRDTclient();
 
-    void localInsert(int index, char value);
+
+    void localInsert(int position, char value);
     void localDelete(int index);
     //void process(const Message& m);
     std::string toString();
@@ -30,7 +33,6 @@ public:
     int getSiteId();
     int getCounter();
     int getCounterAndIncrement();
-    std::vector<Symbol> getSymbols();
 
 };
 

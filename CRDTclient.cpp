@@ -9,6 +9,30 @@
 
 #define MAXNUM 100
 
+void CRDTclient::_toMatrix(int position,int* row,int* index){
+
+    int totalLenght=0,
+        row_counter=0;
+
+    auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
+
+
+        if(position < matrix_row.size())
+            return true;
+        else{
+        totalLenght+=matrix_row.size();
+            return false;
+        }
+    });
+
+    *row=row_counter;
+
+    if(row_counter>0)
+        *index=position-totalLenght;
+    else
+        *index=position;    //se sono alla prima riga parto da totalLenght=0
+}
+
 bool existsPositionInVector(int position, std::vector<int> vector) {
     if(position < vector.size())
         return true;
@@ -106,132 +130,108 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 }
 
-/* 1- costruisco un symbol e genero la sua fractionalPosition */
-void CRDTclient::localInsert(int index, char value) {
+/* position è il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
-    Symbol symbolToInsert(value, this->getSiteId(), this->getCounterAndIncrement());
-    int symbolsSize = this->symbols.size();
+void CRDTclient::localInsert(int position, char value) {
+
+   //TODO fare conversione position -> row,index
+    int row=0,
+        index=0;
+
+    this->_toMatrix(position,&row,&index);
+
+    Char symbolToInsert(value, this->_siteID, this->_counter);
+
+    /* no more symbolsSyze needed, it's the row size */
+    //int symbolsSize = this->_symbols[row]->size();
+    int rowSize=this->_symbols[row].size();
+
+
+    int middleNewLine=0;
+
+    if(value=='\n') {
+        if (index == this->_symbols[row].size() - 1)
+            this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());  /* allocate pointer for new line */
+        else{
+            middleNewLine=1;
+        }
+    }
+
+
+
     if(index == 0){
-        if(symbolsSize == 0){
+        if(rowSize == 0){
+            std::vector<int> precedingFractionalNumber;
             //è il primo elemento che inserisco
             std::vector<int> firstElem{MAXNUM/2};
+            std::vector<int> fakeVector{MAXNUM};
+            if(row!=0){
+                precedingFractionalNumber = this->_symbols[row - 1].at(this->_symbols[row - 1].size() - 1).getFractionalPosition();
+                std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber,fakeVector);
+                symbolToInsert.setFractionalPosition(newFractionalPosition);
+                this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
 
+            }else{
             symbolToInsert.setFractionalPosition(firstElem);
-            this->symbols.insert(this->symbols.begin()+index, symbolToInsert);
+            this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);}
         }
         else {
             //ho degli elementi dopo di me
-            std::vector<int> followingFractionalNumber = this->symbols[0].getFractionalPosition();
-            std::vector<int> fakeVector{0};
-            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(fakeVector, followingFractionalNumber);
+            std::vector<int> precedingFractionalNumber;
+            if(row!=0)
+                precedingFractionalNumber = this->_symbols[row-1].at(this->_symbols[row-1].size()-1).getFractionalPosition();
+            else
+                 precedingFractionalNumber.push_back(0); //sarebbe il fake vector
 
+            std::vector<int> followingFractionalNumber = this->_symbols[row].at(0).getFractionalPosition();
+            std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
-            this->symbols.insert(this->symbols.begin()+index, symbolToInsert);
+            this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
     }
     else {
         //sicuramente avrò un simbolo prima di me
-        if(index >= symbolsSize){  //TODO controllare bene il confronto
+        if(index >= rowSize){  //TODO controllare bene il confronto
             //non ho nessuno dopo di me
-            index = symbolsSize;  //inserisco in append
-            std::vector<int> precedingFractionalNumber = this->symbols[index-1].getFractionalPosition();
+            index = rowSize;  //inserisco in append
+            std::vector<int> precedingFractionalNumber = this->_symbols[row].at(index-1).getFractionalPosition();
             std::vector<int> fakeVector{MAXNUM};
 
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, fakeVector);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
-            this->symbols.insert(this->symbols.begin()+index, symbolToInsert);
+            this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
         else {
             //sono fra due simboli
-            std::vector<int> precedingFractionalNumber = this->symbols[index-1].getFractionalPosition();
-            std::vector<int> followingFractionalNumber = this->symbols[index].getFractionalPosition();
+            std::vector<int> precedingFractionalNumber = this->_symbols[row].at(index-1).getFractionalPosition();
+            std::vector<int> followingFractionalNumber = this->_symbols[row].at(index).getFractionalPosition();
 
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
-            this->symbols.insert(this->symbols.begin()+index, symbolToInsert);
+            this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
     }
 
-
-    // only for debug purposes
-    printSymbols();
-
-
-}
-
-void CRDTclient::localDelete(int index) {
-    /* TODO -controllare se effettivamente il Symbol(l'oggetto) viene
-     * TODO cancellato. Controllare anche nelle altre parti del codice
-     * TODO se ci sono memory leak o cose simili. */
-    Symbol symbolErased = this->symbols[index];
-    this->symbols.erase(this->symbols.begin()+index);
-    printSymbols();
-}
-
-/*
-void CRDTclient::process() {
-
-    if(isInserimento){
-        int i;
-        Symbol symbolToInsert = messageToProcess.getSymbolToSend();
-        for(i=0; i<this->symbols.size(); i++){
-            Symbol currentSymbol = this->symbols[i];
-            if(currentSymbol.getFractionalPosition() == symbolToInsert.getFractionalPosition()){
-                //se hanno la stessa posizione frazionaria,
-                //scelgo di dare sempre la precedenza al symbolo
-                //il cui siteId è minore
-                if(this->getSiteId() < symbolToInsert.getIdOfClient())
-                    this->symbols.insert(this->symbols.begin()+i, symbolToInsert);
-                else
-                    this->symbols.insert(this->symbols.begin()+i+1, symbolToInsert);
-                return;
-            }
-
-            if(currentSymbol.getFractionalPosition() > symbolToInsert.getFractionalPosition()){
-                this->symbols.insert(this->symbols.begin()+i, symbolToInsert);
-                return;
-            }
-        }
-
-        this->symbols.insert(this->symbols.begin()+i, messageToProcess.getSymbolToSend());
-        return;
-    }
-    else {
-        //è una cancellazione
-        int i;
-        Symbol symbolToErase = messageToProcess.getSymbolToSend();
-        for(i=0; i<this->symbols.size(); i++){
-
-            Symbol currentSymbol = this->symbols[i];
-
-            if(currentSymbol.getFractionalPosition() == symbolToErase.getFractionalPosition()
-            && currentSymbol.getUniqueId() == symbolToErase.getUniqueId()){
-                this->symbols.erase(this->symbols.begin()+i);
-                return;
-            }
-
-            if(currentSymbol.getFractionalPosition() > symbolToErase.getFractionalPosition())
-                return;
-        }
+    if(middleNewLine==1) {
+        this->_symbols.insert(this->_symbols.begin() + (row + 1),
+                               vector<Char>(this->_symbols[row].begin() + index + 1, this->_symbols[row].end()));
+        this->_symbols[row].erase(this->_symbols[row].begin() + index + 1, this->_symbols[row].end());
 
     }
 
-}
-*/
+    std::cout<<"Added symbol "<< value <<" position: [";
+    for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
+        std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
+    std::cout<<"]"<<std::endl;
 
-/* ricostruisce la sequenza di caratteri
- * contenuta nell'editor */
-std::string CRDTclient::toString() {
-    std::string carSequence;
-    int i;
-    for(i=0; i<this->symbols.size(); i++){
-        carSequence.insert(i, 1, this->symbols[i].getValue());
-    }
-    return carSequence;
+    /* Numero frazionario generato e simbolo inserito.
+     * Generare ora il Message da spedire */
+    //Message messageToSend(true, symbolToInsert, this);
+    //this->server.send(messageToSend);
 }
 
 
-void CRDTclient::printSymbols()
+/*void CRDTclient::printSymbols()
 {
     std::cout << "-------------" << std::endl;
     for (int i=0; i<symbols.size(); i++)
@@ -244,27 +244,24 @@ void CRDTclient::printSymbols()
         }
         std::cout << std::endl;
     }
-}
+}*/
 
 CRDTclient::CRDTclient() {
     //TODO il vettore di simboli inizialmente è vuoto??
-    this->counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+    this->_symbols=std::vector<std::vector<Char>>(1);
+    this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
 }
 
 int CRDTclient::getSiteId() {
-    return this->siteId;
+    return this->_siteID;
 }
 
 int CRDTclient::getCounterAndIncrement() {
-    int oldCounter = this->counter;
-    this->counter++;
+    int oldCounter = this->_counter;
+    this->_counter++;
     return oldCounter;
 }
 
-std::vector<Symbol> CRDTclient::getSymbols(){
-    return this->symbols;
-}
-
 int CRDTclient::getCounter() {
-    return this->counter;
+    return this->_counter;
 }
