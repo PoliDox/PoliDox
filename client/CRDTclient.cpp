@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <QDebug>
+#include <QObject>
 
 #define MAXNUM 100
 
@@ -109,6 +110,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 /* 1- costruisco un symbol e genero la sua fractionalPosition */
 void CRDTclient::localInsert(int index, char value) {
 
+    m_socket.sendTextMessage("abbellodemamma");
     Symbol symbolToInsert(value, this->getSiteId(), this->getCounterAndIncrement());
     int symbolsSize = this->symbols.size();
     if(index == 0){
@@ -249,6 +251,9 @@ void CRDTclient::printSymbols()
 CRDTclient::CRDTclient() {
     //TODO il vettore di simboli inizialmente è vuoto??
     m_socket.open(QUrl(QStringLiteral("ws://localhost:5678")));
+    QObject::connect(&m_socket, &QWebSocket::textMessageReceived, [&](const QString &message) {
+       qDebug() << "Message received:" << message;
+    });
     this->counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
 }
 
