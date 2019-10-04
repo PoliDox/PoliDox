@@ -1,7 +1,7 @@
 QT += widgets
 
 TEMPLATE        = app
-TARGET          = polidox
+TARGET          = polidox-client
 QT += gui
 
 INSTALLS += target
