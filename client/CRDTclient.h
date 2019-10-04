@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include "symbol.h"
+#include <QWebSocket>
 
 /* modella un'istanza di un editor condiviso */
 class CRDTclient {
@@ -16,6 +17,7 @@ private:
     int siteId;
     int counter;
     std::vector<Symbol> symbols;
+    QWebSocket m_socket;
 
     void printSymbols();
 

@@ -248,6 +248,7 @@ void CRDTclient::printSymbols()
 
 CRDTclient::CRDTclient() {
     //TODO il vettore di simboli inizialmente è vuoto??
+    m_socket.open(QUrl(QStringLiteral("ws://localhost:5678")));
     this->counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
 }
 

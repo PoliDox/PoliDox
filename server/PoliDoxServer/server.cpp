@@ -18,6 +18,8 @@ Server::Server(quint16 port, QObject *parent) :
         QTextStream(stdout) << "Chat Server listening on port " << port << '\n';
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Server::onNewConnection);
+    } else {
+        qDebug() << m_pWebSocketServer->errorString();
     }
 }
 
