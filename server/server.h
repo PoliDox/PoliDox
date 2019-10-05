@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QWebSocketServer>
 #include <QWebSocket>
+#include "servercontroller.h"
 
 class Server : public QObject
 {
@@ -12,14 +13,10 @@ public:
     explicit Server(quint16 port, QObject *parent = nullptr);
     virtual ~Server();
 
-private slots:
-    void onNewConnection();
-    void processMessage(const QString &message);
-    void socketDisconnected();
-
 private:
     QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
+    ServerController m_controller; // TODO: should be a container (multiple files open)
+
 };
 
 #endif // SERVER_H
