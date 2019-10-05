@@ -1,10 +1,6 @@
 #ifndef CLIENTCRDT_H
 #define CLIENTCRDT_H
 
-//
-// Created by federico on 06/05/19.
-//
-
 
 #include <string>
 #include <vector>
@@ -40,7 +36,7 @@ public:
     int getCounterAndIncrement();
 
 signals:
-    void onLocalInsert(); // TODO: Add parameters
+    void onLocalInsert(Char symbol); // TODO: Add parameters
 
 };
 

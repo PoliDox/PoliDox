@@ -232,7 +232,7 @@ void CRDTclient::localInsert(int position, char value) {
      * Generare ora il Message da spedire */
     //Message messageToSend(true, symbolToInsert, this);
     //this->server.send(messageToSend);
-    emit onLocalInsert();
+    emit onLocalInsert(symbolToInsert);
 }
 
 int CRDTclient::getSiteId() {

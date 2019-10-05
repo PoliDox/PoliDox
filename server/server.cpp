@@ -38,15 +38,24 @@ Server::~Server()
     m_pWebSocketServer->close();
 }
 
+
 void Server::onNewConnection()
 {
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
     QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
     tDocument l_document = m_documents.at(0);
+
+    //enable messages receiving and forward it to the server controller
     connect(l_socket, &QWebSocket::textMessageReceived,l_document.controller, &ServerController::messageReceived);
+
+    //to delete
+    //connect(l_socket,&QWebSocket::textMessageReceived,l_document.controller,&ServerController::messageRec);
+
+    //TODO check queued connection instead of connecting two signal to avoid thread affinity
     connect(l_document.controller, &ServerController::messageSent, this, [&](QWebSocket *p_socket, const QString p_msg){
        p_socket->sendTextMessage(p_msg);
     });
+
     QMetaObject::invokeMethod(l_document.controller, "addClient",
                               Qt::QueuedConnection, Q_ARG(QWebSocket*, l_socket));
 }

@@ -24,6 +24,11 @@ public:
     explicit Server(quint16 port, QObject *parent = nullptr);
     virtual ~Server();
 
+/* ======================================================================
+   The slot is connected to the newConnection signal emitted by the
+   QTwebSocket when a new client connects.
+   ======================================================================
+*/
 public slots:
     void onNewConnection();
 

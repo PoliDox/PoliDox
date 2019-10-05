@@ -13,6 +13,7 @@ void ServerController::addClient(QWebSocket *p_socket)
     //connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
     connect(this, &ServerController::messageReceived, this, [&](const QString& p_message) {
         for (QWebSocket *l_client : m_clients) {
+            QTextStream(stdout) << p_message << " connected!\n";
             // TODO: restore this
             // if (l_client != pSender) //don't echo message back to sender
             emit messageSent(l_client, p_message);
@@ -30,3 +31,8 @@ void ServerController::addClient(QWebSocket *p_socket)
     });
     */
 }
+
+//to delete
+/*void ServerController::messageRec(QString mex){
+
+}*/
