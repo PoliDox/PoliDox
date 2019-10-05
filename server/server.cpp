@@ -43,9 +43,10 @@ void Server::onNewConnection()
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
     QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
     tDocument l_document = m_documents.at(0);
-    l_socket->moveToThread(l_document.worker);
-    // connect(l_socket, &QWebSocket::textMessageReceived,l_document.controller, &ServerController::messageReceived);
-    // TODO: invokeMethod would be much better!
+    connect(l_socket, &QWebSocket::textMessageReceived,l_document.controller, &ServerController::messageReceived);
+    connect(l_document.controller, &ServerController::messageSent, this, [&](QWebSocket *p_socket, const QString p_msg){
+       p_socket->sendTextMessage(p_msg);
+    });
     QMetaObject::invokeMethod(l_document.controller, "addClient",
                               Qt::QueuedConnection, Q_ARG(QWebSocket*, l_socket));
 }

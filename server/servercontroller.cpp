@@ -8,19 +8,14 @@ ServerController::ServerController()
 
 void ServerController::addClient(QWebSocket *p_socket)
 {
-    m_clients << p_socket;
-    qDebug() << "Clients:";
-    for (QWebSocket *pClient : m_clients) {
-        qDebug() << "client in " << pClient->thread()->objectName();
-    }
+    m_clients << p_socket;    
 
-    //connect(this, &ServerController::messageReceived, this, [&](const QString& p_message) {
-    connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
-        qDebug() << "Executing addClient in " << QThread::currentThread()->objectName();
-        QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
-        for (QWebSocket *pClient : m_clients) {
-            if (pClient != pSender) //don't echo message back to sender
-                pClient->sendTextMessage(p_message);
+    //connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
+    connect(this, &ServerController::messageReceived, this, [&](const QString& p_message) {
+        for (QWebSocket *l_client : m_clients) {
+            // TODO: restore this
+            // if (l_client != pSender) //don't echo message back to sender
+            emit messageSent(l_client, p_message);
         }
     });
 
