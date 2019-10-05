@@ -10,6 +10,12 @@
 
 #define MAXNUM 100
 
+CRDTclient::CRDTclient(ClientController *p_controller) : m_controller(p_controller) {
+    //TODO il vettore di simboli inizialmente è vuoto??
+    this->_symbols=std::vector<std::vector<Char>>(1);
+    this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+}
+
 void CRDTclient::_toMatrix(int position,int* row,int* index){
 
     int totalLenght=0,
@@ -135,7 +141,6 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 void CRDTclient::localInsert(int position, char value) {
 
-    m_socket.sendTextMessage("abbellodemamma");
    //TODO fare conversione position -> row,index
     int row=0,
         index=0;
@@ -230,6 +235,7 @@ void CRDTclient::localInsert(int position, char value) {
      * Generare ora il Message da spedire */
     //Message messageToSend(true, symbolToInsert, this);
     //this->server.send(messageToSend);
+    emit onLocalInsert();
 }
 
 
@@ -247,12 +253,6 @@ void CRDTclient::localInsert(int position, char value) {
         std::cout << std::endl;
     }
 }*/
-
-CRDTclient::CRDTclient() {
-    //TODO il vettore di simboli inizialmente è vuoto??
-    this->_symbols=std::vector<std::vector<Char>>(1);
-    this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
-}
 
 int CRDTclient::getSiteId() {
     return this->_siteID;

@@ -13,15 +13,16 @@ class Editor : public QMainWindow
 public:
     explicit Editor(QWidget *parent = nullptr);
 
+    QChar at(int pos);
+
 signals:
+    void textChanged(int position, int charsRemoved, int charsAdded);
 
 public slots:
 
 private:
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
-    CRDTclient m_crdt;
-
     QTextCursor *m_remoteCursor;
 };
 
