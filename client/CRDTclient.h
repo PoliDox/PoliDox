@@ -8,21 +8,26 @@
 
 #include <string>
 #include <vector>
+#include <QWebSocket>
 #include "Char.h"
 
+class ClientController;
+
 /* modella un'istanza di un editor condiviso */
-class CRDTclient {
+class CRDTclient : public QObject {
+    Q_OBJECT
 
 private:
+    ClientController *m_controller;
     int _siteID;
     int _counter;
-    std::vector<std::vector<Char>> _symbols;
+    std::vector<std::vector<Char>> _symbols;    
 
     void _toMatrix(int position,int* row,int* index);
     void printSymbols();
 
 public:
-    CRDTclient();
+    CRDTclient(ClientController *p_controller);
 
 
     void localInsert(int position, char value);
@@ -33,6 +38,9 @@ public:
     int getSiteId();
     int getCounter();
     int getCounterAndIncrement();
+
+signals:
+    void onLocalInsert(); // TODO: Add parameters
 
 };
 

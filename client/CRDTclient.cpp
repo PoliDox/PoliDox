@@ -2,9 +2,15 @@
 #include <iostream>
 #include <string>
 #include <QDebug>
+#include <QObject>
 
 #define MAXNUM 100
 
+CRDTclient::CRDTclient(ClientController *p_controller) : m_controller(p_controller) {
+    //TODO il vettore di simboli inizialmente è vuoto??
+    this->_symbols=std::vector<std::vector<Char>>(1);
+    this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+}
 
 bool existsPositionInVector(int position, std::vector<int> vector) {
     if(position < vector.size())
@@ -226,13 +232,7 @@ void CRDTclient::localInsert(int position, char value) {
      * Generare ora il Message da spedire */
     //Message messageToSend(true, symbolToInsert, this);
     //this->server.send(messageToSend);
-}
-
-
-CRDTclient::CRDTclient() {
-    //TODO il vettore di simboli inizialmente è vuoto??
-    this->_symbols=std::vector<std::vector<Char>>(1);
-    this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+    emit onLocalInsert();
 }
 
 int CRDTclient::getSiteId() {

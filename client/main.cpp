@@ -1,15 +1,15 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
-#include "editor.h"
+#include "clientcontroller.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QCoreApplication::setApplicationName("Rich Text");
+    QCoreApplication::setApplicationName("PoliDox client");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
-    Editor editor;
+    ClientController l_controller;
 
     /*
     const QRect availableGeometry = QApplication::desktop()->availableGeometry(&editor);
@@ -21,6 +21,5 @@ int main(int argc, char *argv[])
         editor.fileNew();
     */
 
-    editor.show();
     return a.exec();
 }
