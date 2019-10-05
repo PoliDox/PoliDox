@@ -7,26 +7,45 @@ static QString getIdentifier(QWebSocket *peer)
 }
 
 Server::Server(quint16 port, QObject *parent) :
-    QObject(parent),
-    m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Polidox Server"),
-                                            QWebSocketServer::NonSecureMode,
-                                            this))
+    QObject(parent)
 {
+    thread()->setObjectName("Main Thread");
+
+    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Polidox Server"),
+                                            QWebSocketServer::NonSecureMode, this);
+
     if (m_pWebSocketServer->listen(QHostAddress::Any, port))
     {
         QTextStream(stdout) << "PoliDox server listening on port " << port << '\n';
-        connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, [&](){
-            QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
-            QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
-            m_controller.addClient(l_socket);
-        });
+        connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &Server::onNewConnection);
 
     } else {
         qDebug() << m_pWebSocketServer->errorString();
     }
+
+    // TEST: Initialize the open document list with an empty document
+    tDocument l_document{new ServerController(), new QThread()};
+    l_document.worker->setObjectName("Default doc thread");
+    l_document.controller->moveToThread(l_document.worker);
+    l_document.worker->start();
+    m_documents << l_document;
+
+
 }
 
 Server::~Server()
 {
     m_pWebSocketServer->close();
+}
+
+void Server::onNewConnection()
+{
+    QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
+    QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
+    tDocument l_document = m_documents.at(0);
+    l_socket->moveToThread(l_document.worker);
+    // connect(l_socket, &QWebSocket::textMessageReceived,l_document.controller, &ServerController::messageReceived);
+    // TODO: invokeMethod would be much better!
+    QMetaObject::invokeMethod(l_document.controller, "addClient",
+                              Qt::QueuedConnection, Q_ARG(QWebSocket*, l_socket));
 }

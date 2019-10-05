@@ -1,4 +1,5 @@
 #include "servercontroller.h"
+#include <QThread>
 
 ServerController::ServerController()
 {
@@ -8,7 +9,14 @@ ServerController::ServerController()
 void ServerController::addClient(QWebSocket *p_socket)
 {
     m_clients << p_socket;
-    connect(p_socket, &QWebSocket::textMessageReceived, this, [&](const QString& p_message) {
+    qDebug() << "Clients:";
+    for (QWebSocket *pClient : m_clients) {
+        qDebug() << "client in " << pClient->thread()->objectName();
+    }
+
+    //connect(this, &ServerController::messageReceived, this, [&](const QString& p_message) {
+    connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
+        qDebug() << "Executing addClient in " << QThread::currentThread()->objectName();
         QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
         for (QWebSocket *pClient : m_clients) {
             if (pClient != pSender) //don't echo message back to sender
@@ -16,6 +24,7 @@ void ServerController::addClient(QWebSocket *p_socket)
         }
     });
 
+    /*
     connect(p_socket, &QWebSocket::disconnected, this, [&](){
         QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
         if (pClient)
@@ -24,5 +33,5 @@ void ServerController::addClient(QWebSocket *p_socket)
             pClient->deleteLater();
         }
     });
-
+    */
 }

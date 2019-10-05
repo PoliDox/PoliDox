@@ -7,14 +7,21 @@
 
 class ServerController : public QObject
 {
+    Q_OBJECT
+
+private:
+    QList<QWebSocket *> m_clients;
+
 public:
     ServerController();
 
+signals:
+    void messageReceived(const QString& p_message);
+
+public slots:
     void addClient(QWebSocket *p_socket);
 
-private:
 
-    QList<QWebSocket *> m_clients;
 };
 
 #endif // SERVERCONTROLLER_H
