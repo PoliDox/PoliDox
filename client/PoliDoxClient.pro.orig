@@ -2,7 +2,11 @@ QT += widgets
 
 TEMPLATE        = app
 TARGET          = polidox-client
+<<<<<<< HEAD:client/PoliDoxClient.pro
 QT += gui websockets
+=======
+QT += gui
+>>>>>>> Gabriele:client/PoliDoxClient.pro
 
 INSTALLS += target
 

@@ -135,7 +135,6 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 void CRDTclient::localInsert(int position, char value) {
 
-    m_socket.sendTextMessage("abbellodemamma");
    //TODO fare conversione position -> row,index
     int row=0,
         index=0;
@@ -161,6 +160,12 @@ void CRDTclient::localInsert(int position, char value) {
 
 
 
+<<<<<<< HEAD:client/CRDTclient.cpp
+    m_socket.sendTextMessage("abbellodemamma");
+    Symbol symbolToInsert(value, this->getSiteId(), this->getCounterAndIncrement());
+    int symbolsSize = this->symbols.size();
+=======
+>>>>>>> Gabriele:client/CRDTclient.cpp
     if(index == 0){
         if(rowSize == 0){
             std::vector<int> precedingFractionalNumber;
@@ -250,8 +255,16 @@ void CRDTclient::localInsert(int position, char value) {
 
 CRDTclient::CRDTclient() {
     //TODO il vettore di simboli inizialmente è vuoto??
+<<<<<<< HEAD:client/CRDTclient.cpp
+    m_socket.open(QUrl(QStringLiteral("ws://localhost:5678")));
+    QObject::connect(&m_socket, &QWebSocket::textMessageReceived, [&](const QString &message) {
+       qDebug() << "Message received:" << message;
+    });
+    this->counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+=======
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+>>>>>>> Gabriele:client/CRDTclient.cpp
 }
 
 int CRDTclient::getSiteId() {

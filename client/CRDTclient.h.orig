@@ -8,17 +8,27 @@
 
 #include <string>
 #include <vector>
-#include "Char.h"
+<<<<<<< HEAD:client/CRDTclient.h
+#include "symbol.h"
 #include <QWebSocket>
+=======
+#include "Char.h"
+>>>>>>> Gabriele:client/CRDTclient.h
 
 /* modella un'istanza di un editor condiviso */
 class CRDTclient {
 
 private:
+<<<<<<< HEAD:client/CRDTclient.h
+    int siteId;
+    int counter;
+    std::vector<Symbol> symbols;
+    QWebSocket m_socket;
+=======
     int _siteID;
     int _counter;
     std::vector<std::vector<Char>> _symbols;
-    QWebSocket m_socket;
+>>>>>>> Gabriele:client/CRDTclient.h
 
     void _toMatrix(int position,int* row,int* index);
     void printSymbols();
