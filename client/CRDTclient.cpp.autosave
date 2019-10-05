@@ -142,7 +142,7 @@ void CRDTclient::localInsert(int position, char value) {
 
     /* no more symbolsSyze needed, it's the row size */
     //int symbolsSize = this->_symbols[row]->size();
-    unsigned long rowSize=this->_symbols[row].size();
+    int rowSize=this->_symbols[row].size();
 
 
     int middleNewLine=0;
