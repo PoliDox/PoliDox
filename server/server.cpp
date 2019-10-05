@@ -6,7 +6,6 @@ static QString getIdentifier(QWebSocket *peer)
                                        QString::number(peer->peerPort()));
 }
 
-//! [constructor]
 Server::Server(quint16 port, QObject *parent) :
     QObject(parent),
     m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Polidox Server"),

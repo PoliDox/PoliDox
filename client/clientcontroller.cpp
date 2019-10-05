@@ -17,11 +17,14 @@ ClientController::ClientController()
 
     connect(m_crdt, &CRDTclient::onLocalInsert, this, [&](){
         // TODO: create message
-        qDebug() << "Creating message";
         m_socket.sendTextMessage("abbellodemamma");
     });
 
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
+    connect(&m_socket,&QWebSocket::textMessageReceived, [&](const QString& p_message){
+       qDebug() << "Message received:" << p_message;
+    });
+
     m_editor.show();
 }
 

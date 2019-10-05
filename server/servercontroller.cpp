@@ -9,9 +9,8 @@ void ServerController::addClient(QWebSocket *p_socket)
 {
     m_clients << p_socket;
     connect(p_socket, &QWebSocket::textMessageReceived, this, [&](const QString& p_message) {
-        qDebug() << "Message received";
         QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
-        for (QWebSocket *pClient : qAsConst(m_clients)) {
+        for (QWebSocket *pClient : m_clients) {
             if (pClient != pSender) //don't echo message back to sender
                 pClient->sendTextMessage(p_message);
         }
