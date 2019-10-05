@@ -17,6 +17,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CRDTclient::onLocalInsert, this, [&](){
         // TODO: create message
+        qDebug() << "Creating message";
         m_socket.sendTextMessage("abbellodemamma");
     });
 

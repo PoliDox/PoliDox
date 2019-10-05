@@ -9,7 +9,7 @@ static QString getIdentifier(QWebSocket *peer)
 //! [constructor]
 Server::Server(quint16 port, QObject *parent) :
     QObject(parent),
-    m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Chat Server"),
+    m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Polidox Server"),
                                             QWebSocketServer::NonSecureMode,
                                             this))
 {
