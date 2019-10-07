@@ -1,7 +1,3 @@
-//
-// Created by federico on 06/05/19.
-//
-
 #include "CRDTclient.h"
 #include <iostream>
 #include <string>
@@ -14,30 +10,6 @@ CRDTclient::CRDTclient(ClientController *p_controller) : m_controller(p_controll
     //TODO il vettore di simboli inizialmente è vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
-}
-
-void CRDTclient::_toMatrix(int position,int* row,int* index){
-
-    int totalLenght=0,
-        row_counter=0;
-
-    auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
-
-
-        if(position < matrix_row.size())
-            return true;
-        else{
-        totalLenght+=matrix_row.size();
-            return false;
-        }
-    });
-
-    *row=row_counter;
-
-    if(row_counter>0)
-        *index=position-totalLenght;
-    else
-        *index=position;    //se sono alla prima riga parto da totalLenght=0
 }
 
 bool existsPositionInVector(int position, std::vector<int> vector) {
@@ -137,6 +109,31 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 }
 
+void CRDTclient::_toMatrix(int position,int* row,int* index){
+
+    int totalLenght=0,
+        row_counter=0;
+
+    auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
+
+
+        if(position < matrix_row.size())
+            return true;
+        else{
+        totalLenght+=matrix_row.size();
+            return false;
+        }
+    });
+
+    *row=row_counter;
+
+    if(row_counter>0)
+        *index=position-totalLenght;
+    else
+        *index=position;    //se sono alla prima riga parto da totalLenght=0
+}
+
+
 /* position è il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
 void CRDTclient::localInsert(int position, char value) {
@@ -151,7 +148,7 @@ void CRDTclient::localInsert(int position, char value) {
 
     /* no more symbolsSyze needed, it's the row size */
     //int symbolsSize = this->_symbols[row]->size();
-    int rowSize=this->_symbols[row].size();
+    unsigned long rowSize=this->_symbols[row].size();
 
 
     int middleNewLine=0;
@@ -235,24 +232,8 @@ void CRDTclient::localInsert(int position, char value) {
      * Generare ora il Message da spedire */
     //Message messageToSend(true, symbolToInsert, this);
     //this->server.send(messageToSend);
-    emit onLocalInsert();
+    emit onLocalInsert(symbolToInsert);
 }
-
-
-/*void CRDTclient::printSymbols()
-{
-    std::cout << "-------------" << std::endl;
-    for (int i=0; i<symbols.size(); i++)
-    {
-        std::cout << "'" << symbols.at(i).getValue() << "' |";
-        std::vector<int> l_pos = symbols.at(i).getFractionalPosition();
-        for (int j=0; j<l_pos.size(); j++)
-        {
-            std::cout << " " << l_pos.at(j);
-        }
-        std::cout << std::endl;
-    }
-}*/
 
 int CRDTclient::getSiteId() {
     return this->_siteID;

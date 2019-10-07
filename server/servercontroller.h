@@ -23,6 +23,9 @@ signals:
 public slots:
     void addClient(QWebSocket *p_socket);
 
+    //to delete
+    //void messageRec(const QString mex);
+
 
 };
 
