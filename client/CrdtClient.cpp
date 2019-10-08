@@ -223,10 +223,12 @@ void CRDTclient::localInsert(int position, char value) {
 
     }
 
-    std::cout<<"Added symbol "<< value <<" position: [";
+    std::cout<<"Added symbol "<< value <<" position: [ ";
     for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
     std::cout<<"]"<<std::endl;
+
+    std::cout<<"Parsing symbol to Json ..."<< std::endl;
 
     emit onLocalInsert(symbolToInsert);
 }

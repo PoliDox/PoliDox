@@ -45,12 +45,13 @@ Char Char::read(const QString& _JSONstring){
 
         QJsonArray _JSONpos=_JSONobj["position"].toArray();
 
+        std::cout << "Remote insert of symbol "<< value[0].toLatin1() <<" at position [ ";
         for(QJsonArray::iterator it=_JSONpos.begin();it!=_JSONpos.end();it++){
             position.push_back(it->toInt());
-            std::cout<< it->toInt() << std::endl;
-
+            std::cout<< it->toInt() <<" ";
         }
 
+        std::cout << "]\n\n" << std::endl;
         Char symbol(siteId,counter,value[0].toLatin1());
         symbol.setFractionalPosition(position);
 

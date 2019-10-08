@@ -52,7 +52,7 @@ ClientController::ClientController()
 
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket,&QWebSocket::textMessageReceived, [&](const QString& _JSONstring){
-       qDebug() << "Message received:";
+       std::cout<< "Message received:"<<std::endl;
 
        //TODO Here the message sent from the server must be unmarshalled and a symbol must be create
        Char symbol=Char::read(_JSONstring);
