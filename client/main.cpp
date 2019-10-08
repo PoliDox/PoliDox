@@ -1,7 +1,7 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
-#include "CLIENTcontroller.h"
+#include "ClientController.h"
 
 int main(int argc, char *argv[])
 {

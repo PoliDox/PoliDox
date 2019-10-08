@@ -1,4 +1,4 @@
-#include "CLIENTcontroller.h"
+#include "ClientController.h"
 
 ClientController::ClientController()
 {

@@ -1,4 +1,4 @@
-#include "server.h"
+#include "Server.h"
 
 static QString getIdentifier(QWebSocket *peer)
 {

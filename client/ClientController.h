@@ -4,8 +4,9 @@
 #include <QObject>
 #include <QWebSocket>
 #include <QJsonObject>
-#include "CRDTclient.h"
-#include "editor.h"
+#include "CrdtClient.h"
+#include "Editor.h"
+
 
 /* ========================================================================================
    This class has:

@@ -1,4 +1,4 @@
-#include "CRDTclient.h"
+#include "CrdtClient.h"
 #include <iostream>
 #include <string>
 #include <QDebug>
