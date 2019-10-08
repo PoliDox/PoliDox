@@ -6,6 +6,10 @@
 #define POLIDOX_CHAR_H
 
 #include <vector>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <iostream>
 
 using namespace std;
 
@@ -24,6 +28,10 @@ public:
     char getValue();
     void setFractionalPosition(vector<int> fractionalPosition);
     vector<int> getFractionalPosition();
+
+    // used by the CLIENTcontroller to create the message to be sent to the server
+    QJsonDocument write(const QString &action );
+    static Char read(const QString& _JSONstring);
 };
 
 

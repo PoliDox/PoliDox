@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QList>
 #include <QWebSocket>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <iostream>
 
 class ServerController : public QObject
 {
@@ -18,7 +22,7 @@ public:
 signals:
     void messageReceived(const QString p_msg);
 
-    void messageSent(QWebSocket *p_socket, const QString p_msg);
+    void messageSent(QWebSocket *p_socket, const QString message);
 
 public slots:
     void addClient(QWebSocket *p_socket);
