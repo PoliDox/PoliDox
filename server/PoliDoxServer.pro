@@ -19,8 +19,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    server.cpp \
-    servercontroller.cpp
+    Server.cpp \
+    ServerController.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -28,5 +28,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    server.h \
-    servercontroller.h
+    Server.h \
+    ServerController.h
