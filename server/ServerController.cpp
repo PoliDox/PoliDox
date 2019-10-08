@@ -1,4 +1,4 @@
-#include "servercontroller.h"
+#include "ServerController.h"
 #include <QThread>
 
 ServerController::ServerController()

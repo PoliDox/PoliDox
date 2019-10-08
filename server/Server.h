@@ -5,7 +5,7 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QThread>
-#include "servercontroller.h"
+#include "ServerController.h"
 
 struct tDocument {
     ServerController *controller;
