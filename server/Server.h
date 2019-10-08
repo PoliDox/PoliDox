@@ -7,18 +7,13 @@
 #include <QThread>
 #include "ServerController.h"
 
-struct tDocument {
-    ServerController *controller;
-    QThread *worker;
-};
-
 class Server : public QObject
 {
     Q_OBJECT
 
 private:
     QWebSocketServer *m_pWebSocketServer;
-    QVector<tDocument> m_documents;
+    QMap<QString, ServerController*> m_documents;
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);

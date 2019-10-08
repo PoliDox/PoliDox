@@ -15,16 +15,8 @@ private:
 public:
     ServerController();
 
-signals:
-    void messageReceived(const QString p_msg);
-
-    void messageSent(QWebSocket *p_socket, const QString p_msg);
-
 public slots:
     void addClient(QWebSocket *p_socket);
-
-    //to delete
-    //void messageRec(const QString mex);
 
 
 };
