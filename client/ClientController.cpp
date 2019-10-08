@@ -6,7 +6,9 @@ ClientController::ClientController()
 
     /* ______________________________________________________________________________________
        takes every character from input and call CRDTclient::localInsert or
-       CRDTclient::localDelete
+       CRDTclient::localDelete.
+
+       //TODO   implementare localDelete.
        ______________________________________________________________________________________      */
 
     connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
@@ -23,11 +25,13 @@ ClientController::ClientController()
 
     /* ______________________________________________________________________________________
        CRDTclient signal onLocalInsert connected to CLIENTcontroller lambda slot.
-       This lamba has to prepare the message that will be sent to the server.
+       This lamba has to prepare the message that will be sent to the server:
+
+       //TODO    gestire eventuale fallimento serializzazione
        ______________________________________________________________________________________      */
 
     connect(m_crdt, &CRDTclient::onLocalInsert, this, [&](Char symbol){
-        // TODO: create message
+
         QJsonDocument _JSONdoc=symbol.write("insert");
 
         QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
@@ -40,7 +44,10 @@ ClientController::ClientController()
 
     /* ______________________________________________________________________________________
        SOCKETsignal connected to CLIENTcontroller lambda in order to catch messages forwarded
-       by server
+       by server.
+
+       //TODO   prima di richiamare la remoteInsert implementare il non rinvio del messaggio
+                al mittente.
        ______________________________________________________________________________________     */
 
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
