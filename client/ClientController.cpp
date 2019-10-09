@@ -2,7 +2,7 @@
 
 ClientController::ClientController()
 {
-    m_crdt = new CRDTclient(this);
+    m_crdt = new CrdtClient(this);
 
     /* ______________________________________________________________________________________
        takes every character from input and call CRDTclient::localInsert or
