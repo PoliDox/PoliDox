@@ -10,17 +10,14 @@ void ServerController::addClient(QWebSocket *p_socket)
 {
     m_clients << p_socket;    
 
-    //connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
-    connect(this, &ServerController::messageReceived, this, [&](const QString& _JSONstring) {
-
-        std::cout << "received a message from a client" << std::endl;
-
+    connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
+    //connect(this, &ServerController::messageReceived, this, [&](const QString& p_message) {
+	std::cout << "received a message from a client" << std::endl;
+        QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
         for (QWebSocket *l_client : m_clients) {
-            //QTextStream(stdout) << p_message << " connected!\n";
-
-            // TODO: restore this
-            // if (l_client != pSender) //don't echo message back to sender
-            emit messageSent(l_client, _JSONstring);
+            if (l_client != pSender) { //don't echo message back to sender
+                l_client->sendTextMessage(p_message);
+            }
         }
     });
 
@@ -35,8 +32,3 @@ void ServerController::addClient(QWebSocket *p_socket)
     });
     */
 }
-
-//to delete
-/*void ServerController::messageRec(QString mex){
-
-}*/
