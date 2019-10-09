@@ -75,6 +75,6 @@ void Char::setFractionalPosition(vector<int> fractionalPosition) {
         this->position = fractionalPosition;
 }
 
-vector<int> Char::getFractionalPosition() {
+vector<int> Char::getFractionalPosition() const {
     return position;
 }

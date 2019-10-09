@@ -27,7 +27,7 @@ public:
     vector<int> getPosition();
     char getValue();
     void setFractionalPosition(vector<int> fractionalPosition);
-    vector<int> getFractionalPosition();
+    vector<int> getFractionalPosition() const;
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonDocument write(const QString &action );

@@ -274,7 +274,33 @@ void CRDTclient::remoteInsert(Char symbol){
 
 };
 
+/*void CRDTclient::localDelete(const Char& symbol){
 
+    std::vector<Char>::iterator _indexHIT;
+    std::vector<std::vector<Char>>::iterator _rowHIT;
+
+    _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row)->bool{
+
+        _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
+
+            if(d_symbol.getFractionalPosition()==symbol.getFractionalPosition())
+                return true;
+            else
+                return false;
+
+        });
+
+       if(_indexHIT!=row.end())
+           return true;
+       else
+           return false;
+
+    });
+
+    if(_rowHIT!=this->_symbols.end())
+         _rowHIT->erase(_indexHIT);
+
+}*/
 
 
 
