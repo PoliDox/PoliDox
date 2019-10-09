@@ -71,7 +71,10 @@ ClientController::ClientController()
        if(_JSONobj["action"].toString()=="insert")
                this->m_crdt->remoteInsert(symbol);
 
-       //TODO remoteDelete
+       if(_JSONobj["action"].toString()=="delete")
+               this->m_crdt->remoteDelete(symbol);
+
+
 
     });
 

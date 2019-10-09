@@ -5,6 +5,7 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QThread>
+#include <iostream>
 #include "ServerController.h"
 
 class Server : public QObject

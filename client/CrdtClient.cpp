@@ -274,7 +274,7 @@ void CRDTclient::remoteInsert(Char symbol){
 
 };
 
-/*void CRDTclient::localDelete(const Char& symbol){
+void CRDTclient::remoteDelete(const Char& symbol){
 
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
@@ -300,7 +300,7 @@ void CRDTclient::remoteInsert(Char symbol){
     if(_rowHIT!=this->_symbols.end())
          _rowHIT->erase(_indexHIT);
 
-}*/
+}
 
 
 

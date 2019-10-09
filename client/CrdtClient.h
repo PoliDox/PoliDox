@@ -27,7 +27,7 @@ public:
 
 
     void localInsert(int position, char value);
-    void localDelete(int index);
+    void remoteDelete(const Char& symbol);
     
     void remoteInsert(Char symbol);
     //void process(const Message& m);

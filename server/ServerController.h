@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QWebSocket>
+#include <iostream>
 
 class ServerController : public QObject
 {
