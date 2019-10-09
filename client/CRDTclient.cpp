@@ -144,7 +144,7 @@ void CRDTclient::localInsert(int position, char value) {
 
     this->_toMatrix(position,&row,&index);
 
-    Char symbolToInsert(value, this->_siteID, this->_counter);
+    Char symbolToInsert(this->_siteID, 0, value);
 
     /* no more symbolsSyze needed, it's the row size */
     //int symbolsSize = this->_symbols[row]->size();
@@ -233,6 +233,7 @@ void CRDTclient::localInsert(int position, char value) {
     //Message messageToSend(true, symbolToInsert, this);
     //this->server.send(messageToSend);
     emit onLocalInsert(symbolToInsert);
+
 }
 
 int CRDTclient::getSiteId() {
@@ -247,4 +248,20 @@ int CRDTclient::getCounterAndIncrement() {
 
 int CRDTclient::getCounter() {
     return this->_counter;
+}
+
+void CRDTclient::printDebugChars(){
+    std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
+        std::for_each(row.begin(), row.end(), [](Char val){
+            std::cout << "Valore: " << val.getValue() << " Fractional: [";
+            for(int i = 0; i < (int) val.getFractionalPosition().size(); i++){
+                std::cout << val.getFractionalPosition()[i] << " ";
+            }
+            std::cout << "]" << std::endl;
+
+            /*std::for_each(val.getFractionalPosition().begin(), val.getFractionalPosition().end(), [](auto i){
+                qDebug() << i;
+            });*/
+        });
+    });
 }

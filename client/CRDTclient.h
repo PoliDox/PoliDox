@@ -21,6 +21,7 @@ private:
 
     void _toMatrix(int position,int* row,int* index);
     void printSymbols();
+    void printDebugChars();
 
 public:
     CRDTclient(ClientController *p_controller);
