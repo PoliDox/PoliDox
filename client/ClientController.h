@@ -3,22 +3,8 @@
 
 #include <QObject>
 #include <QWebSocket>
-#include <QJsonObject>
-#include "CrdtClient.h"
-#include "Editor.h"
-
-
-/* ========================================================================================
-   This class has:
-
-               -pointer to CRDTclient: one CLIENTcontroller is associated
-                                       with one CRDTclient and it has to prepare
-                                       the message that will be sent to the sever
-                                       through the socket.
-
-               - socket: used to communicate with the server.
-
-   ========================================================================================  */
+#include "CRDTclient.h"
+#include "editor.h"
 
 class ClientController : public QObject
 {
@@ -28,12 +14,10 @@ public:
     ClientController();
     ~ClientController();
 
-
 private:
     Editor m_editor;
     CRDTclient *m_crdt; // TODO: use smart-pointer
     QWebSocket m_socket;
-
 
 };
 

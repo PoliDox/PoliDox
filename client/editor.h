@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QTextDocument>
-#include "CRDTclient.h"
+#include "CrdtClient.h"
 
 
 class Editor : public QMainWindow
