@@ -16,8 +16,8 @@ ClientController::ClientController()
             QChar car =  m_editor.at(position);
             m_crdt->localInsert(position, car.toLatin1());
         } else {
-            //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            //m_crdt.localDelete(position); //TODO implement local delete
+            qDebug() << "Removed" << charsRemoved << "chars at position" << position;
+            m_crdt->localDelete(position);
         }
     });
 
@@ -31,6 +31,19 @@ ClientController::ClientController()
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
         QJsonDocument _JSONdoc=symbol.write("insert");
+
+        QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
+
+        std::cout << jsonString.toUtf8().constData() <<std::endl;
+
+        m_socket.sendTextMessage(jsonString);
+    });
+
+
+
+    connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
+
+        QJsonDocument _JSONdoc=symbol.write("delete");
 
         QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
 
@@ -67,7 +80,9 @@ ClientController::ClientController()
        if(_JSONobj["action"].toString()=="insert")
                this->m_crdt->remoteInsert(symbol);
 
-       //TODO remoteDelete
+       if(_JSONobj["action"].toString()=="delete")
+               this->m_crdt->remoteDelete(symbol);
+
 
     });
 
