@@ -7,7 +7,7 @@
 #define MAXNUM 100
 
 CRDTclient::CRDTclient(ClientController *p_controller) : m_controller(p_controller) {
-    //TODO il vettore di simboli inizialmente è vuoto??
+    //TODO il vettore di simboli inizialmente Ã¨ vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
 }
@@ -43,7 +43,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
         else {
             middle.push_back(preceding[i]);
             if(difference == 1){
-                //qui terminerò sicuro, devo solo trovare un numero più
+                //qui terminerÃ² sicuro, devo solo trovare un numero piÃ¹
                 //grande di preceding da poter inserire
                 if( existsPositionInVector(i+1, preceding) ) {
                     for(int j=i+1; j<precedingSize; j++) {
@@ -53,8 +53,8 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
                             middle.push_back(middleElement);
                             return middle;
                         } else {
-                            //copia preceding finché non trovi
-                            //un elemento i-esimo più grande da poter inserire.
+                            //copia preceding finchÃ© non trovi
+                            //un elemento i-esimo piÃ¹ grande da poter inserire.
                             middle.push_back(preceding[j]);
                         }
                     }
@@ -70,9 +70,9 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
     }
 
-    //se arrivo qui è perché sicuramente
-    //preceding è finito e following ancora no!!
-    //TODO da confermare se è vero
+    //se arrivo qui Ã¨ perchÃ© sicuramente
+    //preceding Ã¨ finito e following ancora no!!
+    //TODO da confermare se Ã¨ vero
 
     bool precedingIsFinish = i==precedingSize;
     bool followingIsFinish = i==followingSize;
@@ -83,9 +83,9 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
     }
 
     if(precedingIsFinish){
-        //preceding è finito e following no
+        //preceding Ã¨ finito e following no
         for(i; i<followingSize; i++) {
-            if (following[i] == 0) {  //può essere sia 1 che zero
+            if (following[i] == 0) {  //puÃ² essere sia 1 che zero
                 middle.push_back(following[i]);
             }
             else {
@@ -134,7 +134,7 @@ void CRDTclient::_toMatrix(int position,int* row,int* index){
 }
 
 
-/* position è il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
+/* position Ã¨ il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
 void CRDTclient::localInsert(int position, char value) {
 
@@ -166,7 +166,7 @@ void CRDTclient::localInsert(int position, char value) {
     if(index == 0){
         if(rowSize == 0){
             std::vector<int> precedingFractionalNumber;
-            //è il primo elemento che inserisco
+            //Ã¨ il primo elemento che inserisco
             std::vector<int> firstElem{MAXNUM/2};
             std::vector<int> fakeVector{MAXNUM};
             if(row!=0){
@@ -194,7 +194,7 @@ void CRDTclient::localInsert(int position, char value) {
         }
     }
     else {
-        //sicuramente avrò un simbolo prima di me
+        //sicuramente avrÃ² un simbolo prima di me
         if(index >= rowSize){  //TODO controllare bene il confronto
             //non ho nessuno dopo di me
             index = rowSize;  //inserisco in append
@@ -260,17 +260,17 @@ void CRDTclient::remoteInsert(Char symbol){
 
 
     auto it1=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row){
-        
+
             _row++;
 
             auto it2=find_if(row.begin(),row.end(),[&](Char m_symbol){
-            
+
             index++;
 
             return symbol.getFractionalPosition()<m_symbol.getFractionalPosition();
-                
+
             });
-    
+
             if(it2!=row.end()){
 
                 this->_symbols[_row-1].insert(it2,symbol);
@@ -339,3 +339,4 @@ int CRDTclient::getCounterAndIncrement() {
 int CRDTclient::getCounter() {
     return this->_counter;
 }
+

@@ -7,14 +7,15 @@ QT += gui websockets
 INSTALLS += target
 
 HEADERS += \
-    CLIENTcontroller.h \
-    CRDTclient.h \
+    ClientController.h \
+    CrdtClient.h \
+    CrdtClient.h \
     editor.h \
     Char.h
 
 SOURCES += \
-    CLIENTcontroller.cpp \
-    CRDTclient.cpp \
-    editor.cpp \
+    ClientController.cpp \
+    CrdtClient.cpp \
+    Editor.cpp \
     main.cpp \
     Char.cpp
