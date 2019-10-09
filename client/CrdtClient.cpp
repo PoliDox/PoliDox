@@ -144,7 +144,7 @@ void CrdtClient::localInsert(int position, char value) {
 
     this->_toMatrix(position,&row,&index);
 
-    Char symbolToInsert(value, this->_siteID, this->_counter);
+    Char symbolToInsert(this->_siteID, 0, value);
 
     /* no more symbolsSyze needed, it's the row size */
     //int symbolsSize = this->_symbols[row]->size();
