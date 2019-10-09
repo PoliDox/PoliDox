@@ -16,7 +16,7 @@ QJsonDocument Char::write(const QString &action){
   QJsonArray _JSONpos;
 
   _JSONobj.insert("action",action);
-  _JSONobj.insert("value",this->value);
+  _JSONobj.insert("value",QString(this->value));
   _JSONobj.insert("siteId",this->siteId);
   _JSONobj.insert("counter",this->counter);
 
@@ -46,7 +46,7 @@ Char Char::read(const QString& _JSONstring){
         QJsonArray _JSONpos=_JSONobj["position"].toArray();
 
         QString action= _JSONobj["action"].toString();
-        std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value[0].toLatin1() <<" at position [ ";
+        std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value.toUtf8().constData() <<" at position [ ";
         for(QJsonArray::iterator it=_JSONpos.begin();it!=_JSONpos.end();it++){
             position.push_back(it->toInt());
             std::cout<< it->toInt() <<" ";
