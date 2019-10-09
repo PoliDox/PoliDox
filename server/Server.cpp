@@ -24,12 +24,8 @@ Server::Server(quint16 port, QObject *parent) :
     }
 
     // TEST: Initialize the open document list with an empty document
-    tDocument l_document{new ServerController(), new QThread()};
-    l_document.worker->setObjectName("Default doc thread");
-    l_document.controller->moveToThread(l_document.worker);
-    l_document.worker->start();
-    m_documents << l_document;
-
+    ServerController *l_firstFile = new ServerController();
+    m_documents["firstFile"] = l_firstFile;
 
 }
 
@@ -42,20 +38,6 @@ Server::~Server()
 void Server::onNewConnection()
 {
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
-    QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
-    tDocument l_document = m_documents.at(0);
-
-    //enable messages receiving and forward it to the server controller
-    connect(l_socket, &QWebSocket::textMessageReceived,l_document.controller, &ServerController::messageReceived);
-
-    //to delete
-    //connect(l_socket,&QWebSocket::textMessageReceived,l_document.controller,&ServerController::messageRec);
-
-    //TODO check queued connection instead of connecting two signal to avoid thread affinity
-    connect(l_document.controller, &ServerController::messageSent, this, [&](QWebSocket *p_socket, const QString p_msg){
-       p_socket->sendTextMessage(p_msg);
-    });
-
-    QMetaObject::invokeMethod(l_document.controller, "addClient",
-                              Qt::QueuedConnection, Q_ARG(QWebSocket*, l_socket));
+    QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";           
+    m_documents["firstFile"]->addClient(l_socket);
 }
