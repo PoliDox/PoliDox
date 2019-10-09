@@ -1,4 +1,4 @@
-#include "CrdtClient.h"
+#include "CRDTclient.h"
 #include <iostream>
 #include <string>
 #include <QDebug>
@@ -6,14 +6,11 @@
 
 #define MAXNUM 100
 
-/* ________________________________ COSTRUTTORE ________________________________ */
 CRDTclient::CRDTclient(ClientController *p_controller) : m_controller(p_controller) {
     //TODO il vettore di simboli inizialmente è vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
 }
-/* ____________________________________________ ________________________________ */
-
 
 bool existsPositionInVector(int position, std::vector<int> vector) {
     if(position < vector.size())
@@ -117,13 +114,13 @@ void CRDTclient::_toMatrix(int position,int* row,int* index){
     int totalLenght=0,
         row_counter=0;
 
-    std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
+    auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
 
 
         if(position < matrix_row.size())
             return true;
         else{
-            totalLenght+=matrix_row.size();
+        totalLenght+=matrix_row.size();
             return false;
         }
     });
@@ -137,14 +134,17 @@ void CRDTclient::_toMatrix(int position,int* row,int* index){
 }
 
 
+/* position è il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
+
 void CRDTclient::localInsert(int position, char value) {
 
+   //TODO fare conversione position -> row,index
     int row=0,
         index=0;
 
-    this->_toMatrix(position,&row,&index);  /* conversion from position given by QT and [row][index] of matrix */
+    this->_toMatrix(position,&row,&index);
 
-    Char symbolToInsert(this->_siteID, this->_counter, value);
+    Char symbolToInsert(value, this->_siteID, this->_counter);
 
     /* no more symbolsSyze needed, it's the row size */
     //int symbolsSize = this->_symbols[row]->size();
@@ -223,61 +223,17 @@ void CRDTclient::localInsert(int position, char value) {
 
     }
 
-    std::cout<<"Added symbol "<< value <<" position: [ ";
+    std::cout<<"Added symbol "<< value <<" position: [";
     for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
     std::cout<<"]"<<std::endl;
 
-    std::cout<<"Parsing symbol to Json ..."<< std::endl;
-
+    /* Numero frazionario generato e simbolo inserito.
+     * Generare ora il Message da spedire */
+    //Message messageToSend(true, symbolToInsert, this);
+    //this->server.send(messageToSend);
     emit onLocalInsert(symbolToInsert);
 }
-
-void CRDTclient::remoteInsert(Char symbol){
-
-    int  _row=0,
-         index=0;
-
-
-    auto it1=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row){
-        
-            _row++;
-
-            auto it2=find_if(row.begin(),row.end(),[&](Char m_symbol){
-            
-            index++;
-
-            return symbol.getFractionalPosition()<m_symbol.getFractionalPosition();
-                
-            });
-    
-            if(it2!=row.end()){
-
-                this->_symbols[_row-1].insert(it2,symbol);
-
-                 if(symbol.getValue()=='\n'){
-
-                     this->_symbols.insert(this->_symbols.begin() + (_row),
-                                            vector<Char>(this->_symbols[_row-1].begin() + index + 1, this->_symbols[_row-1].end()));
-                     this->_symbols[_row-1].erase(this->_symbols[_row-1].begin() + index + 1, this->_symbols[_row-1].end());
-
-                 }
-
-
-                }
-                return true;
-    });
-
-    if(it1==this->_symbols.end())
-        this->_symbols.push_back(std::vector<Char>(1,symbol));
-
-
-};
-
-
-
-
-
 
 int CRDTclient::getSiteId() {
     return this->_siteID;
