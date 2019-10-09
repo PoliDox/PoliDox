@@ -242,15 +242,14 @@ void CrdtClient::localDelete(int position){
     int row=0,
         index=0;
 
-    printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
+
     Char _Dsymbol=this->_symbols[row][index];
 
     this->_toMatrix(position,&row,&index);
 
     this->_symbols[row].erase(this->_symbols[row].begin()+index);
 
-    printDebugChars();
+
     emit onLocalDelete(_Dsymbol);
 
 
@@ -299,6 +298,9 @@ void CrdtClient::remoteInsert(Char symbol){
 
 void CrdtClient::remoteDelete(const Char& symbol){
 
+    printDebugChars();
+    std::cout <<"____________________________"<<std::endl;
+
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
 
@@ -322,6 +324,9 @@ void CrdtClient::remoteDelete(const Char& symbol){
 
     if(_rowHIT!=this->_symbols.end())
          _rowHIT->erase(_indexHIT);
+
+    printDebugChars();
+
 
 }
 
