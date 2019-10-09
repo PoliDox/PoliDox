@@ -2,7 +2,7 @@
 
 ClientController::ClientController()
 {
-    m_crdt = new CRDTclient(this);
+    m_crdt = new CrdtClient(this);
 
     /* takes every character from input and call localInsert */
     connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
@@ -18,10 +18,10 @@ ClientController::ClientController()
     });
 
 
-    /* CRDTclient signal onLocalInsert connected to CLIENTcontroller lambda slot.
+    /* CrdtClient signal onLocalInsert connected to CLIENTcontroller lambda slot.
      * This lamba has to prepare the message that will be sent to the server.
      */
-    connect(m_crdt, &CRDTclient::onLocalInsert, this, [&](Char symbol){
+    connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
         // TODO: create message
         m_socket.sendTextMessage("Message from a client");
     });

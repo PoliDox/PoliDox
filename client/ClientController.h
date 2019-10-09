@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QWebSocket>
 #include "CrdtClient.h"
-#include "editor.h"
+#include "Editor.h"
 
 class ClientController : public QObject
 {
@@ -16,7 +16,7 @@ public:
 
 private:
     Editor m_editor;
-    CRDTclient *m_crdt; // TODO: use smart-pointer
+    CrdtClient *m_crdt; // TODO: use smart-pointer
     QWebSocket m_socket;
 
 };

@@ -6,7 +6,7 @@
 
 #define MAXNUM 100
 
-CRDTclient::CRDTclient(ClientController *p_controller) : m_controller(p_controller) {
+CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
     //TODO il vettore di simboli inizialmente Ã¨ vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
@@ -109,7 +109,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 }
 
-void CRDTclient::_toMatrix(int position,int* row,int* index){
+void CrdtClient::_toMatrix(int position,int* row,int* index){
 
     int totalLenght=0,
         row_counter=0;
@@ -136,7 +136,7 @@ void CRDTclient::_toMatrix(int position,int* row,int* index){
 
 /* position Ã¨ il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
-void CRDTclient::localInsert(int position, char value) {
+void CrdtClient::localInsert(int position, char value) {
 
    //TODO fare conversione position -> row,index
     int row=0,
@@ -237,23 +237,26 @@ void CRDTclient::localInsert(int position, char value) {
 
 
 
-void CRDTclient::localDelete(int position){
+void CrdtClient::localDelete(int position){
 
     int row=0,
         index=0;
 
+    printDebugChars();
+    std::cout <<"____________________________"<<std::endl;
     Char _Dsymbol=this->_symbols[row][index];
 
     this->_toMatrix(position,&row,&index);
 
     this->_symbols[row].erase(this->_symbols[row].begin()+index);
 
+    printDebugChars();
     emit onLocalDelete(_Dsymbol);
 
 
 }
 
-void CRDTclient::remoteInsert(Char symbol){
+void CrdtClient::remoteInsert(Char symbol){
 
     int  _row=0,
          index=0;
@@ -294,7 +297,7 @@ void CRDTclient::remoteInsert(Char symbol){
 
 };
 
-void CRDTclient::remoteDelete(const Char& symbol){
+void CrdtClient::remoteDelete(const Char& symbol){
 
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
@@ -323,20 +326,34 @@ void CRDTclient::remoteDelete(const Char& symbol){
 }
 
 
+void CrdtClient::printDebugChars(){
+    std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
+        std::for_each(row.begin(), row.end(), [](Char val){
+            std::cout << "Valore: " << val.getValue() << " Fractional: [";
+            for(int i = 0; i < (int) val.getFractionalPosition().size(); i++){
+                std::cout << val.getFractionalPosition()[i] << " ";
+            }
+            std::cout << "]" << std::endl;
+
+            /*std::for_each(val.getFractionalPosition().begin(), val.getFractionalPosition().end(), [](auto i){
+                qDebug() << i;
+            });*/
+        });
+    });
+}
 
 
-
-int CRDTclient::getSiteId() {
+int CrdtClient::getSiteId() {
     return this->_siteID;
 }
 
-int CRDTclient::getCounterAndIncrement() {
+int CrdtClient::getCounterAndIncrement() {
     int oldCounter = this->_counter;
     this->_counter++;
     return oldCounter;
 }
 
-int CRDTclient::getCounter() {
+int CrdtClient::getCounter() {
     return this->_counter;
 }
 

@@ -10,7 +10,7 @@
 class ClientController;
 
 /* modella un'istanza di un editor condiviso */
-class CRDTclient : public QObject {
+class CrdtClient : public QObject {
     Q_OBJECT
 
 private:
@@ -23,9 +23,9 @@ private:
     void printSymbols();
 
 public:
-    CRDTclient(ClientController *p_controller);
+    CrdtClient(ClientController *p_controller);
 
-
+    void printDebugChars();
     void localInsert(int position, char value);
     void remoteInsert(Char symbol);
     void localDelete(int index);
