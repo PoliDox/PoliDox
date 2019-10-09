@@ -48,16 +48,30 @@ ClientController::ClientController()
 
        //TODO   prima di richiamare la remoteInsert implementare il non rinvio del messaggio
                 al mittente.
+
+       //TODO   avere un booleano all'interno di Char in modo da manetere le azioni sul JSON
+                interne alla classe Char?
        ______________________________________________________________________________________     */
 
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket,&QWebSocket::textMessageReceived, [&](const QString& _JSONstring){
+
        std::cout<< "Message received:"<<std::endl;
 
-       //TODO Here the message sent from the server must be unmarshalled and a symbol must be create
+       QJsonObject _JSONobj;
+       QJsonDocument _JSONdoc;
+
        Char symbol=Char::read(_JSONstring);
 
-       //this->m_crdt->remoteInsert(symbol);
+        _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
+
+       if(!_JSONdoc.isNull())
+            _JSONobj=_JSONdoc.object();
+
+       if(_JSONobj["action"].toString()=="insert")
+               this->m_crdt->remoteInsert(symbol);
+
+       //TODO remoteDelete
 
     });
 
