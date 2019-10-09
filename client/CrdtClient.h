@@ -27,8 +27,9 @@ public:
 
 
     void localInsert(int position, char value);
+    void localDelete(int position);
+
     void remoteDelete(const Char& symbol);
-    
     void remoteInsert(Char symbol);
     //void process(const Message& m);
     std::string toString();
@@ -39,6 +40,7 @@ public:
 
 signals:
     void onLocalInsert(Char symbol); // TODO: Add parameters
+    void onLocalDelete(Char symbol);
 
 };
 

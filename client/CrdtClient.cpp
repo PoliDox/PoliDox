@@ -233,6 +233,23 @@ void CRDTclient::localInsert(int position, char value) {
     emit onLocalInsert(symbolToInsert);
 }
 
+
+void CRDTclient::localDelete(int position){
+
+    int row=0,
+        index=0;
+
+    Char _Dsymbol=this->_symbols[row][index];
+
+    this->_toMatrix(position,&row,&index);
+
+    this->_symbols[row].erase(this->_symbols[row].begin()+index);
+
+    emit onLocalDelete(_Dsymbol);
+
+
+}
+
 void CRDTclient::remoteInsert(Char symbol){
 
     int  _row=0,

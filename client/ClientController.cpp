@@ -17,8 +17,8 @@ ClientController::ClientController()
             QChar car =  m_editor.at(position);
             m_crdt->localInsert(position, car.toLatin1());
         } else {
-            //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            //m_crdt.localDelete(position); //TODO implement local delete
+            qDebug() << "Removed" << charsRemoved << "chars at position" << position;
+            m_crdt->localDelete(position); //TODO implement local delete
         }
     });
 
