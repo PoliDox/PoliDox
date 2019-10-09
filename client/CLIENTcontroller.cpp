@@ -1,4 +1,4 @@
-#include "ClientController.h"
+#include "CLIENTcontroller.h"
 
 ClientController::ClientController()
 {
@@ -11,9 +11,8 @@ ClientController::ClientController()
             QChar car =  m_editor.at(position);
             m_crdt->localInsert(position, car.toLatin1());
         } else {
-
-            qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            m_crdt->localDelete(position); //TODO implement local delete
+            //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
+            //m_crdt.localDelete(position);
         }
     });
 
@@ -30,29 +29,9 @@ ClientController::ClientController()
     /* SOCKETsignal connected to CLIENTcontroller lambda in order to catch messages forwarded
      * by server */
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
-
-    connect(&m_socket,&QWebSocket::textMessageReceived, [&](const QString& _JSONstring){
-
-       std::cout<< "Message received:"<<std::endl;
-
-       QJsonObject _JSONobj;
-       QJsonDocument _JSONdoc;
-
-       Char symbol=Char::read(_JSONstring);
-
-        _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
-
-       if(!_JSONdoc.isNull())
-            _JSONobj=_JSONdoc.object();
-
-       if(_JSONobj["action"].toString()=="insert")
-               this->m_crdt->remoteInsert(symbol);
-
-       if(_JSONobj["action"].toString()=="delete")
-               this->m_crdt->remoteDelete(symbol);
-
-
-
+    connect(&m_socket,&QWebSocket::textMessageReceived, [&](const QString& p_message){
+       qDebug() << "Message received:" << p_message;
+       //TODO implement remot insert
     });
 
     m_editor.show();

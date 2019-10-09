@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QWebSocket>
-#include "CrdtClient.h"
+#include "CRDTclient.h"
 #include "editor.h"
 
 class ClientController : public QObject

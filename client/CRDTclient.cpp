@@ -1,4 +1,4 @@
-#include "CrdtClient.h"
+#include "CRDTclient.h"
 #include <iostream>
 #include <string>
 #include <QDebug>
@@ -234,97 +234,6 @@ void CRDTclient::localInsert(int position, char value) {
     //this->server.send(messageToSend);
     emit onLocalInsert(symbolToInsert);
 }
-
-
-
-void CRDTclient::localDelete(int position){
-
-    int row=0,
-        index=0;
-
-    Char _Dsymbol=this->_symbols[row][index];
-
-    this->_toMatrix(position,&row,&index);
-
-    this->_symbols[row].erase(this->_symbols[row].begin()+index);
-
-    emit onLocalDelete(_Dsymbol);
-
-
-}
-
-void CRDTclient::remoteInsert(Char symbol){
-
-    int  _row=0,
-         index=0;
-
-
-    auto it1=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row){
-        
-            _row++;
-
-            auto it2=find_if(row.begin(),row.end(),[&](Char m_symbol){
-            
-            index++;
-
-            return symbol.getFractionalPosition()<m_symbol.getFractionalPosition();
-                
-            });
-    
-            if(it2!=row.end()){
-
-                this->_symbols[_row-1].insert(it2,symbol);
-
-                 if(symbol.getValue()=='\n'){
-
-                     this->_symbols.insert(this->_symbols.begin() + (_row),
-                                            vector<Char>(this->_symbols[_row-1].begin() + index + 1, this->_symbols[_row-1].end()));
-                     this->_symbols[_row-1].erase(this->_symbols[_row-1].begin() + index + 1, this->_symbols[_row-1].end());
-
-                 }
-
-
-                }
-                return true;
-    });
-
-    if(it1==this->_symbols.end())
-        this->_symbols.push_back(std::vector<Char>(1,symbol));
-
-
-};
-
-void CRDTclient::remoteDelete(const Char& symbol){
-
-    std::vector<Char>::iterator _indexHIT;
-    std::vector<std::vector<Char>>::iterator _rowHIT;
-
-    _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row)->bool{
-
-        _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
-
-            if(d_symbol.getFractionalPosition()==symbol.getFractionalPosition())
-                return true;
-            else
-                return false;
-
-        });
-
-       if(_indexHIT!=row.end())
-           return true;
-       else
-           return false;
-
-    });
-
-    if(_rowHIT!=this->_symbols.end())
-         _rowHIT->erase(_indexHIT);
-
-}
-
-
-
-
 
 int CRDTclient::getSiteId() {
     return this->_siteID;

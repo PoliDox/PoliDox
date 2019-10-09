@@ -2,5 +2,6 @@
 # Il file gitignore è stato creato automaticamente da Microsoft(R) Visual Studio.
 ################################################################################
 
-client/PoliDoxClient.pro.user
-server/PoliDoxServer.pro.user
+/PoliDocs/PoliDocs/.vs/PoliDocs/v16/Browse.VC.db
+/PoliDocs/PoliDocs/.vs/PoliDocs/v16/Browse.VC.opendb
+/PoliDocs/.vs/PoliDocs/v16/Browse.VC.opendb
