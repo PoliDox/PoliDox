@@ -14,7 +14,7 @@ class CRDTclient : public QObject {
     Q_OBJECT
 
 private:
-    ClientController *m_controller;
+    ClientController *m_controller; //TODO use smart pointer
     int _siteID;
     int _counter;
     std::vector<std::vector<Char>> _symbols;    
@@ -28,6 +28,8 @@ public:
 
     void localInsert(int position, char value);
     void localDelete(int index);
+    
+    void remoteInsert(Char symbol);
     //void process(const Message& m);
     std::string toString();
 
