@@ -10,8 +10,8 @@ HEADERS += \
     ClientController.h \
     CrdtClient.h \
     CrdtClient.h \
-    editor.h \
-    Char.h
+    Char.h \
+    Editor.h
 
 SOURCES += \
     ClientController.cpp \
