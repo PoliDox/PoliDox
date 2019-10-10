@@ -32,7 +32,7 @@ ClientController::ClientController()
 
         } else {
             _processed=charsRemoved;
-            qDebug() << "Removed" << charsRemoved << "chars at position" << position;
+            //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
             while(_processed>0){
                 m_crdt->localDelete(position);
                 _processed--;
@@ -53,7 +53,7 @@ ClientController::ClientController()
 
         QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
 
-        std::cout << jsonString.toUtf8().constData() <<std::endl;
+        //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
         m_socket.sendTextMessage(jsonString);
     });
@@ -64,7 +64,7 @@ ClientController::ClientController()
 
         QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
 
-        std::cout << jsonString.toUtf8().constData() <<std::endl;
+        //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
         m_socket.sendTextMessage(jsonString);
     });

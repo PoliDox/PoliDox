@@ -46,13 +46,13 @@ Char Char::read(const QString& _JSONstring){
         QJsonArray _JSONpos=_JSONobj["position"].toArray();
 
         QString action= _JSONobj["action"].toString();
-        std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value.toUtf8().constData() <<" at position [ ";
+        //std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value.toUtf8().constData() <<" at position [ ";
         for(QJsonArray::iterator it=_JSONpos.begin();it!=_JSONpos.end();it++){
             position.push_back(it->toInt());
-            std::cout<< it->toInt() <<" ";
+            //std::cout<< it->toInt() <<" ";
         }
 
-        std::cout << "]" << std::endl;
+        //std::cout << "]" << std::endl;
         Char symbol(siteId,counter,value[0].toLatin1());
         symbol.setFractionalPosition(position);
 

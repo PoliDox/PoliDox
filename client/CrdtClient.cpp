@@ -242,10 +242,12 @@ void CrdtClient::localInsert(int position, char value) {
 
     }
 
-    std::cout << "Added symbol " << value << " (" << (int)value << ") at position: [";
+    /*std::cout << "Added symbol " << value << " (" << (int)value << ") at position: [";
     for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
-    std::cout<<"]"<<std::endl;
+    std::cout<<"]"<<std::endl;*/
+
+    printDebugChars();
 
     emit onLocalInsert(symbolToInsert);
 }
@@ -287,6 +289,8 @@ void CrdtClient::remoteInsert(Char symbol){
 
     int _LINEARpos=0;
 
+    char _CHAR=symbol.getValue();
+
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
 
             _row++;
@@ -309,19 +313,35 @@ void CrdtClient::remoteInsert(Char symbol){
     });
 
 
-    if (_ROWhit != this->_symbols.end()) {
+    if(this->_symbols.size()==1 && this->_symbols.begin()->size()==0){
 
-        _ROWhit->insert(_INDEXhit,symbol);
+        this->_symbols.begin()->push_back(symbol);
+    }
+    else if (_ROWhit != this->_symbols.end()  ) {
 
-        if(symbol.getValue()=='\n'){
+        if(_CHAR=='\n'){
 
-            this->_symbols.insert(_ROWhit++, std::vector<Char>(_INDEXhit++,_ROWhit->end()));
-            _ROWhit->erase(_INDEXhit++, _ROWhit->end());
+             std::vector<Char> _VETT(_INDEXhit,_ROWhit->end());
+
+             this->_symbols.insert(_ROWhit+1, _VETT);
+              _ROWhit->erase(_INDEXhit, _ROWhit->end());
+
         }
 
-    } else {
+        _ROWhit->insert(_ROWhit->end(),symbol);
 
-        this->_symbols[this->_symbols.size()-1].push_back(symbol);
+    } else
+
+    /*  if anything bigger than the symbol to inser has been found i need to check if
+     *  the last character of the last line is '\n'. If Yes, create a new row otherwise
+     *  insert the symbol as the last character of the last row.                    */
+
+        {
+
+        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n')
+            this->_symbols.push_back(std::vector<Char>(1,symbol));
+        else
+            this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
     }
 
@@ -332,6 +352,8 @@ void CrdtClient::remoteInsert(Char symbol){
 
     std::cout << "Linear position is: "<<_LINEARpos << std::endl;
     emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
+
+    printDebugChars();
 };
 
 /* ______________________________________________________________________________________
