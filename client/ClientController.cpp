@@ -20,12 +20,12 @@ ClientController::ClientController()
             //qDebug() << "Added" << charsAdded << "chars at position" << position;
              _processed=charsAdded;
             while(_processed>0){
-                QChar car =  m_editor.at(position);
+                char car =  m_editor.at(position).toLatin1();
                 if ( 0 == car ) {
                     // Strangely enough \n is given as 0
                     car = '\n';
                 }
-                m_crdt->localInsert(position, car.toLatin1());
+                m_crdt->localInsert(position, car);
                 position++;
                 _processed--;
             }
