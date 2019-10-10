@@ -11,12 +11,10 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false)
     m_remoteCursor = new QTextCursor(m_textDoc);
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
+        // If text changes because of a remote modification we mustn't emit the signal again,
+        // otherwise we fall in an endless loop
         if (!handlingRemoteOp) {
-           emit textChanged(position,charsRemoved, charsAdded);
-        } else {
-            // If text changes because of a remote modification we mustn't emit the signal again,
-            // otherwise we fall in an endless loop
-            qDebug() << "Handling remote operation";
+           emit textChanged(position, charsRemoved, charsAdded);
         }
     });
 

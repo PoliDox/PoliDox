@@ -14,9 +14,13 @@ ClientController::ClientController()
 
     connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
         if (charsAdded) {
-            //qDebug() << "Added" << charsAdded << "chars at position" << position;
-            QChar car =  m_editor.at(position);
-            m_crdt->localInsert(position, car.toLatin1());
+            //qDebug() << "Added" << charsAdded << "chars at position" << position;            
+            char car =  m_editor.at(position).toLatin1();
+            if ( 0 == car ) {
+                // Strangely enough \n is given as 0
+                car = '\n';
+            }
+            m_crdt->localInsert(position, car);
         } else {
             qDebug() << "Removed" << charsRemoved << "chars at position" << position;
             m_crdt->localDelete(position);
@@ -79,7 +83,7 @@ ClientController::~ClientController()
    ______________________________________________________________________________________     */
 void ClientController::onTextMessageReceived(const QString &_JSONstring)
 {
-    std::cout<< "Message received" << std::endl;
+    //std::cout<< "Message received" << std::endl;
 
     QJsonObject _JSONobj;
     QJsonDocument _JSONdoc;

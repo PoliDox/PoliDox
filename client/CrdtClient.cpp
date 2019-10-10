@@ -185,7 +185,7 @@ void CrdtClient::localInsert(int position, char value) {
     if(index == 0){
         if(rowSize == 0){
             std::vector<int> precedingFractionalNumber;
-            //Ã¨ il primo elemento che inserisco
+            //è il primo elemento che inserisco
             std::vector<int> firstElem{MAXNUM/2};
             std::vector<int> fakeVector{MAXNUM};
             if(row!=0){
@@ -213,7 +213,7 @@ void CrdtClient::localInsert(int position, char value) {
         }
     }
     else {
-        //sicuramente avrÃ² un simbolo prima di me
+        //sicuramente avrà un simbolo prima di me
         if(index >= rowSize){  //TODO controllare bene il confronto
             //non ho nessuno dopo di me
             index = rowSize;  //inserisco in append
@@ -242,7 +242,7 @@ void CrdtClient::localInsert(int position, char value) {
 
     }
 
-    std::cout<<"Added symbol "<< value <<" position: [";
+    std::cout << "Added symbol " << value << " (" << (int)value << ") at position: [";
     for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
     std::cout<<"]"<<std::endl;
