@@ -23,9 +23,7 @@ private:
     void printSymbols();
 
 public:
-
     CrdtClient(ClientController *p_controller);
-
 
     void localInsert(int position, char value);
     void localDelete(int index);
@@ -40,9 +38,10 @@ public:
     void printDebugChars();
 
 signals:
-
-    void onLocalInsert(Char symbol); // TODO: Add parameters
+    void onLocalInsert(Char symbol);
     void onLocalDelete(Char symbol);
+    void onRemoteInsert(int position);
+    void onRemoteDelete(int position);
 
 };
 

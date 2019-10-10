@@ -1,6 +1,6 @@
 #include "ClientController.h"
 
-#include <Qlabel>
+#include <QLabel>
 
 ClientController::ClientController()
 {
@@ -67,7 +67,7 @@ ClientController::ClientController()
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket,&QWebSocket::textMessageReceived, [&](const QString& _JSONstring){
 
-       std::cout<< "Message received:"<<std::endl;
+       std::cout<< "Message received"<<std::endl;
 
        QJsonObject _JSONobj;
        QJsonDocument _JSONdoc;

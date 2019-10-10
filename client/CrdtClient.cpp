@@ -264,11 +264,11 @@ void CrdtClient::remoteInsert(Char symbol){
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
 
-    _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row) -> bool{
+    _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
 
-            _INDEXhit=find_if(row.begin(),row.end(),[&](Char m_symbol)->bool{
+            _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
 
-            return symbol.getFractionalPosition()<m_symbol.getFractionalPosition();
+                return symbol.getFractionalPosition() < m_symbol.getFractionalPosition();
 
             });
 
@@ -280,19 +280,19 @@ void CrdtClient::remoteInsert(Char symbol){
     });
 
 
-    if(_ROWhit!=this->_symbols.end()){
+    if(_ROWhit != this->_symbols.end()){
 
         _ROWhit->insert(_INDEXhit,symbol);
 
         if(symbol.getValue()=='\n'){
 
-            this->_symbols.insert(_ROWhit++,std::vector<Char>(_INDEXhit++,_ROWhit->end()));
-            _ROWhit->erase(_INDEXhit++,_ROWhit->end());
+            this->_symbols.insert(_ROWhit++, std::vector<Char>(_INDEXhit++,_ROWhit->end()));
+            _ROWhit->erase(_INDEXhit++, _ROWhit->end());
         }
 
     }else{
 
-    this->_symbols[this->_symbols.size()-1].push_back(symbol);
+        this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
     }
 
