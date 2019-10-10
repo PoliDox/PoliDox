@@ -117,11 +117,10 @@ void CrdtClient::_toMatrix(int position,int* row,int* index){
 
     auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
 
-
         if(position < matrix_row.size())
             return true;
         else{
-        totalLenght+=matrix_row.size();
+            totalLenght+=matrix_row.size();
             return false;
         }
     });
@@ -139,7 +138,6 @@ void CrdtClient::_toMatrix(int position,int* row,int* index){
 
 void CrdtClient::localInsert(int position, char value) {
 
-   //TODO fare conversione position -> row,index
     int row=0,
         index=0;
 
