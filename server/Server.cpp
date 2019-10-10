@@ -38,6 +38,6 @@ Server::~Server()
 void Server::onNewConnection()
 {
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
-    QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";           
+    QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
     m_documents["firstFile"]->addClient(l_socket);
 }
