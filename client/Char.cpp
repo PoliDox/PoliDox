@@ -52,7 +52,7 @@ Char Char::read(const QString& _JSONstring){
             std::cout<< it->toInt() <<" ";
         }
 
-        std::cout << "]\n\n" << std::endl;
+        std::cout << "]" << std::endl;
         Char symbol(siteId,counter,value[0].toLatin1());
         symbol.setFractionalPosition(position);
 
