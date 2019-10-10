@@ -33,7 +33,7 @@ void Editor::remoteInsert(int position, char ch)
 {
     handlingRemoteOp = true;
     m_remoteCursor->clearSelection();
-    m_remoteCursor->setPosition(position);
+    m_remoteCursor->setPosition(position);   
     m_remoteCursor->insertText(QString(ch));
     handlingRemoteOp = false;
 }

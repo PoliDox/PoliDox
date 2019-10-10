@@ -9,17 +9,29 @@ ClientController::ClientController()
     /* ______________________________________________________________________________________
        takes every character from input and call CRDTclient::localInsert or
        CRDTclient::localDelete.
-       //TODO   implementare localDelete.
        ______________________________________________________________________________________      */
 
     connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
+
+        int _processed=0;
+
         if (charsAdded) {
             //qDebug() << "Added" << charsAdded << "chars at position" << position;
-            QChar car =  m_editor.at(position);
-            m_crdt->localInsert(position, car.toLatin1());
+             _processed=charsAdded;
+            while(_processed>0){
+                QChar car =  m_editor.at(position);
+                m_crdt->localInsert(position, car.toLatin1());
+                position++;
+                _processed--;
+            }
+
         } else {
+            _processed=charsRemoved;
             qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            m_crdt->localDelete(position);
+            while(_processed>0){
+                m_crdt->localDelete(position);
+                _processed--;
+            }
         }
     });
 
