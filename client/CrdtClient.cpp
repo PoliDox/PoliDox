@@ -242,9 +242,6 @@ void CrdtClient::localDelete(int position){
     int row=0,
         index=0;
 
-    printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
-
     this->_toMatrix(position,&row,&index);
 
     Char _Dsymbol=this->_symbols[row][index];
@@ -254,22 +251,15 @@ void CrdtClient::localDelete(int position){
 
     emit onLocalDelete(_Dsymbol);
 
-    printDebugChars();
 
 }
 
 void CrdtClient::remoteInsert(Char symbol){
 
-    int  _row=0,
-         index=0;
-
-    printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
-
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
 
-    _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row) -> bool{
+    _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row) -> bool{
 
             _INDEXhit=find_if(row.begin(),row.end(),[&](Char m_symbol)->bool{
 
@@ -301,9 +291,6 @@ void CrdtClient::remoteInsert(Char symbol){
 
     }
 
-    printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
-
 
 };
 
@@ -313,16 +300,17 @@ void CrdtClient::remoteDelete(const Char& symbol){
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
 
-    _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row)->bool{
+    _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
 
         _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
 
-            if(symbol.getFractionalPosition()==d_symbol.getFractionalPosition())
+            if(d_symbol.getFractionalPosition()==symbol.getFractionalPosition())
                 return true;
             else
                 return false;
 
         });
+
 
        if(_indexHIT!=row.end())
            return true;
@@ -331,10 +319,10 @@ void CrdtClient::remoteDelete(const Char& symbol){
 
     });
 
+
     if(_rowHIT!=this->_symbols.end())
          _rowHIT->erase(_indexHIT);
-
-    printDebugChars();
+    //else THROW EXCEPTION
 
 
 }
