@@ -254,6 +254,14 @@ void CrdtClient::localDelete(int position){
 
 }
 
+/* ______________________________________________________________________________________
+   IMPORTANTE!
+
+   Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
+   altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
+
+   //TODO aggiungere const al reference.
+   ______________________________________________________________________________________     */
 void CrdtClient::remoteInsert(Char symbol){
 
     std::vector<std::vector<Char>>::iterator _ROWhit;
@@ -293,6 +301,15 @@ void CrdtClient::remoteInsert(Char symbol){
 
 
 };
+
+/* ______________________________________________________________________________________
+   IMPORTANTE!
+
+   Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
+   altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
+
+   //TODO aggiungere const al reference.
+   ______________________________________________________________________________________     */
 
 void CrdtClient::remoteDelete(const Char& symbol){
 
