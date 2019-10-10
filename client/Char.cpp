@@ -68,7 +68,7 @@ vector<int> Char::getPosition() {
     return position;
 }
 
-char Char::getValue() {
+char Char::getValue() const {
     return value;
 }
 

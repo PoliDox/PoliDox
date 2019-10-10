@@ -15,6 +15,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent)
 
 }
 
+
 QChar Editor::at(int pos)
 {
     return m_textDoc->characterAt(pos);

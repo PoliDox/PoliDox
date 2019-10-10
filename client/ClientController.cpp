@@ -1,5 +1,7 @@
 #include "ClientController.h"
 
+#include <Qlabel>
+
 ClientController::ClientController()
 {
     m_crdt = new CrdtClient(this);
@@ -77,12 +79,19 @@ ClientController::ClientController()
        if(!_JSONdoc.isNull())
             _JSONobj=_JSONdoc.object();
 
-       if(_JSONobj["action"].toString()=="insert")
+       try{
+            if(_JSONobj["action"].toString()=="insert")
                this->m_crdt->remoteInsert(symbol);
 
-       if(_JSONobj["action"].toString()=="delete")
+
+            if(_JSONobj["action"].toString()=="delete")
                this->m_crdt->remoteDelete(symbol);
 
+        }catch(std::string _excp){
+
+           //TODO manage exception
+
+       }
 
     });
 

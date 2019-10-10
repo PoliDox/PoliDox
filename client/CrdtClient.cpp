@@ -15,7 +15,8 @@ CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controll
 bool existsPositionInVector(int position, std::vector<int> vector) {
     if(position < vector.size())
         return true;
-    return false;
+
+        return false;
 }
 
 
@@ -228,10 +229,6 @@ void CrdtClient::localInsert(int position, char value) {
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
     std::cout<<"]"<<std::endl;
 
-    /* Numero frazionario generato e simbolo inserito.
-     * Generare ora il Message da spedire */
-    //Message messageToSend(true, symbolToInsert, this);
-    //this->server.send(messageToSend);
     emit onLocalInsert(symbolToInsert);
 }
 
@@ -311,7 +308,7 @@ void CrdtClient::remoteInsert(Char symbol){
    //TODO aggiungere const al reference.
    ______________________________________________________________________________________     */
 
-void CrdtClient::remoteDelete(const Char& symbol){
+void CrdtClient::remoteDelete(const Char& symbol) {
 
 
     std::vector<Char>::iterator _indexHIT;
@@ -339,8 +336,8 @@ void CrdtClient::remoteDelete(const Char& symbol){
 
     if(_rowHIT!=this->_symbols.end())
          _rowHIT->erase(_indexHIT);
-    //else THROW EXCEPTION
-
+    else
+        throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
 
 }
 

@@ -23,22 +23,24 @@ private:
     void printSymbols();
 
 public:
+
     CrdtClient(ClientController *p_controller);
 
-    void printDebugChars();
-    void localInsert(int position, char value);
-    void remoteInsert(Char symbol);
-    void localDelete(int index);
-    //void process(const Message& m);
 
+    void localInsert(int position, char value);
+    void localDelete(int index);
+
+    void remoteInsert(Char symbol);
     void remoteDelete(const Char& symbol);
-    std::string toString();
 
     int getSiteId();
     int getCounter();
     int getCounterAndIncrement();
 
+    void printDebugChars();
+
 signals:
+
     void onLocalInsert(Char symbol); // TODO: Add parameters
     void onLocalDelete(Char symbol);
 
