@@ -19,6 +19,9 @@ private:
     CrdtClient *m_crdt; // TODO: use smart-pointer
     QWebSocket m_socket;
 
+public slots:
+    void onTextMessageReceived(const QString& _JSONstring);
+
 };
 
 #endif // CLIENTCONTROLLER_H

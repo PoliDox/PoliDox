@@ -40,7 +40,7 @@ public:
 signals:
     void onLocalInsert(Char symbol);
     void onLocalDelete(Char symbol);
-    void onRemoteInsert(int position);
+    void onRemoteInsert(int position, char ch);
     void onRemoteDelete(int position);
 
 };
