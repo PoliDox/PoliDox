@@ -21,10 +21,10 @@ ClientController::ClientController()
              _processed=charsAdded;
             while(_processed>0){
                 QChar car =  m_editor.at(position);
-	        if ( 0 == car ) {
-		        // Strangely enough \n is given as 0
-		        car = '\n';
-		}
+                if ( 0 == car ) {
+                    // Strangely enough \n is given as 0
+                    car = '\n';
+                }
                 m_crdt->localInsert(position, car.toLatin1());
                 position++;
                 _processed--;
