@@ -20,6 +20,7 @@ private:
     std::vector<std::vector<Char>> _symbols;
 
     void _toMatrix(int position,int* row,int* index);
+    int _toLinear(int row,int index);
     void printSymbols();
 
 public:

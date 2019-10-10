@@ -133,6 +133,26 @@ void CrdtClient::_toMatrix(int position,int* row,int* index){
         *index=position;    //se sono alla prima riga parto da totalLenght=0
 }
 
+int CrdtClient::_toLinear(int row,int index){
+
+
+    int position=0;
+
+    std::vector<std::vector<Char>>::iterator _ROWit=this->_symbols.begin();
+    std::vector<std::vector<Char>>::iterator _ROWend=_ROWit+row;
+
+    while(_ROWit!=_ROWend){
+        position+=_ROWit->size();
+        _ROWit++;
+
+    }
+
+    position+=index;
+
+    return position;
+
+}
+
 
 /* position Ã¨ il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
@@ -262,16 +282,27 @@ void CrdtClient::remoteInsert(Char symbol){
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
 
+    int _row=0,
+        _index=0;
+
+    int _LINEARpos=0;
+
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
 
+            _row++;
+
             _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
+
+                _index++;
 
                 return symbol.getFractionalPosition() < m_symbol.getFractionalPosition();
 
             });
 
-            if(_INDEXhit!=row.end())
+            if(_INDEXhit!=row.end()){
+                _index--;               /* se l'inserimento non avviene alla fine si fa un confronto in più */
                 return true;
+            }
             else
                 return false;
 
@@ -293,6 +324,14 @@ void CrdtClient::remoteInsert(Char symbol){
         this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
     }
+
+    if(_index!=0)
+        _LINEARpos=_toLinear(_row-1,_index);
+    else
+        _LINEARpos=_toLinear(_row-1,0);
+
+    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
+    emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 };
 
 /* ______________________________________________________________________________________
@@ -309,9 +348,18 @@ void CrdtClient::remoteDelete(const Char& symbol) {
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
 
+    int _row=0,
+        _index=0;
+
+    int _LINEARpos=0;
+
     _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
 
+        _row++;
+
         _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
+
+            _index++;
 
             if(d_symbol.getFractionalPosition()==symbol.getFractionalPosition())
                 return true;
@@ -321,8 +369,9 @@ void CrdtClient::remoteDelete(const Char& symbol) {
         });
 
 
-       if(_indexHIT!=row.end())
+       if(_indexHIT!=row.end()){
            return true;
+       }
        else
            return false;
 
@@ -333,6 +382,14 @@ void CrdtClient::remoteDelete(const Char& symbol) {
          _rowHIT->erase(_indexHIT);
     else
         throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
+
+    if(_index!=0)
+        _LINEARpos=_toLinear(_row-1,_index-1);
+    else
+        _LINEARpos=_toLinear(_row-1,0);
+
+    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
+    emit this->onRemoteDelete(_LINEARpos);
 
 }
 
