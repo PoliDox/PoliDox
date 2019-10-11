@@ -15,7 +15,8 @@ CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controll
 bool existsPositionInVector(int position, std::vector<int> vector) {
     if(position < vector.size())
         return true;
-    return false;
+
+        return false;
 }
 
 
@@ -116,11 +117,10 @@ void CrdtClient::_toMatrix(int position,int* row,int* index){
 
     auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
 
-
         if(position < matrix_row.size())
             return true;
         else{
-        totalLenght+=matrix_row.size();
+            totalLenght+=matrix_row.size();
             return false;
         }
     });
@@ -133,12 +133,31 @@ void CrdtClient::_toMatrix(int position,int* row,int* index){
         *index=position;    //se sono alla prima riga parto da totalLenght=0
 }
 
+int CrdtClient::_toLinear(int row,int index){
+
+
+    int position=0;
+
+    std::vector<std::vector<Char>>::iterator _ROWit=this->_symbols.begin();
+    std::vector<std::vector<Char>>::iterator _ROWend=_ROWit+row;
+
+    while(_ROWit!=_ROWend){
+        position+=_ROWit->size();
+        _ROWit++;
+
+    }
+
+    position+=index;
+
+    return position;
+
+}
+
 
 /* position Ã¨ il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
 void CrdtClient::localInsert(int position, char value) {
 
-   //TODO fare conversione position -> row,index
     int row=0,
         index=0;
 
@@ -166,7 +185,7 @@ void CrdtClient::localInsert(int position, char value) {
     if(index == 0){
         if(rowSize == 0){
             std::vector<int> precedingFractionalNumber;
-            //Ã¨ il primo elemento che inserisco
+            //è il primo elemento che inserisco
             std::vector<int> firstElem{MAXNUM/2};
             std::vector<int> fakeVector{MAXNUM};
             if(row!=0){
@@ -194,7 +213,7 @@ void CrdtClient::localInsert(int position, char value) {
         }
     }
     else {
-        //sicuramente avrÃ² un simbolo prima di me
+        //sicuramente avrà un simbolo prima di me
         if(index >= rowSize){  //TODO controllare bene il confronto
             //non ho nessuno dopo di me
             index = rowSize;  //inserisco in append
@@ -223,15 +242,13 @@ void CrdtClient::localInsert(int position, char value) {
 
     }
 
-    std::cout<<"Added symbol "<< value <<" position: [";
+    /*std::cout << "Added symbol " << value << " (" << (int)value << ") at position: [";
     for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
-    std::cout<<"]"<<std::endl;
+    std::cout<<"]"<<std::endl;*/
 
-    /* Numero frazionario generato e simbolo inserito.
-     * Generare ora il Message da spedire */
-    //Message messageToSend(true, symbolToInsert, this);
-    //this->server.send(messageToSend);
+    printDebugChars();
+
     emit onLocalInsert(symbolToInsert);
 }
 
@@ -242,9 +259,6 @@ void CrdtClient::localDelete(int position){
     int row=0,
         index=0;
 
-    printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
-
     this->_toMatrix(position,&row,&index);
 
     Char _Dsymbol=this->_symbols[row][index];
@@ -254,88 +268,150 @@ void CrdtClient::localDelete(int position){
 
     emit onLocalDelete(_Dsymbol);
 
-    printDebugChars();
 
 }
 
+/* ______________________________________________________________________________________
+   IMPORTANTE!
+
+   Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
+   altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
+
+   //TODO aggiungere const al reference.
+   ______________________________________________________________________________________     */
 void CrdtClient::remoteInsert(Char symbol){
-
-    int  _row=0,
-         index=0;
-
-    printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
 
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
 
-    _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row) -> bool{
+    int _row=0,
+        _index=0;
 
-            _INDEXhit=find_if(row.begin(),row.end(),[&](Char m_symbol)->bool{
+    int _LINEARpos=0;
 
-            return symbol.getFractionalPosition()<m_symbol.getFractionalPosition();
+    char _CHAR=symbol.getValue();
+
+    _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
+
+            _row++;
+
+            _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
+
+                _index++;
+
+                return symbol.getFractionalPosition() < m_symbol.getFractionalPosition();
 
             });
 
-            if(_INDEXhit!=row.end())
+            if(_INDEXhit!=row.end()){
+                _index--;               /* se l'inserimento non avviene alla fine si fa un confronto in più */
                 return true;
+            }
             else
                 return false;
 
     });
 
 
-    if(_ROWhit!=this->_symbols.end()){
+    if(this->_symbols.size()==1 && this->_symbols.begin()->size()==0){
 
-        _ROWhit->insert(_INDEXhit,symbol);
+        this->_symbols.begin()->push_back(symbol);
+    }
+    else if (_ROWhit != this->_symbols.end()  ) {
 
-        if(symbol.getValue()=='\n'){
+        if(_CHAR=='\n'){
 
-            this->_symbols.insert(_ROWhit++,std::vector<Char>(_INDEXhit++,_ROWhit->end()));
-            _ROWhit->erase(_INDEXhit++,_ROWhit->end());
+             std::vector<Char> _VETT(_INDEXhit,_ROWhit->end());
+
+             this->_symbols.insert(_ROWhit+1, _VETT);
+              _ROWhit->erase(_INDEXhit, _ROWhit->end());
+
         }
 
-    }else{
+        _ROWhit->insert(_ROWhit->end(),symbol);
 
-    this->_symbols[this->_symbols.size()-1].push_back(symbol);
+    } else
+
+    /*  if anything bigger than the symbol to inser has been found i need to check if
+     *  the last character of the last line is '\n'. If Yes, create a new row otherwise
+     *  insert the symbol as the last character of the last row.                    */
+
+        {
+
+        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n')
+            this->_symbols.push_back(std::vector<Char>(1,symbol));
+        else
+            this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
     }
 
+    if(_index!=0)
+        _LINEARpos=_toLinear(_row-1,_index);
+    else
+        _LINEARpos=_toLinear(_row-1,0);
+
+    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
+    emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
+
     printDebugChars();
-    std::cout <<"____________________________"<<std::endl;
-
-
 };
 
-void CrdtClient::remoteDelete(const Char& symbol){
+/* ______________________________________________________________________________________
+   IMPORTANTE!
 
+   Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
+   altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
+
+   //TODO aggiungere const al reference.
+   ______________________________________________________________________________________     */
+
+void CrdtClient::remoteDelete(const Char& symbol) {
 
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
 
-    _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> row)->bool{
+    int _row=0,
+        _index=0;
+
+    int _LINEARpos=0;
+
+    _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
+
+        _row++;
 
         _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
 
-            if(symbol.getFractionalPosition()==d_symbol.getFractionalPosition())
+            _index++;
+
+            if(d_symbol.getFractionalPosition()==symbol.getFractionalPosition())
                 return true;
             else
                 return false;
 
         });
 
-       if(_indexHIT!=row.end())
+
+       if(_indexHIT!=row.end()){
            return true;
+       }
        else
            return false;
 
     });
 
+
     if(_rowHIT!=this->_symbols.end())
          _rowHIT->erase(_indexHIT);
+    else
+        throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
 
-    printDebugChars();
+    if(_index!=0)
+        _LINEARpos=_toLinear(_row-1,_index-1);
+    else
+        _LINEARpos=_toLinear(_row-1,0);
 
+    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
+    emit this->onRemoteDelete(_LINEARpos);
 
 }
 

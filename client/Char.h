@@ -25,7 +25,7 @@ public:
     ~Char();
     void setPosition(std::vector<int> x);
     vector<int> getPosition();
-    char getValue();
+    char getValue() const;
     void setFractionalPosition(vector<int> fractionalPosition);
     vector<int> getFractionalPosition() const;
 

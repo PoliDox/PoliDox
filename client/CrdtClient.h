@@ -20,27 +20,29 @@ private:
     std::vector<std::vector<Char>> _symbols;
 
     void _toMatrix(int position,int* row,int* index);
+    int _toLinear(int row,int index);
     void printSymbols();
 
 public:
     CrdtClient(ClientController *p_controller);
 
-    void printDebugChars();
     void localInsert(int position, char value);
-    void remoteInsert(Char symbol);
     void localDelete(int index);
-    //void process(const Message& m);
 
+    void remoteInsert(Char symbol);
     void remoteDelete(const Char& symbol);
-    std::string toString();
 
     int getSiteId();
     int getCounter();
     int getCounterAndIncrement();
 
+    void printDebugChars();
+
 signals:
-    void onLocalInsert(Char symbol); // TODO: Add parameters
+    void onLocalInsert(Char symbol);
     void onLocalDelete(Char symbol);
+    void onRemoteInsert(int position, char ch);
+    void onRemoteDelete(int position);
 
 };
 
