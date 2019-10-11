@@ -1,6 +1,7 @@
 #include "Editor.h"
 #include <QDebug>
 #include <QChar>
+#include <QLabel>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false)
 {
@@ -16,8 +17,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false)
         if (!handlingRemoteOp) {
            emit textChanged(position, charsRemoved, charsAdded);
         }
-    });
-
+    });   
 
 }
 
@@ -34,6 +34,14 @@ void Editor::remoteInsert(int position, char ch)
     m_remoteCursor->setPosition(position);   
     m_remoteCursor->insertText(QString(ch));
     handlingRemoteOp = false;
+    QLabel *qLbl = new QLabel(QString("|"), m_textEdit);
+    m_textEdit->moveCursor(QTextCursor::Start);
+    const QRect qRect = m_textEdit->cursorRect();
+    qDebug() << "Rect:" << qRect;
+    //QLabel *qLbl = new QLabel(QString("Ciao a tutti!!"), m_textEdit);
+    qLbl->setVisible(true);
+    //qLbl->show();
+    qLbl->move(qRect.left(), qRect.top());
 }
 
 void Editor::remoteDelete(int position)

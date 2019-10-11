@@ -73,7 +73,8 @@ ClientController::ClientController()
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
-    m_editor.show();
+    m_editor.show();    
+
 }
 
 
