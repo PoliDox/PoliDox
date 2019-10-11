@@ -6,6 +6,7 @@
 
 #define MAXNUM 100
 
+
 CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
     //TODO il vettore di simboli inizialmente Ã¨ vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
@@ -112,25 +113,38 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 void CrdtClient::_toMatrix(int position,int* row,int* index){
 
-    int totalLenght=0,
-        row_counter=0;
 
-    auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
+    int row_counter=0,
+        _NEWLINE=0;
 
-        if(position < matrix_row.size())
-            return true;
-        else{
-            totalLenght+=matrix_row.size();
-            return false;
+    while(1){
+
+
+
+        if(position>this->_symbols[row_counter].size()){
+            if((this->_symbols[row_counter].end()-1)->getValue()=='\n'){
+                _NEWLINE++;
+                 position-=this->_symbols[row_counter].size();
+            }
         }
-    });
+            else if(position==this->_symbols[row_counter].size()){
+                if(this->_symbols[row_counter].size()!=0 && (this->_symbols[row_counter].end()-1)->getValue()=='\n'){
+                    _NEWLINE++;
+                     position-=this->_symbols[row_counter].size();
+                }
+                break;
+            }
+        else if(position<this->_symbols[row_counter].size())
+                break;
 
-    *row=row_counter;
+         row_counter++;
+    }
 
-    if(row_counter>0)
-        *index=position-totalLenght;
-    else
-        *index=position;    //se sono alla prima riga parto da totalLenght=0
+    *row=_NEWLINE;
+    *index=position;
+
+    std::cout <<*row << " " << *index << std::endl;
+
 }
 
 int CrdtClient::_toLinear(int row,int index){
@@ -173,8 +187,12 @@ void CrdtClient::localInsert(int position, char value) {
     int middleNewLine=0;
 
     if(value=='\n') {
-        if (index == this->_symbols[row].size() - 1)
+        /*  !!!!!BUG SU LOCAL INSERT!!!!!
+            if (index == this->_symbols[row].size() - 1)
             this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());  /* allocate pointer for new line */
+
+        if (index == this->_symbols[row].size())
+           this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());
         else{
             middleNewLine=1;
         }
@@ -247,7 +265,8 @@ void CrdtClient::localInsert(int position, char value) {
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
     std::cout<<"]"<<std::endl;*/
 
-    printDebugChars();
+    //printDebugChars();
+
 
     emit onLocalInsert(symbolToInsert);
 }
@@ -285,7 +304,9 @@ void CrdtClient::remoteInsert(Char symbol){
     std::vector<Char>::iterator _INDEXhit;
 
     int _row=0,
-        _index=0;
+        _index=0,
+        _NOTFOUND=false,
+        _NEWLINE=false;
 
     int _LINEARpos=0;
 
@@ -293,6 +314,7 @@ void CrdtClient::remoteInsert(Char symbol){
 
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
 
+            _index=0; //newline
             _row++;
 
             _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
@@ -307,12 +329,13 @@ void CrdtClient::remoteInsert(Char symbol){
                 _index--;               /* se l'inserimento non avviene alla fine si fa un confronto in più */
                 return true;
             }
-            else
+            else{
                 return false;
+            }
 
     });
 
-
+    /* se editor vuoto */
     if(this->_symbols.size()==1 && this->_symbols.begin()->size()==0){
 
         this->_symbols.begin()->push_back(symbol);
@@ -324,11 +347,12 @@ void CrdtClient::remoteInsert(Char symbol){
              std::vector<Char> _VETT(_INDEXhit,_ROWhit->end());
 
              this->_symbols.insert(_ROWhit+1, _VETT);
-              _ROWhit->erase(_INDEXhit, _ROWhit->end());
+              (this->_symbols.begin()+_row-1)->erase(_INDEXhit, (this->_symbols.begin()+_row-1)->end());
+
 
         }
 
-        _ROWhit->insert(_ROWhit->end(),symbol);
+        (this->_symbols.begin()+_row-1)->insert((this->_symbols.begin()+_row-1)->begin()+_index,symbol);
 
     } else
 
@@ -338,27 +362,35 @@ void CrdtClient::remoteInsert(Char symbol){
 
         {
 
-        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n')
+        _NOTFOUND=true;
+
+        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n'){
+            _NEWLINE=true;
             this->_symbols.push_back(std::vector<Char>(1,symbol));
+        }
         else
             this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
     }
 
-    if(_index!=0)
-        _LINEARpos=_toLinear(_row-1,_index);
+    if(!_NOTFOUND||!_NEWLINE)
+            _LINEARpos=_toLinear(_row-1,_index);
     else
-        _LINEARpos=_toLinear(_row-1,0);
+            _LINEARpos=_toLinear(this->_symbols.size()-1,0);
 
+
+
+
+
+    std::cout << "row " << _row-1 << "index " << _index << std::endl;
     std::cout << "Linear position is: "<<_LINEARpos << std::endl;
     emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
-    printDebugChars();
+
 };
 
 /* ______________________________________________________________________________________
-   IMPORTANTE!
-
+   IMPORTANTE!a
    Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
    altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
 
