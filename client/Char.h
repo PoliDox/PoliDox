@@ -30,6 +30,7 @@ public:
     vector<int> getFractionalPosition() const;
 
     // used by the CLIENTcontroller to create the message to be sent to the server
+    QJsonObject toJson() const;
     QJsonDocument write(const QString &action );
     static Char read(const QString& _JSONstring);
 };

@@ -11,11 +11,13 @@ HEADERS += \
     CrdtClient.h \
     CrdtClient.h \
     Char.h \
-    Editor.h
+    Editor.h \
+    MessageFactory.h
 
 SOURCES += \
     ClientController.cpp \
     CrdtClient.cpp \
     Editor.cpp \
     main.cpp \
-    Char.cpp
+    Char.cpp \
+    MessageFactory.cpp
