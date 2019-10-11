@@ -27,6 +27,14 @@ Server::Server(quint16 port, QObject *parent) :
     ServerController *l_firstFile = new ServerController();
     m_documents["firstFile"] = l_firstFile;
 
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("127.0.0.1");
+    db.setDatabaseName("qtprova");
+    db.setUserName("root");     //default xampp  //TODO: da cambiare username
+    db.setPassword("");         //default xampp  //TODO: da cambiare password
+    bool ok = db.open();
+    QTextStream(stdout) << "connessione al db: " << ok << '\n';
 }
 
 Server::~Server()

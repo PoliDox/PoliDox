@@ -7,6 +7,9 @@
 #include <QThread>
 #include "ServerController.h"
 
+#include <QSqlDatabase>
+#include <QtSql>
+
 class Server : public QObject
 {
     Q_OBJECT
