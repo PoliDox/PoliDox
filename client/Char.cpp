@@ -28,7 +28,7 @@ QJsonObject Char::toJson() const {
     return _JSONobj;
 }
 
-Char Char::read(const QString& _JSONstring){
+Char Char::fromJson(const QString& _JSONstring){
 
     QJsonDocument _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
 
@@ -42,7 +42,6 @@ Char Char::read(const QString& _JSONstring){
 
         QJsonArray _JSONpos=_JSONobj["position"].toArray();
 
-        QString action= _JSONobj["action"].toString();
         //std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value.toUtf8().constData() <<" at position [ ";
         for(QJsonArray::iterator it=_JSONpos.begin();it!=_JSONpos.end();it++){
             position.push_back(it->toInt());

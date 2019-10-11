@@ -98,7 +98,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     QJsonObject _JSONobj;
     QJsonDocument _JSONdoc;
 
-    Char symbol=Char::read(_JSONstring);
+    Char symbol=Char::fromJson(_JSONstring);
 
      _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
 
