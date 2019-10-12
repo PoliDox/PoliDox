@@ -143,7 +143,7 @@ void CrdtClient::_toMatrix(int position,int* row,int* index){
     *row=_NEWLINE;
     *index=position;
 
-    std::cout <<*row << " " << *index << std::endl;
+
 
 }
 
@@ -176,6 +176,8 @@ void CrdtClient::localInsert(int position, char value) {
         index=0;
 
     this->_toMatrix(position,&row,&index);
+
+    std::cout << "[LOCAL INSERT]@ " << row << " " << index << std::endl;
 
     Char symbolToInsert(this->_siteID, 0, value);
 
@@ -294,6 +296,8 @@ void CrdtClient::localDelete(int position){
 
     emit onLocalDelete(_Dsymbol);
 
+    std::cout << "[LOCAL DELETE]@ " << row << " " << index << std::endl;
+
 
 }
 
@@ -389,15 +393,14 @@ void CrdtClient::remoteInsert(Char symbol){
 
 
 
-    std::cout << "row " << _row-1 << "index " << _index << std::endl;
-    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
+    std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index << std::endl;
     emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
 
 };
 
 /* ______________________________________________________________________________________
-   IMPORTANTE!a
+   IMPORTANTE!
    Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
    altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
 
@@ -458,7 +461,7 @@ void CrdtClient::remoteDelete(const Char& symbol) {
     else
         _LINEARpos=_toLinear(_row,0);
 
-    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
+    std::cout << "[REMOTE DELETE]@ " << _row << " " << _index-1 << std::endl;
     emit this->onRemoteDelete(_LINEARpos);
 
 }
