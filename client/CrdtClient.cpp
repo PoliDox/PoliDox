@@ -442,7 +442,7 @@ void CrdtClient::remoteDelete(const Char& symbol) {
 
     if(_rowHIT!=this->_symbols.end()){
 
-        if((_rowHIT->begin()+_index)->getValue()=='\n'){
+        if((_rowHIT->begin()+_index-1)->getValue()=='\n'){
              this->_symbols[_row].erase(this->_symbols[_row].end()-1);
              this->_symbols[_row].insert(this->_symbols[_row].end(),this->_symbols[_row+1].begin(),this->_symbols[_row+1].end());
              this->_symbols.erase(this->_symbols.begin()+_row+1);
