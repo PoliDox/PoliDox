@@ -280,9 +280,16 @@ void CrdtClient::localDelete(int position){
 
     this->_toMatrix(position,&row,&index);
 
+
     Char _Dsymbol=this->_symbols[row][index];
 
-    this->_symbols[row].erase(this->_symbols[row].begin()+index);
+
+        if((this->_symbols[row].end()-1)->getValue()=='\n'){
+            this->_symbols[row].erase(this->_symbols[row].end()-1);
+            this->_symbols[row].insert(this->_symbols[row].end(),this->_symbols[row+1].begin(),this->_symbols[row+1].end());
+            this->_symbols.erase(this->_symbols.begin()+row+1);
+        }else
+            this->_symbols[row].erase(this->_symbols[row].begin()+index);
 
 
     emit onLocalDelete(_Dsymbol);
