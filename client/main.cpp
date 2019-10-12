@@ -3,9 +3,12 @@
 #include <QDesktopWidget>
 #include "ClientController.h"
 
+#include "mainwindow.h"
+
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("PoliDox");
     QCoreApplication::setApplicationName("PoliDox client");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
@@ -21,5 +24,8 @@ int main(int argc, char *argv[])
         editor.fileNew();
     */
 
-    return a.exec();
+   /* MainWindow mainWin;
+    mainWin.show();*/
+
+    return app.exec();
 }

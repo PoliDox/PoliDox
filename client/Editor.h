@@ -21,12 +21,19 @@ signals:
 public slots:
     void remoteInsert(int position, char ch);
     void remoteDelete(int position);
+    void newFile();
+
 
 private:
+    void createActions();
+    void createStatusBar();
+    void readSettings();
+    void setCurrentFile(const QString &fileName);
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_remoteCursor;
     bool handlingRemoteOp;
+    QString curFile;
 };
 
 #endif // EDITOR_H

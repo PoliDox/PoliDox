@@ -11,11 +11,18 @@ HEADERS += \
     CrdtClient.h \
     CrdtClient.h \
     Char.h \
-    Editor.h
+    Editor.h \
+    mainwindow.h
 
 SOURCES += \
     ClientController.cpp \
     CrdtClient.cpp \
     Editor.cpp \
     main.cpp \
-    Char.cpp
+    Char.cpp \
+    mainwindow.cpp
+
+DISTFILES += \
+    images/filenew.png \
+    images/new_file.png \
+    images/open_file.png
