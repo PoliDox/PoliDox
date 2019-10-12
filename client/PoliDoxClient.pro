@@ -12,7 +12,7 @@ HEADERS += \
     CrdtClient.h \
     Char.h \
     Editor.h \
-    MessageFactory.h
+    ClientMessageFactory.h
 
 SOURCES += \
     ClientController.cpp \
@@ -20,7 +20,7 @@ SOURCES += \
     Editor.cpp \
     main.cpp \
     Char.cpp \
-    MessageFactory.cpp
+    ClientMessageFactory.cpp
 
 DISTFILES += \
     images/filenew.png \

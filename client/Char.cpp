@@ -5,6 +5,11 @@ Char::~Char()
 {
 }
 
+int Char::getSiteId() const
+{
+    return siteId;
+}
+
 void Char::setPosition(std::vector<int> x)
 {
     this->position = x;
@@ -28,36 +33,27 @@ QJsonObject Char::toJson() const {
     return _JSONobj;
 }
 
-Char Char::fromJson(const QString& _JSONstring){
+Char Char::fromJson(const QJsonObject& _JSONobj){
 
-    QJsonDocument _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
+    // TODO: What if some value is missing? E.g. There is no "value"
+    QString value=_JSONobj["value"].toString();
+    int counter=_JSONobj["counter"].toInt();
+    int siteId=_JSONobj["siteId"].toInt();
+    std::vector<int> position;
 
-    if(!_JSONdoc.isNull()){
+    QJsonArray _JSONpos=_JSONobj["position"].toArray();
 
-        QJsonObject _JSONobj=_JSONdoc.object();
-        QString value=_JSONobj["value"].toString();
-        int counter=_JSONobj["counter"].toInt();
-        int siteId=_JSONobj["siteId"].toInt();
-        std::vector<int> position;
-
-        QJsonArray _JSONpos=_JSONobj["position"].toArray();
-
-        //std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value.toUtf8().constData() <<" at position [ ";
-        for(QJsonArray::iterator it=_JSONpos.begin();it!=_JSONpos.end();it++){
-            position.push_back(it->toInt());
-            //std::cout<< it->toInt() <<" ";
-        }
-
-        //std::cout << "]" << std::endl;
-        Char symbol(siteId,counter,value[0].toLatin1());
-        symbol.setFractionalPosition(position);
-
-        return symbol;
+    //std::cout << "Remote "<< action.toUtf8().constData() << " of symbol "<< value.toUtf8().constData() <<" at position [ ";
+    for(QJsonArray::iterator it=_JSONpos.begin();it!=_JSONpos.end();it++){
+        position.push_back(it->toInt());
+        //std::cout<< it->toInt() <<" ";
     }
 
+    //std::cout << "]" << std::endl;
+    Char symbol(siteId,counter,value[0].toLatin1());
+    symbol.setFractionalPosition(position);
 
-
-
+    return symbol;
 }
 
 vector<int> Char::getPosition() {

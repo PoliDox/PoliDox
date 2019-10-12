@@ -4,10 +4,10 @@
 #include <QJsonDocument>
 #include "Char.h"
 
-class MessageFactory
+class ClientMessageFactory
 {
 public:    
-    MessageFactory() = delete;
+    ClientMessageFactory() = delete;
 
     static QByteArray createInsertMessage(const Char& p_char);
     static QByteArray createDeleteMessage(const Char& p_char);

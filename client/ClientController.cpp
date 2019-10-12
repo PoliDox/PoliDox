@@ -1,7 +1,7 @@
 #include "ClientController.h"
 
 #include <QLabel>
-#include "MessageFactory.h"
+#include "ClientMessageFactory.h"
 
 ClientController::ClientController()
 {
@@ -50,7 +50,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
-        QByteArray jsonString = MessageFactory::createInsertMessage(symbol);
+        QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -59,21 +59,18 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
-        QByteArray jsonString = MessageFactory::createDeleteMessage(symbol);
+        QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
         m_socket.sendTextMessage(jsonString);
     });
 
-    connect(m_crdt, &CrdtClient::onRemoteInsert, &m_editor, &Editor::remoteInsert);
-    connect(m_crdt, &CrdtClient::onRemoteDelete, &m_editor, &Editor::remoteDelete);
-
-
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
-    m_editor.show();
+    m_editor.show();    
+
 }
 
 
@@ -96,27 +93,45 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     //std::cout<< "Message received" << std::endl;
 
     QJsonObject _JSONobj;
-    QJsonDocument _JSONdoc;
+    QJsonDocument _JSONdoc;    
 
-    Char symbol=Char::fromJson(_JSONstring);
+     _JSONdoc = QJsonDocument::fromJson(_JSONstring.toUtf8());
 
-     _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
-
-    if(!_JSONdoc.isNull())
-         _JSONobj=_JSONdoc.object();
-
-    try{
-         if(_JSONobj["action"].toString()=="insert")
-            this->m_crdt->remoteInsert(symbol);
-
-
-         if(_JSONobj["action"].toString()=="delete")
-            this->m_crdt->remoteDelete(symbol);
-
-     }catch(std::string _excp){
-
-        //TODO manage exception
-
+    if (_JSONdoc.isNull()) {
+        // TODO: print some debug
+        return;
     }
+
+
+    _JSONobj = _JSONdoc.object();
+
+    // No try-catch here because we cannot handle it here anyway
+
+    //try {
+
+    // No switch case for strings in C++ :((
+    QString l_header = _JSONobj["action"].toString();
+    if (l_header == "insert") {
+        Char symbol = Char::fromJson(_JSONobj);
+        int linPos = m_crdt->remoteInsert(symbol);
+        m_editor.remoteInsert(symbol.getSiteId(), linPos, symbol.getValue());
+
+    } else if (l_header== "delete") {
+        Char symbol = Char::fromJson(_JSONobj);
+        int linPos = m_crdt->remoteDelete(symbol);
+        m_editor.remoteDelete(symbol.getSiteId(), linPos);
+
+    } else if (l_header == "newClient") {
+        int siteId = _JSONobj["siteId"].toInt();
+        m_editor.addClient(siteId);
+        qDebug() << "New client with siteId" << siteId;
+
+    } else {
+        qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
+    }
+
+    //} catch (std::string _excp) {
+        //TODO manage exception
+    //}
 
 }

@@ -8,9 +8,11 @@
 
 
 CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
-    //TODO il vettore di simboli inizialmente Ã¨ vuoto??
+    //TODO il vettore di simboli inizialmente è vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+
+    _siteID = 1; // ONLY FOR TESTING
 }
 
 bool existsPositionInVector(int position, std::vector<int> vector) {
@@ -336,7 +338,7 @@ void CrdtClient::localDelete(int position){
 
    //TODO aggiungere const al reference.
    ______________________________________________________________________________________     */
-void CrdtClient::remoteInsert(Char symbol){
+int CrdtClient::remoteInsert(Char symbol){
 
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
@@ -419,11 +421,15 @@ void CrdtClient::remoteInsert(Char symbol){
 
 
 
+
     if(_CHAR=='\n')
         std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index << " \\n "<< std::endl;
     else
         std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index <<" " << _CHAR << std::endl;
-    emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
+    //emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
+
+
+    return _LINEARpos;
 
 
 };
@@ -436,7 +442,7 @@ void CrdtClient::remoteInsert(Char symbol){
    //TODO aggiungere const al reference.
    ______________________________________________________________________________________     */
 
-void CrdtClient::remoteDelete(const Char& symbol) {
+int CrdtClient::remoteDelete(const Char& symbol) {
 
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
@@ -499,8 +505,8 @@ void CrdtClient::remoteDelete(const Char& symbol) {
         _LINEARpos=_toLinear(_row,0);
 
     std::cout << "[REMOTE DELETE]@ " << _row << " " << _index-1 << std::endl;
-    emit this->onRemoteDelete(_LINEARpos);
 
+    return _LINEARpos;
 }
 
 
