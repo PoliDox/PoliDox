@@ -280,10 +280,17 @@ void CrdtClient::localDelete(int position){
 
     this->_toMatrix(position,&row,&index);
 
+
     Char _Dsymbol=this->_symbols[row][index];
 
-    this->_symbols[row].erase(this->_symbols[row].begin()+index);
-
+    if(index==this->_symbols[row].size()-1){
+        if((this->_symbols[row].end()-1)->getValue()=='\n'){
+            this->_symbols[row].erase(this->_symbols[row].end()-1);
+            this->_symbols[row].insert(this->_symbols[row].end(),this->_symbols[row+1].begin(),this->_symbols[row+1].end());
+            this->_symbols.erase(this->_symbols.begin()+row+1);
+        }
+    }else
+        this->_symbols[row].erase(this->_symbols[row].begin()+index);
 
     emit onLocalDelete(_Dsymbol);
 
@@ -402,14 +409,15 @@ void CrdtClient::remoteDelete(const Char& symbol) {
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
 
-    int _row=0,
-        _index=0;
+    int _row=-1,
+        _index=-1;
 
     int _LINEARpos=0;
 
     _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
 
         _row++;
+        _index=0;
 
         _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
 
@@ -432,15 +440,23 @@ void CrdtClient::remoteDelete(const Char& symbol) {
     });
 
 
-    if(_rowHIT!=this->_symbols.end())
-         _rowHIT->erase(_indexHIT);
+    if(_rowHIT!=this->_symbols.end()){
+
+        if((_rowHIT->begin()+_index-1)->getValue()=='\n'){
+             this->_symbols[_row].erase(this->_symbols[_row].end()-1);
+             this->_symbols[_row].insert(this->_symbols[_row].end(),this->_symbols[_row+1].begin(),this->_symbols[_row+1].end());
+             this->_symbols.erase(this->_symbols.begin()+_row+1);
+
+         }else
+            _rowHIT->erase(_indexHIT);
+    }
     else
         throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
 
     if(_index!=0)
-        _LINEARpos=_toLinear(_row-1,_index-1);
+        _LINEARpos=_toLinear(_row,_index-1);
     else
-        _LINEARpos=_toLinear(_row-1,0);
+        _LINEARpos=_toLinear(_row,0);
 
     std::cout << "Linear position is: "<<_LINEARpos << std::endl;
     emit this->onRemoteDelete(_LINEARpos);
