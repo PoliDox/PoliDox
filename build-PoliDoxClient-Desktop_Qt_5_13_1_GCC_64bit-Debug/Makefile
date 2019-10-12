@@ -1724,6 +1724,9 @@ editor.o: ../client/editor.cpp ../client/editor.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/QJsonDocument \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/qjsondocument.h \
 		ui_editor.h \
+		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QAction \
+		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qaction.h \
+		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qactiongroup.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QApplication \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qapplication.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/qcoreapplication.h \
@@ -1731,11 +1734,10 @@ editor.o: ../client/editor.cpp ../client/editor.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qdesktopwidget.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtGui/qguiapplication.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtGui/qinputmethod.h \
+		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QMenu \
+		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qmenu.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QMenuBar \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qmenubar.h \
-		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qmenu.h \
-		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qaction.h \
-		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qactiongroup.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QStatusBar \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/qstatusbar.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QToolBar \
@@ -1748,7 +1750,6 @@ editor.o: ../client/editor.cpp ../client/editor.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QWidget \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/QDebug \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/QChar \
-		/opt/Qt/5.13.1/gcc_64/include/QtWidgets/QMenu \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/QSettings \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/qsettings.h \
 		/opt/Qt/5.13.1/gcc_64/include/QtCore/QCoreApplication \
