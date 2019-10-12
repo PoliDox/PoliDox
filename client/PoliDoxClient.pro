@@ -21,3 +21,14 @@ SOURCES += \
     main.cpp \
     Char.cpp \
     MessageFactory.cpp
+
+DISTFILES += \
+    images/filenew.png \
+    images/new_file.png \
+    images/open_file.png
+
+FORMS += \
+    editor.ui
+
+RESOURCES += \
+    Resources.qrc
