@@ -20,10 +20,11 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
 {
     ui->setupUi(this);
     m_textEdit = ui->textEdit;
-    setCentralWidget(m_textEdit);
-    m_textDoc = new QTextDocument(m_textEdit);
+    setCentralWidget(m_textEdit);   
+    m_textDoc = new QTextDocument(m_textEdit); 
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
+    m_textEdit->setTextCursor(*m_localCursor);
     setWindowTitle("PoliDox");
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
@@ -50,27 +51,30 @@ QChar Editor::at(int pos)
 void Editor::addClient(int siteId)
 {
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
+    // TODO: Uncomment these lines when siteId is supported
+    //m_remoteCursors[siteId]->setVisible(true);
+    //QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
+    //m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
 }
 
-void Editor::remoteInsert(int position, char ch)
+void Editor::remoteInsert(int siteId, int position, char ch)
 {
     handlingRemoteOp = true;
+    int origPos = m_localCursor->position();
     m_localCursor->clearSelection();
-    m_localCursor->setPosition(position);
+    m_localCursor->setPosition(position);    
     m_localCursor->insertText(QString(ch));
     handlingRemoteOp = false;
-    QLabel *qLbl = new QLabel(QString("|"), m_textEdit);
-    m_textEdit->moveCursor(QTextCursor::Start);
-    const QRect qRect = m_textEdit->cursorRect();
-    //qDebug() << "Rect:" << qRect;
-    //QLabel *qLbl = new QLabel(QString("Ciao a tutti!!"), m_textEdit);
-    qLbl->setVisible(true);
-    //qLbl->show();
-    qLbl->move(qRect.left(), qRect.top());
+    // TODO: Uncomment these lines when siteId is supported
+    //m_localCursor->setPosition(position+1);
+    //QRect remoteCoord = m_textEdit->cursorRect(*m_localCursor);
+    //m_remoteCursors[siteId]->move(remoteCoord.left(), remoteCoord.top());
+    m_localCursor->setPosition(origPos);
 }
 
-void Editor::remoteDelete(int position)
+void Editor::remoteDelete(int siteId, int position)
 {
+    // TODO: implement it (see remoteInsert)
     handlingRemoteOp = true;
     m_localCursor->clearSelection();
     m_localCursor->setPosition(position);

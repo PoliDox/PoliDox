@@ -66,10 +66,6 @@ ClientController::ClientController()
         m_socket.sendTextMessage(jsonString);
     });
 
-    connect(m_crdt, &CrdtClient::onRemoteInsert, &m_editor, &Editor::remoteInsert);
-    connect(m_crdt, &CrdtClient::onRemoteDelete, &m_editor, &Editor::remoteDelete);
-
-
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
@@ -117,14 +113,19 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
         Char symbol = Char::fromJson(_JSONobj);
-        m_crdt->remoteInsert(symbol);
+        int linPos = m_crdt->remoteInsert(symbol);
+        m_editor.remoteInsert(symbol.getSiteId(), linPos, symbol.getValue());
+
     } else if (l_header== "delete") {
         Char symbol = Char::fromJson(_JSONobj);
-        m_crdt->remoteDelete(symbol);
+        int linPos = m_crdt->remoteDelete(symbol);
+        m_editor.remoteDelete(symbol.getSiteId(), linPos);
+
     } else if (l_header == "newClient") {
         int siteId = _JSONobj["siteId"].toInt();
         m_editor.addClient(siteId);
         qDebug() << "New client with siteId" << siteId;
+
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }

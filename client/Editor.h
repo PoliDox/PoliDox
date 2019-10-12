@@ -22,13 +22,13 @@ public:
 
     QChar at(int pos);
     void addClient(int siteId);
+    void remoteInsert(int siteId, int position, char ch);
+    void remoteDelete(int siteId, int position);
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
 
 public slots:
-    void remoteInsert(int position, char ch);
-    void remoteDelete(int position);
     //void newFile();
 
 

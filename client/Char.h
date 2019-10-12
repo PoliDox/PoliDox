@@ -23,6 +23,7 @@ private:
 public:
     Char(int siteId, int counter, char value) : siteId(siteId), counter(counter), value(value){};
     ~Char();
+    int getSiteId() const;
     void setPosition(std::vector<int> x);
     vector<int> getPosition();
     char getValue() const;

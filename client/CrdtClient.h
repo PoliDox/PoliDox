@@ -29,8 +29,10 @@ public:
     void localInsert(int position, char value);
     void localDelete(int index);
 
-    void remoteInsert(Char symbol);
-    void remoteDelete(const Char& symbol);
+    // These functions return the linear position
+    // at which the character is added/deleted
+    int remoteInsert(Char symbol);
+    int remoteDelete(const Char& symbol);
 
     int getSiteId();
     int getCounter();
@@ -40,10 +42,7 @@ public:
 
 signals:
     void onLocalInsert(Char symbol);
-    void onLocalDelete(Char symbol);
-    void onRemoteInsert(int position, char ch);
-    void onRemoteDelete(int position);
-
+    void onLocalDelete(Char symbol);    
 };
 
 

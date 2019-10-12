@@ -5,6 +5,11 @@ Char::~Char()
 {
 }
 
+int Char::getSiteId() const
+{
+    return siteId;
+}
+
 void Char::setPosition(std::vector<int> x)
 {
     this->position = x;
