@@ -1,7 +1,7 @@
 #include "ClientController.h"
 
 #include <QLabel>
-#include "MessageFactory.h"
+#include "ClientMessageFactory.h"
 
 ClientController::ClientController()
 {
@@ -50,7 +50,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
-        QByteArray jsonString = MessageFactory::createInsertMessage(symbol);
+        QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -59,7 +59,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
-        QByteArray jsonString = MessageFactory::createDeleteMessage(symbol);
+        QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -97,27 +97,40 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     //std::cout<< "Message received" << std::endl;
 
     QJsonObject _JSONobj;
-    QJsonDocument _JSONdoc;
+    QJsonDocument _JSONdoc;    
 
-    Char symbol=Char::fromJson(_JSONstring);
+     _JSONdoc = QJsonDocument::fromJson(_JSONstring.toUtf8());
 
-     _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
-
-    if(!_JSONdoc.isNull())
-         _JSONobj=_JSONdoc.object();
-
-    try{
-         if(_JSONobj["action"].toString()=="insert")
-            this->m_crdt->remoteInsert(symbol);
-
-
-         if(_JSONobj["action"].toString()=="delete")
-            this->m_crdt->remoteDelete(symbol);
-
-     }catch(std::string _excp){
-
-        //TODO manage exception
-
+    if (_JSONdoc.isNull()) {
+        // TODO: print some debug
+        return;
     }
+
+
+    _JSONobj = _JSONdoc.object();
+
+    // No try-catch here because we cannot handle it here anyway
+
+    //try {
+
+    // No switch case for strings in C++ :((
+    QString l_header = _JSONobj["action"].toString();
+    if (l_header == "insert") {
+        Char symbol = Char::fromJson(_JSONobj);
+        m_crdt->remoteInsert(symbol);
+    } else if (l_header== "delete") {
+        Char symbol = Char::fromJson(_JSONobj);
+        m_crdt->remoteDelete(symbol);
+    } else if (l_header == "newClient") {
+        int siteId = _JSONobj["siteId"].toInt();
+        m_editor.addClient(siteId);
+        qDebug() << "New client with siteId" << siteId;
+    } else {
+        qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
+    }
+
+    //} catch (std::string _excp) {
+        //TODO manage exception
+    //}
 
 }

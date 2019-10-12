@@ -23,7 +23,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
     setCentralWidget(m_textEdit);
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
-    m_remoteCursor = new QTextCursor(m_textDoc);
+    m_localCursor = new QTextCursor(m_textDoc);
     setWindowTitle("PoliDox");
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
@@ -47,17 +47,22 @@ QChar Editor::at(int pos)
     return m_textDoc->characterAt(pos);
 }
 
+void Editor::addClient(int siteId)
+{
+    m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
+}
+
 void Editor::remoteInsert(int position, char ch)
 {
     handlingRemoteOp = true;
-    m_remoteCursor->clearSelection();
-    m_remoteCursor->setPosition(position);
-    m_remoteCursor->insertText(QString(ch));
+    m_localCursor->clearSelection();
+    m_localCursor->setPosition(position);
+    m_localCursor->insertText(QString(ch));
     handlingRemoteOp = false;
     QLabel *qLbl = new QLabel(QString("|"), m_textEdit);
     m_textEdit->moveCursor(QTextCursor::Start);
     const QRect qRect = m_textEdit->cursorRect();
-    qDebug() << "Rect:" << qRect;
+    //qDebug() << "Rect:" << qRect;
     //QLabel *qLbl = new QLabel(QString("Ciao a tutti!!"), m_textEdit);
     qLbl->setVisible(true);
     //qLbl->show();
@@ -67,9 +72,9 @@ void Editor::remoteInsert(int position, char ch)
 void Editor::remoteDelete(int position)
 {
     handlingRemoteOp = true;
-    m_remoteCursor->clearSelection();
-    m_remoteCursor->setPosition(position);
-    m_remoteCursor->deleteChar();
+    m_localCursor->clearSelection();
+    m_localCursor->setPosition(position);
+    m_localCursor->deleteChar();
     handlingRemoteOp = false;
 }
 

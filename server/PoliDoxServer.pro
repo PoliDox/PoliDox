@@ -27,7 +27,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         Server.cpp \
         ServerController.cpp \
-    main.cpp
+    main.cpp \
+    ServerMessageFactory.cpp
 
 
 # Default rules for deployment.
@@ -38,4 +39,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Server.h \
     Server.h \
-    ServerController.h
+    ServerController.h \
+    ServerMessageFactory.h

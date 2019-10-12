@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QTextDocument>
+#include <QMap>
+#include <QLabel>
 #include "CrdtClient.h"
 
 
@@ -19,6 +21,7 @@ public:
     ~Editor();
 
     QChar at(int pos);
+    void addClient(int siteId);
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
@@ -51,11 +54,12 @@ private slots:
 private:
     void createActions();
     void createStatusBar();
+
+    bool handlingRemoteOp;
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
-    QTextCursor *m_remoteCursor;
-    bool handlingRemoteOp;
-    QString curFile;
+    QTextCursor *m_localCursor;
+    QMap<int, QLabel*> m_remoteCursors;
     Ui::Editor *ui;
 };
 
