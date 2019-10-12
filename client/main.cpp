@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include "ClientController.h"
-#include "editor.h"
+#include "Editor.h"
 
 int main(int argc, char *argv[])
 {
