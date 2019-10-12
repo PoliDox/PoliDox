@@ -1,6 +1,7 @@
 #include "ClientController.h"
 
 #include <QLabel>
+#include "MessageFactory.h"
 
 ClientController::ClientController()
 {
@@ -49,9 +50,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
-        QJsonDocument _JSONdoc = symbol.write("insert");
-
-        QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
+        QByteArray jsonString = MessageFactory::createInsertMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -60,9 +59,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
-        QJsonDocument _JSONdoc=symbol.write("delete");
-
-        QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
+        QByteArray jsonString = MessageFactory::createDeleteMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -101,7 +98,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     QJsonObject _JSONobj;
     QJsonDocument _JSONdoc;
 
-    Char symbol=Char::read(_JSONstring);
+    Char symbol=Char::fromJson(_JSONstring);
 
      _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
 
