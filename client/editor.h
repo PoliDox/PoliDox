@@ -51,8 +51,6 @@ private slots:
 private:
     void createActions();
     void createStatusBar();
-    void readSettings();
-    void setCurrentFile(const QString &fileName);
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_remoteCursor;
