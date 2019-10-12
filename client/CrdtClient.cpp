@@ -182,7 +182,10 @@ void CrdtClient::localInsert(int position, char value) {
         this->_symbols.insert(this->_symbols.begin() + (row), vector<Char>());
     }
 
-    std::cout << "[LOCAL INSERT]@ " << row << " " << index << std::endl;
+    if(value=='\n')
+        std::cout << "[LOCAL INSERT]@ " << row << " " << index << " \\n "<< std::endl;
+    else
+        std::cout << "[LOCAL INSERT]@ " << row << " " << index << " \ "<< value << std::endl;
 
     Char symbolToInsert(this->_siteID, 0, value);
 
@@ -198,11 +201,15 @@ void CrdtClient::localInsert(int position, char value) {
             if (index == this->_symbols[row].size() - 1)
             this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());  /* allocate pointer for new line */
 
-        if (index == this->_symbols[row].size())
-           this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());
+        /*if (index == this->_symbols[row].size())
+           this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>()); //NON NECESSARIO DOPO FIX SECONDO BUG
         else{
             middleNewLine=1;
-        }
+        }*/
+
+        if (index != this->_symbols[row].size())
+            middleNewLine=1;
+
     }
 
 
@@ -291,7 +298,6 @@ void CrdtClient::localDelete(int position){
     Char _Dsymbol=this->_symbols[row][index];
 
 
-
     if(row>0&&index==this->_symbols[row-1].size()+1){
 
         if((this->_symbols[row-1].end()-1)->getValue()=='\n'){
@@ -306,6 +312,11 @@ void CrdtClient::localDelete(int position){
 
     }else{
         this->_symbols[row].erase(this->_symbols[row].begin()+index);
+
+        if(_Dsymbol.getValue()=='\n'&& (row+1<this->_symbols.size())){
+            this->_symbols[row].insert(this->_symbols[row].end(),this->_symbols[row+1].begin(),this->_symbols[row+1].end());
+            this->_symbols.erase(this->_symbols.begin()+row+1);
+        }
         if(this->_symbols[row].size()==0)
             this->_symbols.erase(this->_symbols.begin()+row);
     }
@@ -408,8 +419,10 @@ void CrdtClient::remoteInsert(Char symbol){
 
 
 
-
-    std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index << std::endl;
+    if(_CHAR=='\n')
+        std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index << " \\n "<< std::endl;
+    else
+        std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index <<" " << _CHAR << std::endl;
     emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
 
