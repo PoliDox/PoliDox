@@ -18,13 +18,13 @@ ClientController::ClientController()
         // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
         // Probably we should delete everything first and then insert..
 
-        qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
+        //qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
         if (charsAdded > 1) {
             // When copying something a paragraph separator is inserted and deleted implicitly
             charsAdded--;
             if (!charsRemoved) {
-                qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
+                //qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
             }
             charsRemoved--;
         }
