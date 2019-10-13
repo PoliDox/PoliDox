@@ -18,10 +18,8 @@ void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
         QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
         for(auto it = m_clients.constBegin(); it != m_clients.constEnd(); it++) {
             const Account& l_client = it.key();
-            auto l_socket = it.value();            
-            qDebug() << "Client " << l_client.getSiteId() << "has socket " << l_socket;
-            if (l_socket != pSender) { // don't echo message back to sender
-                qDebug () << "Forwarding message to client " << l_client.getSiteId();
+            auto l_socket = it.value();                    
+            if (l_socket != pSender) { // don't echo message back to sender                
                 l_socket->sendTextMessage(p_message);
             }
         }
