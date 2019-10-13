@@ -120,17 +120,20 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     // No switch case for strings in C++ :((
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
-        Char symbol = Char::fromJson(_JSONobj);
+        QJsonObject charObj = _JSONobj["char"].toObject();
+        Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
         m_editor.remoteInsert(symbol.getSiteId(), linPos, symbol.getValue());
 
     } else if (l_header== "delete") {
-        Char symbol = Char::fromJson(_JSONobj);
+        QJsonObject charObj = _JSONobj["char"].toObject();
+        Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteDelete(symbol);
         m_editor.remoteDelete(symbol.getSiteId(), linPos);
 
-    } else if (l_header == "newClient") {        
-        Account newUser = Account::fromJson(_JSONobj);
+    } else if (l_header == "newClient") {
+        QJsonObject accountObj = _JSONobj["account"].toObject();
+        Account newUser = Account::fromJson(accountObj);
         m_editor.addClient(newUser);
         qDebug() << "New client with siteId" << newUser.getSiteId();
 
