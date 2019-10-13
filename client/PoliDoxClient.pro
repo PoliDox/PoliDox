@@ -12,7 +12,8 @@ HEADERS += \
     CrdtClient.h \
     Char.h \
     Editor.h \
-    ClientMessageFactory.h
+    ClientMessageFactory.h \
+    Account.h
 
 SOURCES += \
     ClientController.cpp \

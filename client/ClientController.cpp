@@ -15,30 +15,38 @@ ClientController::ClientController()
 
     connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
 
-        int _processed=0;
+        // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
+        // Probably we should delete everything first and then insert..
 
-        if (charsAdded) {
-            //qDebug() << "Added" << charsAdded << "chars at position" << position;
-             _processed=charsAdded;
-            while(_processed>0){
-                char car =  m_editor.at(position).toLatin1();
-                if ( 0 == car ) {
-                    // Strangely enough \n is given as 0
-                    car = '\n';
-                }
-                m_crdt->localInsert(position, car);
-                position++;
-                _processed--;
-            }
+        qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
-        } else {
-            _processed=charsRemoved;
-            //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            while(_processed>0){
-                m_crdt->localDelete(position);
-                _processed--;
+        if (charsAdded > 1) {
+            // When copying something a paragraph separator is inserted and deleted implicitly
+            charsAdded--;
+            if (!charsRemoved) {
+                qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
             }
+            charsRemoved--;
         }
+
+        // It could happen that some chars were removed and some others were added at the same time
+        for (int i = 0; i < charsRemoved; i++) {
+            m_crdt->localDelete(position);
+        }
+
+        for (int i = 0; i < charsAdded; i++) {
+
+            QChar qchar = m_editor.at(position+i);
+            char _char;
+            if (qchar == QChar::ParagraphSeparator) {
+                qDebug() << "ParagraphSeparator";
+                _char = '\n';
+            } else {
+                _char =  qchar.toLatin1();
+            }
+            m_crdt->localInsert(position+i, _char);
+        }
+
     });
 
 
@@ -112,19 +120,22 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     // No switch case for strings in C++ :((
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
-        Char symbol = Char::fromJson(_JSONobj);
+        QJsonObject charObj = _JSONobj["char"].toObject();
+        Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
         m_editor.remoteInsert(symbol.getSiteId(), linPos, symbol.getValue());
 
     } else if (l_header== "delete") {
-        Char symbol = Char::fromJson(_JSONobj);
+        QJsonObject charObj = _JSONobj["char"].toObject();
+        Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteDelete(symbol);
         m_editor.remoteDelete(symbol.getSiteId(), linPos);
 
     } else if (l_header == "newClient") {
-        int siteId = _JSONobj["siteId"].toInt();
-        m_editor.addClient(siteId);
-        qDebug() << "New client with siteId" << siteId;
+        QJsonObject accountObj = _JSONobj["account"].toObject();
+        Account newUser = Account::fromJson(accountObj);
+        m_editor.addClient(newUser);
+        qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
