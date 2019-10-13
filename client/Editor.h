@@ -6,7 +6,7 @@
 #include <QTextDocument>
 #include <QMap>
 #include <QLabel>
-#include "CrdtClient.h"
+#include "Account.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -21,7 +21,7 @@ public:
     ~Editor();
 
     QChar at(int pos);
-    void addClient(int siteId);
+    void addClient(Account& user);
     void remoteInsert(int siteId, int position, char ch);
     void remoteDelete(int siteId, int position);
 
@@ -59,6 +59,7 @@ private:
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_localCursor;
+    QVector<Account> m_users;
     QMap<int, QLabel*> m_remoteCursors;
     Ui::Editor *ui;
 };

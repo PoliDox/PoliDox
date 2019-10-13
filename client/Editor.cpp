@@ -48,8 +48,11 @@ QChar Editor::at(int pos)
     return m_textDoc->characterAt(pos);
 }
 
-void Editor::addClient(int siteId)
+void Editor::addClient(Account& user)
 {
+    m_users.append(user);
+
+    int siteId = user.getSiteId();
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
     // TODO: Uncomment these lines when siteId is supported
     //m_remoteCursors[siteId]->setVisible(true);

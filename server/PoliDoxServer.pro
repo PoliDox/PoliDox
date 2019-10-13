@@ -25,8 +25,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        Server.cpp \
-        ServerController.cpp \
+    Server.cpp \
+    ServerController.cpp \
     main.cpp \
     ServerMessageFactory.cpp
 
@@ -37,6 +37,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Account.h \
     Server.h \
     Server.h \
     ServerController.h \

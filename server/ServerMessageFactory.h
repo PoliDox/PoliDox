@@ -2,14 +2,14 @@
 #define SERVERMESSAGEFACTORY_H
 
 #include <QJsonDocument>
-
+#include "Account.h"
 
 class ServerMessageFactory
 {
 public:
     ServerMessageFactory() = delete;
 
-    static QByteArray createNewClientMessage(int p_siteId);
+    static QByteArray createNewClientMessage(const Account& account);
 
 };
 

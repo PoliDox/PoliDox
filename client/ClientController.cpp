@@ -121,10 +121,10 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         int linPos = m_crdt->remoteDelete(symbol);
         m_editor.remoteDelete(symbol.getSiteId(), linPos);
 
-    } else if (l_header == "newClient") {
-        int siteId = _JSONobj["siteId"].toInt();
-        m_editor.addClient(siteId);
-        qDebug() << "New client with siteId" << siteId;
+    } else if (l_header == "newClient") {        
+        Account newUser = Account::fromJson(_JSONobj);
+        m_editor.addClient(newUser);
+        qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
