@@ -50,6 +50,5 @@ void Server::onNewConnection()
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
     QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
     Account newUser(i++, "", ""); // TODO: Fill the parameters!
-    qDebug() << "Calling addClient";
     m_documents["firstFile"]->addClient(newUser, l_socket);
 }
