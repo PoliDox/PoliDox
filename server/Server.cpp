@@ -45,8 +45,11 @@ Server::~Server()
 
 void Server::onNewConnection()
 {
+    static int i = 0; // ONLY FOR TESTING
+
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
     QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
-    Account newUser(0, "", ""); // TODO: Fill the parameters!
+    Account newUser(i++, "", ""); // TODO: Fill the parameters!
+    qDebug() << "Calling addClient";
     m_documents["firstFile"]->addClient(newUser, l_socket);
 }

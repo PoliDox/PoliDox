@@ -20,9 +20,9 @@ public:
     Account(int p_siteId, const QString& p_name, const QByteArray& p_picture)
         : m_siteId(p_siteId), m_name(p_name), m_picture(p_picture){ }
 
-    int getSiteId() { return m_siteId; }
-    QString getName() { return m_name; }
-    QByteArray getPicture() { return m_picture; }
+    int getSiteId() const { return m_siteId; }
+    QString getName() const { return m_name; }
+    QByteArray getPicture() const { return m_picture; }
 
     QJsonObject toJson() const {
         QJsonObject _JSONobj;

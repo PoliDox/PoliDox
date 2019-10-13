@@ -10,12 +10,13 @@ ServerController::ServerController()
 
 void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
 {   
-    connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {    
+    qDebug() << "addClient called";
+
+    connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
 
         qDebug() << "Received a message from a client";
 
-        auto it = m_clients.constBegin();
-        while (it != m_clients.constEnd()) {
+        for(auto it = m_clients.constBegin(); it != m_clients.constEnd(); it++) {
             auto l_socket = it.value();
             if (l_socket != p_socket) { //don't echo message back to sender
                 l_socket->sendTextMessage(p_message);
@@ -23,11 +24,11 @@ void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
         }
     });
 
-    auto it = m_clients.constBegin();
-    while (it != m_clients.constEnd()) {
-        // Notify existing client about the new entry
+    for (auto it = m_clients.constBegin(); it != m_clients.constEnd(); it++) {
+        // Notify existing client about the new entry        
         const Account& l_client = it.key();
         auto l_socket = it.value();
+        qDebug() << "Notifying client " << l_client.getSiteId();
         QString l_msg = ServerMessageFactory::createNewClientMessage(p_account);
         l_socket->sendTextMessage(l_msg);
 
@@ -36,8 +37,8 @@ void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
         p_socket->sendTextMessage(l_msg);
     }
 
-    m_clients.insert(p_account, p_socket);
-
+    qDebug() << "Inserting client, already got " << m_clients.size();
+    m_clients.insert(p_account, p_socket);    
 
 
     /*

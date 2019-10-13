@@ -12,7 +12,7 @@ class ServerController : public QObject
     Q_OBJECT
 
 private:
-    QMap<Account, QWebSocket *> m_clients;
+    QMap<Account, QWebSocket*> m_clients;
 
 public:
     ServerController();
