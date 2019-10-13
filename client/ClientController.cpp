@@ -20,8 +20,9 @@ ClientController::ClientController()
 
         //qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
-        if (charsAdded > 1) {
-            // When copying something a paragraph separator is inserted and deleted implicitly
+        if (charsAdded > 1 && position == 0 &&
+                m_editor.at(0) != QChar::ParagraphSeparator) {
+            // When copying to the beginning everything is deleted and copied anew
             charsAdded--;
             if (!charsRemoved) {
                 //qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
