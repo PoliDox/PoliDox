@@ -185,9 +185,9 @@ void CrdtClient::localInsert(int position, char value) {
     }
 
     if(value=='\n')
-        std::cout << "[LOCAL INSERT]@ " << row << " " << index << " \\n "<< std::endl;
+        std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t\\n "<<"\tLINEAR POSITION " << position<< std::endl;
     else
-        std::cout << "[LOCAL INSERT]@ " << row << " " << index << " \ "<< value << std::endl;
+        std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 
     Char symbolToInsert(this->_siteID, 0, value);
 
@@ -414,18 +414,22 @@ int CrdtClient::remoteInsert(Char symbol){
     }
 
     if(!_NOTFOUND||!_NEWLINE)
-            _LINEARpos=_toLinear(_row-1,_index);
-    else
-            _LINEARpos=_toLinear(this->_symbols.size()-1,0);
+            //_LINEARpos=_toLinear(_row-1,_index);
+            _row-=1;
+    else{
+           // _LINEARpos=_toLinear(this->_symbols.size()-1,0);
+        _row=this->_symbols.size()-1;
+        _index=0;
+        }
 
-
+    _LINEARpos=_toLinear(_row,_index);
 
 
 
     if(_CHAR=='\n')
-        std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index << " \\n "<< std::endl;
+        std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index << "]\t\\n "<<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
     else
-        std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index <<" " << _CHAR << std::endl;
+        std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index <<"]\t" << _CHAR <<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
     //emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
 
