@@ -5,7 +5,7 @@
 #include <QObject>
 
 #define MAXNUM 100
-
+//#define DEBUG_OUTPUT
 
 CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
     //TODO il vettore di simboli inizialmente è vuoto??
@@ -184,10 +184,12 @@ void CrdtClient::localInsert(int position, char value) {
         this->_symbols.insert(this->_symbols.begin() + (row), vector<Char>());
     }
 
+#ifdef DEBUG_OUTPUT
     if(value=='\n')
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t\\n "<<"\tLINEAR POSITION " << position<< std::endl;
     else
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
+#endif
 
     Char symbolToInsert(this->_siteID, 0, value);
 
@@ -276,14 +278,6 @@ void CrdtClient::localInsert(int position, char value) {
 
     }
 
-    /*std::cout << "Added symbol " << value << " (" << (int)value << ") at position: [";
-    for(int i=0;i<symbolToInsert.getFractionalPosition().size();i++)
-        std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
-    std::cout<<"]"<<std::endl;*/
-
-    //printDebugChars();
-
-
     emit onLocalInsert(symbolToInsert);
 }
 
@@ -325,7 +319,9 @@ void CrdtClient::localDelete(int position){
 
     emit onLocalDelete(_Dsymbol);
 
+#ifdef DEBUG_OUTPUT
     std::cout << "[LOCAL DELETE]@ " << row << " " << index << std::endl;
+#endif
 
 
 }
@@ -358,60 +354,50 @@ int CrdtClient::remoteInsert(Char symbol){
             _row++;
 
             _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
-
                 _index++;
-
                 return symbol.getFractionalPosition() < m_symbol.getFractionalPosition();
-
             });
 
-            if(_INDEXhit!=row.end()){
+            if(_INDEXhit!=row.end())
+            {
                 _index--;               /* se l'inserimento non avviene alla fine si fa un confronto in più */
                 return true;
             }
-            else{
+            else
                 return false;
-            }
-
     });
 
     /* se editor vuoto */
-    if(this->_symbols.size()==1 && this->_symbols.begin()->size()==0){
-
+    if(this->_symbols.size()==1 && this->_symbols.begin()->size()==0)
+    {
         this->_symbols.begin()->push_back(symbol);
     }
-    else if (_ROWhit != this->_symbols.end()  ) {
-
-        if(_CHAR=='\n'){
-
+    else if (_ROWhit != this->_symbols.end()  )
+    {
+        if(_CHAR=='\n')
+        {
              std::vector<Char> _VETT(_INDEXhit,_ROWhit->end());
-
              this->_symbols.insert(_ROWhit+1, _VETT);
-              (this->_symbols.begin()+_row-1)->erase(_INDEXhit, (this->_symbols.begin()+_row-1)->end());
-
-
+             (this->_symbols.begin()+_row-1)->erase(_INDEXhit, (this->_symbols.begin()+_row-1)->end());
         }
 
         (this->_symbols.begin()+_row-1)->insert((this->_symbols.begin()+_row-1)->begin()+_index,symbol);
-
-    } else
-
+    }
+    else
     /*  if anything bigger than the symbol to inser has been found i need to check if
      *  the last character of the last line is '\n'. If Yes, create a new row otherwise
      *  insert the symbol as the last character of the last row.                    */
-
         {
-
-        _NOTFOUND=true;
-
-        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n'){
+            _NOTFOUND=true;
+            if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n')
+        {
             _NEWLINE=true;
             this->_symbols.push_back(std::vector<Char>(1,symbol));
         }
         else
             this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
-    }
+        }
 
     if(!_NOTFOUND||!_NEWLINE)
             //_LINEARpos=_toLinear(_row-1,_index);
@@ -425,13 +411,14 @@ int CrdtClient::remoteInsert(Char symbol){
     _LINEARpos=_toLinear(_row,_index);
 
 
+#ifdef DEBUG_OUTPUT
 
     if(_CHAR=='\n')
         std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index << "]\t\\n "<<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
     else
         std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index <<"]\t" << _CHAR <<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
-    //emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
+#endif
 
     return _LINEARpos;
 
@@ -462,41 +449,40 @@ int CrdtClient::remoteDelete(const Char& symbol) {
         _index=0;
 
         _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
-
             _index++;
-
             if(d_symbol.getFractionalPosition()==symbol.getFractionalPosition())
                 return true;
             else
                 return false;
-
         });
 
-
-       if(_indexHIT!=row.end()){
+       if(_indexHIT!=row.end())
            return true;
-       }
        else
            return false;
-
     });
 
 
-    if(_rowHIT!=this->_symbols.end()){
-
-    if(_row>0&&(_index-1)==this->_symbols[_row-1].size()){
-
-        if((_rowHIT->begin()+_index-1)->getValue()=='\n'){
-             this->_symbols[_row].erase(this->_symbols[_row].end()-1);
-             this->_symbols[_row].insert(this->_symbols[_row].end(),this->_symbols[_row+1].begin(),this->_symbols[_row+1].end());
-             this->_symbols.erase(this->_symbols.begin()+_row+1);
-        }else{
-            _rowHIT->erase(_indexHIT);
-            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
-                this->_symbols.erase(this->_symbols.begin()+_row);
+    if(_rowHIT!=this->_symbols.end())
+    {
+        if(_row>0&&(_index-1)==this->_symbols[_row-1].size())
+        {
+            if((_rowHIT->begin()+_index-1)->getValue()=='\n')
+            {
+                this->_symbols[_row].erase(this->_symbols[_row].end()-1);
+                this->_symbols[_row].insert(this->_symbols[_row].end(),this->_symbols[_row+1].begin(),this->_symbols[_row+1].end());
+                this->_symbols.erase(this->_symbols.begin()+_row+1);
+            }
+            else
+            {
+                _rowHIT->erase(_indexHIT);
+                if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
+                    this->_symbols.erase(this->_symbols.begin()+_row);
+            }
         }
-    }else
+        else
             _rowHIT->erase(_indexHIT);
+
             if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+_row);
     }
@@ -508,7 +494,9 @@ int CrdtClient::remoteDelete(const Char& symbol) {
     else
         _LINEARpos=_toLinear(_row,0);
 
+#ifdef DEBUG_OUTPUT
     std::cout << "[REMOTE DELETE]@ " << _row << " " << _index-1 << std::endl;
+#endif
 
     return _LINEARpos;
 }
