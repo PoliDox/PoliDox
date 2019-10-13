@@ -308,7 +308,7 @@ void CrdtClient::localDelete(int position){
             this->_symbols.erase(this->_symbols.begin()+row);
         }else{
             this->_symbols[row].erase(this->_symbols[row].begin()+index);
-            if(this->_symbols[row].size()==0)
+            if(this->_symbols[row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+row);
         }
 
@@ -319,7 +319,7 @@ void CrdtClient::localDelete(int position){
             this->_symbols[row].insert(this->_symbols[row].end(),this->_symbols[row+1].begin(),this->_symbols[row+1].end());
             this->_symbols.erase(this->_symbols.begin()+row+1);
         }
-        if(this->_symbols[row].size()==0)
+        if(this->_symbols[row].size()==0&&this->_symbols.size()>1)
             this->_symbols.erase(this->_symbols.begin()+row);
     }
 
@@ -488,12 +488,12 @@ int CrdtClient::remoteDelete(const Char& symbol) {
              this->_symbols.erase(this->_symbols.begin()+_row+1);
         }else{
             _rowHIT->erase(_indexHIT);
-            if(this->_symbols[_row].size()==0)
+            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+_row);
         }
     }else
             _rowHIT->erase(_indexHIT);
-            if(this->_symbols[_row].size()==0)
+            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+_row);
     }
     else
