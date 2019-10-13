@@ -184,7 +184,10 @@ void CrdtClient::localInsert(int position, char value) {
         this->_symbols.insert(this->_symbols.begin() + (row), vector<Char>());
     }
 
-    std::cout << "[LOCAL INSERT]@ " << row << " " << index << std::endl;
+    if(value=='\n')
+        std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t\\n "<<"\tLINEAR POSITION " << position<< std::endl;
+    else
+        std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 
     Char symbolToInsert(this->_siteID, 0, value);
 
@@ -200,11 +203,15 @@ void CrdtClient::localInsert(int position, char value) {
             if (index == this->_symbols[row].size() - 1)
             this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());  /* allocate pointer for new line */
 
-        if (index == this->_symbols[row].size())
-           this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());
+        /*if (index == this->_symbols[row].size())
+           this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>()); //NON NECESSARIO DOPO FIX SECONDO BUG
         else{
             middleNewLine=1;
-        }
+        }*/
+
+        if (index != this->_symbols[row].size())
+            middleNewLine=1;
+
     }
 
 
@@ -293,7 +300,6 @@ void CrdtClient::localDelete(int position){
     Char _Dsymbol=this->_symbols[row][index];
 
 
-
     if(row>0&&index==this->_symbols[row-1].size()+1){
 
         if((this->_symbols[row-1].end()-1)->getValue()=='\n'){
@@ -302,13 +308,18 @@ void CrdtClient::localDelete(int position){
             this->_symbols.erase(this->_symbols.begin()+row);
         }else{
             this->_symbols[row].erase(this->_symbols[row].begin()+index);
-            if(this->_symbols[row].size()==0)
+            if(this->_symbols[row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+row);
         }
 
     }else{
         this->_symbols[row].erase(this->_symbols[row].begin()+index);
-        if(this->_symbols[row].size()==0)
+
+        if(_Dsymbol.getValue()=='\n'&& (row+1<this->_symbols.size())){
+            this->_symbols[row].insert(this->_symbols[row].end(),this->_symbols[row+1].begin(),this->_symbols[row+1].end());
+            this->_symbols.erase(this->_symbols.begin()+row+1);
+        }
+        if(this->_symbols[row].size()==0&&this->_symbols.size()>1)
             this->_symbols.erase(this->_symbols.begin()+row);
     }
 
@@ -403,13 +414,27 @@ int CrdtClient::remoteInsert(Char symbol){
     }
 
     if(!_NOTFOUND||!_NEWLINE)
-            _LINEARpos=_toLinear(_row-1,_index);
+            //_LINEARpos=_toLinear(_row-1,_index);
+            _row-=1;
+    else{
+           // _LINEARpos=_toLinear(this->_symbols.size()-1,0);
+        _row=this->_symbols.size()-1;
+        _index=0;
+        }
+
+    _LINEARpos=_toLinear(_row,_index);
+
+
+
+    if(_CHAR=='\n')
+        std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index << "]\t\\n "<<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
     else
-            _LINEARpos=_toLinear(this->_symbols.size()-1,0);
+        std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index <<"]\t" << _CHAR <<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
+    //emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
 
-    std::cout << "[REMOTE INSERT]@ " << _row-1 << " " << _index << std::endl;
     return _LINEARpos;
+
 
 };
 
@@ -467,12 +492,12 @@ int CrdtClient::remoteDelete(const Char& symbol) {
              this->_symbols.erase(this->_symbols.begin()+_row+1);
         }else{
             _rowHIT->erase(_indexHIT);
-            if(this->_symbols[_row].size()==0)
+            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+_row);
         }
     }else
             _rowHIT->erase(_indexHIT);
-            if(this->_symbols[_row].size()==0)
+            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
                 this->_symbols.erase(this->_symbols.begin()+_row);
     }
     else
