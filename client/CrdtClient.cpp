@@ -382,10 +382,8 @@ int CrdtClient::remoteInsert(Char symbol){
         }
 
     if(!_NOTFOUND||!_NEWLINE)
-            //_LINEARpos=_toLinear(_row-1,_index);
             _row-=1;
     else{
-           // _LINEARpos=_toLinear(this->_symbols.size()-1,0);
         _row=this->_symbols.size()-1;
         _index=0;
         }
