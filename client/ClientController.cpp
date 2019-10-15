@@ -18,7 +18,7 @@ ClientController::ClientController()
         // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
         // Probably we should delete everything first and then insert..
 
-        //qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
+        qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
         if (charsAdded > 1 && position == 0 &&
                 m_editor.at(0) != QChar::ParagraphSeparator) {

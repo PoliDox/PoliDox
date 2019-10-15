@@ -5,7 +5,7 @@
 #include <QObject>
 
 #define MAXNUM 100
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 
 CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
     //TODO il vettore di simboli inizialmente è vuoto??
