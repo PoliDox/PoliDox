@@ -13,12 +13,14 @@ HEADERS += \
     Char.h \
     Editor.h \
     ClientMessageFactory.h \
-    Account.h
+    Account.h \
+    Log_dialog.h
 
 SOURCES += \
     ClientController.cpp \
     CrdtClient.cpp \
     Editor.cpp \
+    Log_dialog.cpp \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp
@@ -29,7 +31,8 @@ DISTFILES += \
     images/open_file.png
 
 FORMS += \
-    editor.ui
+    editor.ui \
+    log_dialog.ui \
 
 RESOURCES += \
     Resources.qrc

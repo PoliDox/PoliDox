@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include "ClientMessageFactory.h"
+#include "Log_dialog.h"
 
 ClientController::ClientController()
 {
@@ -78,8 +79,11 @@ ClientController::ClientController()
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
-    m_editor.show();    
-
+    Log_Dialog loginWindow;
+    loginWindow.setEditor(&m_editor);
+    loginWindow.setModal(true);
+    loginWindow.exec();
+    //m_editor.show();
 }
 
 
