@@ -20,6 +20,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
 {
     ui->setupUi(this);
     m_textEdit = ui->textEdit;
+    this->setStyleSheet("background-color:#d0e0e2;");
     setCentralWidget(m_textEdit);
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);

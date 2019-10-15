@@ -31,8 +31,8 @@ DISTFILES += \
     images/open_file.png
 
 FORMS += \
+    editor.ui \
     log_dialog.ui \
-    login.ui
 
 RESOURCES += \
     Resources.qrc

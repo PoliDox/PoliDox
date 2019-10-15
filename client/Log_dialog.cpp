@@ -7,6 +7,7 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
     ui(new Ui::Log_Dialog)
 {
     ui->setupUi(this);
+    this->setStyleSheet("background-color:#d0e0e2;");
     setWindowTitle("PoliDox");
 }
 
