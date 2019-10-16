@@ -30,6 +30,10 @@ void CRDT::inserRowAtEnd(std::vector<Char>& row){
     this->_symbols.push_back(row);
 }
 
+void CRDT::deleteSymbolAt(std::vector<Char>& row,unsigned int index){
+    row.erase(row.begin()+index);
+}
+
 void CRDT::searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
 
     _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
