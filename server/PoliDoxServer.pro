@@ -37,6 +37,7 @@ SOURCES += \
     Server.cpp \
     ServerController.cpp \
     main.cpp \
+    Account.cpp \
     ServerMessageFactory.cpp
 
 

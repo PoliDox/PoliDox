@@ -9,12 +9,15 @@
 
 
 
-class ServerController : public QObject
-{
+class ServerController : public QObject {
     Q_OBJECT
 
 private:
-    QMap<Account, QWebSocket*> m_clients;
+    //TODO: in realtà questa mappa andrebbe al contrario,
+    //io dalle slot sono in grado di risalire al socket,
+    //e quindi poi all'account
+    QMap<Account, QWebSocket*> account2socket;
+    //CRDT c;
 
 public:
     ServerController();

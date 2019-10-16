@@ -17,6 +17,7 @@
 //TODO: - gestire eccezioni e controllare tipi di ritorno
 //      - vedere mongodb autenticazione sicura  al db e chiavi primarie/autoincrement/foreign key/join
 //      - fare un unico metodo generateBuilder in cui gli si passa un array di campi e uno di valori
+//      - in realtà la macra Q_OBJECT non serve, da togliere!!
 
 
 
@@ -29,23 +30,20 @@ private:
     mongocxx::client *client;
     mongocxx::uri *uri;
 
-    //void updateCounterOfCollection(QString nameCollection);
-    //int getCounterOfCollection(QString nameCollection);
-
-public:
     void incrementCounterOfCollection(QString nameCollection);
     double getCounterOfCollection(QString nameCollection);
 
+public:
     DatabaseManager();
-    bool registerUser(QString name, QString password, QByteArray image);
-    bool checkPassword(QString name, QString password);
+    double registerUser(QString name, QString password, QByteArray image);
+    double checkPassword(QString name, QString password);
     bool insertNewDocument(QString documentName);
     bool insertSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition);
     bool deleteSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition);
     void retrieveAllInserts(QString nameDocument);
+    QList<QString> retrieveAllDocuments();
     mongocxx::database getDb();
     ~DatabaseManager();
-
 };
 
 
