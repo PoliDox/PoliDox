@@ -54,9 +54,12 @@ Server::~Server()
 //codice login
 void Server::onNewConnection()
 {
+    static int i = 0; // ONLY FOR TESTING
+
     QWebSocket *l_socket = m_pWebSocketServer->nextPendingConnection();
     QTextStream(stdout) << getIdentifier(l_socket) << " connected!\n";
-    m_documents["firstFile"]->addClient(l_socket);
+    Account newUser(i++, "", ""); // TODO: Fill the parameters!
+    m_documents["firstFile"]->addClient(newUser, l_socket);
 }
 
 

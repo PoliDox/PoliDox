@@ -36,7 +36,8 @@ SOURCES += \
     DatabaseManager.cpp \
     Server.cpp \
     ServerController.cpp \
-    main.cpp
+    main.cpp \
+    ServerMessageFactory.cpp
 
 
 # Default rules for deployment.
@@ -45,11 +46,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Account.h \
     DatabaseManager.h \
     Server.h \
-    Server.h \
-    ServerController.h
-
-
-
-
+    ServerController.h \
+    ServerMessageFactory.h

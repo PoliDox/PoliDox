@@ -1,6 +1,8 @@
 #include "ClientController.h"
 
 #include <QLabel>
+#include "ClientMessageFactory.h"
+#include "Log_dialog.h"
 
 ClientController::ClientController()
 {
@@ -14,30 +16,39 @@ ClientController::ClientController()
 
     connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
 
-        int _processed=0;
+        // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
+        // Probably we should delete everything first and then insert..
 
-        if (charsAdded) {
-            //qDebug() << "Added" << charsAdded << "chars at position" << position;
-             _processed=charsAdded;
-            while(_processed>0){
-                char car =  m_editor.at(position).toLatin1();
-                if ( 0 == car ) {
-                    // Strangely enough \n is given as 0
-                    car = '\n';
-                }
-                m_crdt->localInsert(position, car);
-                position++;
-                _processed--;
-            }
+        qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
-        } else {
-            _processed=charsRemoved;
-            //qDebug() << "Removed" << charsRemoved << "chars at position" << position;
-            while(_processed>0){
-                m_crdt->localDelete(position);
-                _processed--;
+        if (charsAdded > 1 && position == 0 &&
+                m_editor.at(0) != QChar::ParagraphSeparator) {
+            // When copying to the beginning everything is deleted and copied anew
+            charsAdded--;
+            if (!charsRemoved) {
+                qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
             }
+            charsRemoved--;
         }
+
+        // It could happen that some chars were removed and some others were added at the same time
+        for (int i = 0; i < charsRemoved; i++) {
+            m_crdt->localDelete(position);
+        }
+
+        for (int i = 0; i < charsAdded; i++) {
+
+            QChar qchar = m_editor.at(position+i);
+            char _char;
+            if (qchar == QChar::ParagraphSeparator) {
+                qDebug() << "ParagraphSeparator";
+                _char = '\n';
+            } else {
+                _char =  qchar.toLatin1();
+            }
+            m_crdt->localInsert(position+i, _char);
+        }
+
     });
 
 
@@ -49,9 +60,7 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
-        QJsonDocument _JSONdoc = symbol.write("insert");
-
-        QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
+        QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -60,23 +69,21 @@ ClientController::ClientController()
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
-        QJsonDocument _JSONdoc=symbol.write("delete");
-
-        QString jsonString = _JSONdoc.toJson(QJsonDocument::Indented);
+        QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
         m_socket.sendTextMessage(jsonString);
     });
 
-    connect(m_crdt, &CrdtClient::onRemoteInsert, &m_editor, &Editor::remoteInsert);
-    connect(m_crdt, &CrdtClient::onRemoteDelete, &m_editor, &Editor::remoteDelete);
-
-
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
-    m_editor.show();
+    Log_Dialog loginWindow;
+    loginWindow.setEditor(&m_editor);
+    loginWindow.setModal(true);
+    loginWindow.exec();
+    //m_editor.show();
 }
 
 
@@ -99,27 +106,48 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     //std::cout<< "Message received" << std::endl;
 
     QJsonObject _JSONobj;
-    QJsonDocument _JSONdoc;
+    QJsonDocument _JSONdoc;    
 
-    Char symbol=Char::read(_JSONstring);
+     _JSONdoc = QJsonDocument::fromJson(_JSONstring.toUtf8());
 
-     _JSONdoc=QJsonDocument::fromJson(_JSONstring.toUtf8());
-
-    if(!_JSONdoc.isNull())
-         _JSONobj=_JSONdoc.object();
-
-    try{
-         if(_JSONobj["action"].toString()=="insert")
-            this->m_crdt->remoteInsert(symbol);
-
-
-         if(_JSONobj["action"].toString()=="delete")
-            this->m_crdt->remoteDelete(symbol);
-
-     }catch(std::string _excp){
-
-        //TODO manage exception
-
+    if (_JSONdoc.isNull()) {
+        // TODO: print some debug
+        return;
     }
+
+
+    _JSONobj = _JSONdoc.object();
+
+    // No try-catch here because we cannot handle it here anyway
+
+    //try {
+
+    // No switch case for strings in C++ :((
+    QString l_header = _JSONobj["action"].toString();
+    if (l_header == "insert") {
+        QJsonObject charObj = _JSONobj["char"].toObject();
+        Char symbol = Char::fromJson(charObj);
+        int linPos = m_crdt->remoteInsert(symbol);
+        m_editor.remoteInsert(symbol.getSiteId(), linPos, symbol.getValue());
+
+    } else if (l_header== "delete") {
+        QJsonObject charObj = _JSONobj["char"].toObject();
+        Char symbol = Char::fromJson(charObj);
+        int linPos = m_crdt->remoteDelete(symbol);
+        m_editor.remoteDelete(symbol.getSiteId(), linPos);
+
+    } else if (l_header == "newClient") {
+        QJsonObject accountObj = _JSONobj["account"].toObject();
+        Account newUser = Account::fromJson(accountObj);
+        m_editor.addClient(newUser);
+        qDebug() << "New client with siteId" << newUser.getSiteId();
+
+    } else {
+        qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
+    }
+
+    //} catch (std::string _excp) {
+        //TODO manage exception
+    //}
 
 }

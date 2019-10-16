@@ -5,6 +5,7 @@
 #include <QList>
 #include <QWebSocket>
 #include <iostream>
+#include "Account.h"
 
 
 
@@ -13,14 +14,13 @@ class ServerController : public QObject
     Q_OBJECT
 
 private:
-    QList<QWebSocket *> m_clients;
+    QMap<Account, QWebSocket*> m_clients;
 
 public:
     ServerController();
 
 public slots:
-    void addClient(QWebSocket *p_socket);
-
+    void addClient(Account& p_account, QWebSocket *p_socket);
 
 };
 

@@ -6,10 +6,13 @@
 
 #define MAXNUM 100
 
+
 CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
-    //TODO il vettore di simboli inizialmente Ã¨ vuoto??
+    //TODO il vettore di simboli inizialmente è vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
+
+    _siteID = 1; // ONLY FOR TESTING
 }
 
 bool existsPositionInVector(int position, std::vector<int> vector) {
@@ -112,25 +115,38 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 void CrdtClient::_toMatrix(int position,int* row,int* index){
 
-    int totalLenght=0,
-        row_counter=0;
 
-    auto it=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char> matrix_row) -> bool{
+    int row_counter=0,
+        _NEWLINE=0;
 
-        if(position < matrix_row.size())
-            return true;
-        else{
-            totalLenght+=matrix_row.size();
-            return false;
+    while(1){
+
+
+
+        if(position>this->_symbols[row_counter].size()){
+            if((this->_symbols[row_counter].end()-1)->getValue()=='\n'){
+                _NEWLINE++;
+                 position-=this->_symbols[row_counter].size();
+            }
         }
-    });
+            else if(position==this->_symbols[row_counter].size()){
+                if(this->_symbols[row_counter].size()!=0 && (this->_symbols[row_counter].end()-1)->getValue()=='\n'){
+                    _NEWLINE++;
+                     position-=this->_symbols[row_counter].size();
+                }
+                break;
+            }
+        else if(position<this->_symbols[row_counter].size())
+                break;
 
-    *row=row_counter;
+         row_counter++;
+    }
 
-    if(row_counter>0)
-        *index=position-totalLenght;
-    else
-        *index=position;    //se sono alla prima riga parto da totalLenght=0
+    *row=_NEWLINE;
+    *index=position;
+
+
+
 }
 
 int CrdtClient::_toLinear(int row,int index){
@@ -163,6 +179,16 @@ void CrdtClient::localInsert(int position, char value) {
 
     this->_toMatrix(position,&row,&index);
 
+    /* !!! SOLUTION TO 2ND BUG ON LOCAL INSERT !!! */
+    if(row>=this->_symbols.size()){
+        this->_symbols.insert(this->_symbols.begin() + (row), vector<Char>());
+    }
+
+    if(value=='\n')
+        std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t\\n "<<"\tLINEAR POSITION " << position<< std::endl;
+    else
+        std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
+
     Char symbolToInsert(this->_siteID, 0, value);
 
     /* no more symbolsSyze needed, it's the row size */
@@ -173,11 +199,19 @@ void CrdtClient::localInsert(int position, char value) {
     int middleNewLine=0;
 
     if(value=='\n') {
-        if (index == this->_symbols[row].size() - 1)
+        /*  !!!!!BUG SU LOCAL INSERT!!!!!
+            if (index == this->_symbols[row].size() - 1)
             this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>());  /* allocate pointer for new line */
+
+        /*if (index == this->_symbols[row].size())
+           this->_symbols.insert(this->_symbols.begin() + (row + 1), vector<Char>()); //NON NECESSARIO DOPO FIX SECONDO BUG
         else{
             middleNewLine=1;
-        }
+        }*/
+
+        if (index != this->_symbols[row].size())
+            middleNewLine=1;
+
     }
 
 
@@ -247,7 +281,8 @@ void CrdtClient::localInsert(int position, char value) {
         std::cout << symbolToInsert.getFractionalPosition()[i] <<" ";
     std::cout<<"]"<<std::endl;*/
 
-    printDebugChars();
+    //printDebugChars();
+
 
     emit onLocalInsert(symbolToInsert);
 }
@@ -261,12 +296,36 @@ void CrdtClient::localDelete(int position){
 
     this->_toMatrix(position,&row,&index);
 
+
     Char _Dsymbol=this->_symbols[row][index];
 
-    this->_symbols[row].erase(this->_symbols[row].begin()+index);
 
+    if(row>0&&index==this->_symbols[row-1].size()+1){
+
+        if((this->_symbols[row-1].end()-1)->getValue()=='\n'){
+            this->_symbols[row].erase(this->_symbols[row].end()-1);
+            this->_symbols[row-1].insert(this->_symbols[row-1].end(),this->_symbols[row].begin(),this->_symbols[row].end());
+            this->_symbols.erase(this->_symbols.begin()+row);
+        }else{
+            this->_symbols[row].erase(this->_symbols[row].begin()+index);
+            if(this->_symbols[row].size()==0&&this->_symbols.size()>1)
+                this->_symbols.erase(this->_symbols.begin()+row);
+        }
+
+    }else{
+        this->_symbols[row].erase(this->_symbols[row].begin()+index);
+
+        if(_Dsymbol.getValue()=='\n'&& (row+1<this->_symbols.size())){
+            this->_symbols[row].insert(this->_symbols[row].end(),this->_symbols[row+1].begin(),this->_symbols[row+1].end());
+            this->_symbols.erase(this->_symbols.begin()+row+1);
+        }
+        if(this->_symbols[row].size()==0&&this->_symbols.size()>1)
+            this->_symbols.erase(this->_symbols.begin()+row);
+    }
 
     emit onLocalDelete(_Dsymbol);
+
+    std::cout << "[LOCAL DELETE]@ " << row << " " << index << std::endl;
 
 
 }
@@ -279,13 +338,15 @@ void CrdtClient::localDelete(int position){
 
    //TODO aggiungere const al reference.
    ______________________________________________________________________________________     */
-void CrdtClient::remoteInsert(Char symbol){
+int CrdtClient::remoteInsert(Char symbol){
 
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
 
     int _row=0,
-        _index=0;
+        _index=0,
+        _NOTFOUND=false,
+        _NEWLINE=false;
 
     int _LINEARpos=0;
 
@@ -293,6 +354,7 @@ void CrdtClient::remoteInsert(Char symbol){
 
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
 
+            _index=0; //newline
             _row++;
 
             _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
@@ -307,12 +369,13 @@ void CrdtClient::remoteInsert(Char symbol){
                 _index--;               /* se l'inserimento non avviene alla fine si fa un confronto in più */
                 return true;
             }
-            else
+            else{
                 return false;
+            }
 
     });
 
-
+    /* se editor vuoto */
     if(this->_symbols.size()==1 && this->_symbols.begin()->size()==0){
 
         this->_symbols.begin()->push_back(symbol);
@@ -324,11 +387,12 @@ void CrdtClient::remoteInsert(Char symbol){
              std::vector<Char> _VETT(_INDEXhit,_ROWhit->end());
 
              this->_symbols.insert(_ROWhit+1, _VETT);
-              _ROWhit->erase(_INDEXhit, _ROWhit->end());
+              (this->_symbols.begin()+_row-1)->erase(_INDEXhit, (this->_symbols.begin()+_row-1)->end());
+
 
         }
 
-        _ROWhit->insert(_ROWhit->end(),symbol);
+        (this->_symbols.begin()+_row-1)->insert((this->_symbols.begin()+_row-1)->begin()+_index,symbol);
 
     } else
 
@@ -338,46 +402,64 @@ void CrdtClient::remoteInsert(Char symbol){
 
         {
 
-        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n')
+        _NOTFOUND=true;
+
+        if(((this->_symbols.end()-1)->end()-1)->getValue()=='\n'){
+            _NEWLINE=true;
             this->_symbols.push_back(std::vector<Char>(1,symbol));
+        }
         else
             this->_symbols[this->_symbols.size()-1].push_back(symbol);
 
     }
 
-    if(_index!=0)
-        _LINEARpos=_toLinear(_row-1,_index);
+    if(!_NOTFOUND||!_NEWLINE)
+            //_LINEARpos=_toLinear(_row-1,_index);
+            _row-=1;
+    else{
+           // _LINEARpos=_toLinear(this->_symbols.size()-1,0);
+        _row=this->_symbols.size()-1;
+        _index=0;
+        }
+
+    _LINEARpos=_toLinear(_row,_index);
+
+
+
+    if(_CHAR=='\n')
+        std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index << "]\t\\n "<<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
     else
-        _LINEARpos=_toLinear(_row-1,0);
+        std::cout << "[REMOTE INSERT]@ [" << _row << "][" << _index <<"]\t" << _CHAR <<"\tLINEAR POSITION " << _LINEARpos<< std::endl;
+    //emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
-    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
-    emit this->onRemoteInsert(_LINEARpos,symbol.getValue());
 
-    printDebugChars();
+    return _LINEARpos;
+
+
 };
 
 /* ______________________________________________________________________________________
    IMPORTANTE!
-
    Nella prima find_if la lamba deve lavorare su un reference di std::vector<Char>&
    altrimenti nella copia ( per il passaggio per valore ) non viene riempita la position!
 
    //TODO aggiungere const al reference.
    ______________________________________________________________________________________     */
 
-void CrdtClient::remoteDelete(const Char& symbol) {
+int CrdtClient::remoteDelete(const Char& symbol) {
 
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
 
-    int _row=0,
-        _index=0;
+    int _row=-1,
+        _index=-1;
 
     int _LINEARpos=0;
 
     _rowHIT=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
 
         _row++;
+        _index=0;
 
         _indexHIT=std::find_if(row.begin(),row.end(),[&](Char d_symbol)->bool{
 
@@ -400,19 +482,35 @@ void CrdtClient::remoteDelete(const Char& symbol) {
     });
 
 
-    if(_rowHIT!=this->_symbols.end())
-         _rowHIT->erase(_indexHIT);
+    if(_rowHIT!=this->_symbols.end()){
+
+    if(_row>0&&(_index-1)==this->_symbols[_row-1].size()){
+
+        if((_rowHIT->begin()+_index-1)->getValue()=='\n'){
+             this->_symbols[_row].erase(this->_symbols[_row].end()-1);
+             this->_symbols[_row].insert(this->_symbols[_row].end(),this->_symbols[_row+1].begin(),this->_symbols[_row+1].end());
+             this->_symbols.erase(this->_symbols.begin()+_row+1);
+        }else{
+            _rowHIT->erase(_indexHIT);
+            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
+                this->_symbols.erase(this->_symbols.begin()+_row);
+        }
+    }else
+            _rowHIT->erase(_indexHIT);
+            if(this->_symbols[_row].size()==0&&this->_symbols.size()>1)
+                this->_symbols.erase(this->_symbols.begin()+_row);
+    }
     else
         throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
 
     if(_index!=0)
-        _LINEARpos=_toLinear(_row-1,_index-1);
+        _LINEARpos=_toLinear(_row,_index-1);
     else
-        _LINEARpos=_toLinear(_row-1,0);
+        _LINEARpos=_toLinear(_row,0);
 
-    std::cout << "Linear position is: "<<_LINEARpos << std::endl;
-    emit this->onRemoteDelete(_LINEARpos);
+    std::cout << "[REMOTE DELETE]@ " << _row << " " << _index-1 << std::endl;
 
+    return _LINEARpos;
 }
 
 

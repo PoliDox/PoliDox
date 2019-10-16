@@ -23,6 +23,7 @@ private:
 public:
     Char(int siteId, int counter, char value) : siteId(siteId), counter(counter), value(value){};
     ~Char();
+    int getSiteId() const;
     void setPosition(std::vector<int> x);
     vector<int> getPosition();
     char getValue() const;
@@ -30,8 +31,8 @@ public:
     vector<int> getFractionalPosition() const;
 
     // used by the CLIENTcontroller to create the message to be sent to the server
-    QJsonDocument write(const QString &action );
-    static Char read(const QString& _JSONstring);
+    QJsonObject toJson() const;
+    static Char fromJson(const QJsonObject& _JSONobj);
 };
 
 
