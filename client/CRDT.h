@@ -14,12 +14,12 @@ protected:
     int _toLinear(int row,int index);
 
     void mergeRows(std::vector<Char>& current,std::vector<Char>& next);
-    void splitRows(std::vector<std::vector<Char>>& matrix, std::vector<Char>& current,const unsigned int& row,const unsigned int& index);
+    void splitRows(std::vector<Char>& current,const unsigned int& row,const unsigned int& index);
     void insertSymbolAt(std::vector<Char>&row,Char& symbol,const unsigned int index);
-    void deleteRowAt(std::vector<std::vector<Char>>& matrix,unsigned int row);
-    void inserRowAtEnd(std::vector<std::vector<Char>>& matrix,std::vector<Char>& row);
-    void searchEqualSymbol(std::vector<std::vector<Char>>& matrix,const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
-    void searchGreaterSymbol(std::vector<std::vector<Char>>& matrix,const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
+    void deleteRowAt(unsigned int row);
+    void inserRowAtEnd(std::vector<Char>& row);
+    void searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
+    void searchGreaterSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
 
 public:
 

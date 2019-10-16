@@ -10,11 +10,11 @@ void CRDT::mergeRows(std::vector<Char>& current,std::vector<Char>& next){
     current.insert(current.end(),next.begin(),next.end());
 }
 
-void CRDT::splitRows(std::vector<std::vector<Char>>& matrix, std::vector<Char>& current,const unsigned int& row,const unsigned int& index){
+void CRDT::splitRows(std::vector<Char>& current,const unsigned int& row,const unsigned int& index){
     std::vector<Char> _VETT(current.begin()+index+1,current.end());
-    matrix.insert(matrix.begin()+row+1,_VETT);
+    this->_symbols.insert(this->_symbols.begin()+row+1,_VETT);
     //current.erase(current.begin()+index+1,current.end()); //WHY CURRENT INVALID AFTER INSERT, NOT AN ITERATOR. PROBABLY HEAP REALLOCATION ???
-    matrix[row].erase(matrix[row].begin()+index+1,matrix[row].end());
+    this->_symbols[row].erase(this->_symbols[row].begin()+index+1,this->_symbols[row].end());
 
 }
 
@@ -22,17 +22,17 @@ void CRDT::insertSymbolAt(std::vector<Char>&row,Char& symbol,const unsigned int 
     row.insert(row.begin()+index,symbol);
 }
 
-void CRDT::deleteRowAt(std::vector<std::vector<Char>>& matrix,unsigned int row){
-    matrix.erase(matrix.begin()+row);
+void CRDT::deleteRowAt(unsigned int row){
+    this->_symbols.erase(this->_symbols.begin()+row);
 }
 
-void CRDT::inserRowAtEnd(std::vector<std::vector<Char>>& matrix,std::vector<Char>& row){
-    matrix.push_back(row);
+void CRDT::inserRowAtEnd(std::vector<Char>& row){
+    this->_symbols.push_back(row);
 }
 
-void CRDT::searchEqualSymbol(std::vector<std::vector<Char>>& matrix,const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
+void CRDT::searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
 
-    _ROWhit=std::find_if(matrix.begin(),matrix.end(),[&](std::vector<Char>& row)->bool{
+    _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
         _row++;
         _index=0;
 
@@ -58,9 +58,9 @@ void CRDT::searchEqualSymbol(std::vector<std::vector<Char>>& matrix,const Char& 
 
 }
 
-void CRDT::searchGreaterSymbol(std::vector<std::vector<Char>>& matrix,const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
+void CRDT::searchGreaterSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
 
-    _ROWhit = std::find_if(matrix.begin(), matrix.end(), [&](std::vector<Char>& row) -> bool{
+    _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
             _index=0; //newline
             _row++;
 
@@ -156,7 +156,7 @@ int CRDT::remoteInsert(Char symbol){
 
     char _CHAR=symbol.getValue();
 
-    searchGreaterSymbol(this->_symbols,symbol,_row,_index,_LINECOUNTER,_ROWhit,_INDEXhit);
+    searchGreaterSymbol(symbol,_row,_index,_LINECOUNTER,_ROWhit,_INDEXhit);
 
     _row--;
 
@@ -166,7 +166,7 @@ int CRDT::remoteInsert(Char symbol){
     else if (_ROWhit != this->_symbols.end()){
         insertSymbolAt(this->_symbols[_row],symbol,_index);
         if(_CHAR=='\n')
-             splitRows(this->_symbols,this->_symbols[_row],_row,_index);
+             splitRows(this->_symbols[_row],_row,_index);
     }
     else // se non ho trovato nulla, row e index non hanno significato, li setto dopo!
         {
@@ -176,7 +176,7 @@ int CRDT::remoteInsert(Char symbol){
             if(_LASTCHAR=='\n'){
                 _NEWLINE=true;
                 std::vector<Char>_NEWROW(1,symbol);
-                inserRowAtEnd(this->_symbols,_NEWROW);
+                inserRowAtEnd(_NEWROW);
             }
             else{
                 insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
@@ -219,20 +219,20 @@ int CRDT::remoteDelete(const Char& symbol) {
 
     unsigned int _NROWS=this->_symbols.size();
 
-    searchEqualSymbol(this->_symbols, symbol, _row, _index, _rowHIT,_indexHIT);
+    searchEqualSymbol(symbol, _row, _index, _rowHIT,_indexHIT);
 
     if(_rowHIT!=this->_symbols.end()) { //if i found something
         char _CHAR=this->_symbols[_row][_index].getValue();
 
         if(_CHAR=='\n' && _NROWS!=1 && _row!=_NROWS-1){
          mergeRows(this->_symbols[_row],this->_symbols[_row+1]);
-         deleteRowAt(this->_symbols,_row+1);
+         deleteRowAt(_row+1);
         }
         else
             _rowHIT->erase(_indexHIT);
 
          if(this->_symbols[_row].size()==0 && this->_symbols.size()>1) //editor empty=one empty row so don't clear last row
-             deleteRowAt(this->_symbols,_row);
+             deleteRowAt(_row);
     }
     else
         throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
