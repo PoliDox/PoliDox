@@ -30,7 +30,7 @@ public:
 
     void printDebugChars();
 
-    static CrdtClient* fromJson(const QJsonObject& _JSONobj);
+    CrdtClient* fromJson(const QJsonArray &_JSONarray);
 
 signals:
     void onLocalInsert(Char symbol);

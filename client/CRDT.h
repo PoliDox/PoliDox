@@ -29,10 +29,6 @@ public:
     virtual int remoteInsert(Char symbol);
     virtual int remoteDelete(const Char& symbol);
 
-
-
-
-
-
+    QJsonArray toJson() const;
 
 };

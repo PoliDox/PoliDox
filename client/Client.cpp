@@ -64,7 +64,7 @@ void Client::onMessageReceived(const QString &p_msg)
         QString replCode = _JSONobj["response"].toString();
         // TODO: Check if response is "ok"
 
-        QJsonObject JSONcrdt = _JSONobj["document"].toObject();
+        QJsonArray JSONcrdt = _JSONobj["document"].toArray();
         CrdtClient *crdt = CrdtClient::fromJson(JSONcrdt);
         m_document = new ClientController(crdt, &m_socket);
 

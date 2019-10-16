@@ -250,8 +250,6 @@ int CrdtClient::getSiteId() {
     return this->_siteID;
 }
 
-
-
 void CrdtClient::printDebugChars(){
     std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
         std::for_each(row.begin(), row.end(), [](Char val){
@@ -268,8 +266,16 @@ void CrdtClient::printDebugChars(){
     });
 }
 
-CrdtClient *CrdtClient::fromJson(const QJsonObject &_JSONobj)
+CrdtClient *CrdtClient::fromJson(const QJsonArray &_JSONarray)
 {
-    return new CrdtClient();
+    CrdtClient *retCrdt = new CrdtClient();
+    // TODO
+    /*
+    for(QJsonArray::iterator it = _JSONarray.begin(); it != _JSONarray.end(); it++){
+        QJsonArray row = it->
+        position.push_back(it->toInt());
+        //std::cout<< it->toInt() <<" ";
+    }
+    */
 }
 
