@@ -24,7 +24,7 @@ ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket) :
             // When copying to the beginning everything is deleted and copied anew
             charsAdded--;
             if (!charsRemoved) {
-                qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
+                //qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
             }
             charsRemoved--;
         }

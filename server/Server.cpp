@@ -6,6 +6,7 @@ static QString getIdentifier(QWebSocket *peer)
                                        QString::number(peer->peerPort()));
 }
 
+
 Server::Server(quint16 port, QObject *parent) :
     QObject(parent)
 {
@@ -28,14 +29,21 @@ Server::Server(quint16 port, QObject *parent) :
     m_documents["firstFile"] = l_firstFile;
 
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("127.0.0.1");
-    db.setDatabaseName("qtprova");
-    db.setUserName("root");     //default xampp  //TODO: da cambiare username
-    db.setPassword("");         //default xampp  //TODO: da cambiare password
-    bool ok = db.open();
-    QTextStream(stdout) << "connessione al db: " << ok << '\n';
+    //TEST DB
+
+    DatabaseManager db;
+    //db.registerUser("provauser4","provapsw4","a");
+    //std::cout << db.checkPassword("provauser4", "provapsw4") << "\n";
+    db.insertNewDocument("provadocument2");
+
+    std::vector<int> v = {7, 5, 16, 8};
+    std::vector<int> v2 = {7, 1};
+    db.insertSymbol("provadocument", "a", v2);
+    //std::cout << db.deleteSymbol("provadocument", "a", v) << "\n";
+
+    db.retrieveAllInserts("provadocument");
 }
+
 
 Server::~Server()
 {
@@ -43,6 +51,7 @@ Server::~Server()
 }
 
 
+//codice login
 void Server::onNewConnection()
 {
     static int i = 0; // ONLY FOR TESTING
@@ -52,3 +61,15 @@ void Server::onNewConnection()
     Account newUser(i++, "", ""); // TODO: Fill the parameters!
     m_documents["firstFile"]->addClient(newUser, l_socket);
 }
+
+
+//slot per json open new file (namedocument)
+//creare o restituire server controller
+//controllare file esistente
+
+
+
+
+
+
+

@@ -2,15 +2,23 @@ TARGET = polidox-server
 
 QT -= gui
 QT += websockets
-
-#FV
 QT += sql
-#
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
 
+################################################################
+# to find external libraries about mongocxx driver for mongodb #
+################################################################
+QT_CONFIG -= no-pkg-config
+CONFIG += link_pkgconfig
+PKGCONFIG += libmongocxx
+
+mac {
+  PKG_CONFIG = /usr/local/bin/pkg-config
+}
+################################################################
 
 
 # The following define makes your compiler emit warnings if you use
@@ -25,6 +33,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    DatabaseManager.cpp \
     Server.cpp \
     ServerController.cpp \
     main.cpp \
@@ -38,7 +47,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     Account.h \
-    Server.h \
+    DatabaseManager.h \
     Server.h \
     ServerController.h \
     ServerMessageFactory.h

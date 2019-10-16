@@ -14,6 +14,7 @@ void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
 
     connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
 
+
         qDebug() << "Received a message from a client";
         QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
         for(auto it = m_clients.constBegin(); it != m_clients.constEnd(); it++) {
@@ -52,3 +53,5 @@ void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
     });
     */
 }
+
+

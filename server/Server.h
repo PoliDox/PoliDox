@@ -6,9 +6,9 @@
 #include <QWebSocket>
 #include <QThread>
 #include "ServerController.h"
+#include "DatabaseManager.h"
 
-#include <QSqlDatabase>
-#include <QtSql>
+
 
 class Server : public QObject
 {
@@ -17,6 +17,7 @@ class Server : public QObject
 private:
     QWebSocketServer *m_pWebSocketServer;
     QMap<QString, ServerController*> m_documents;
+    DatabaseManager *dbOperations;
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
