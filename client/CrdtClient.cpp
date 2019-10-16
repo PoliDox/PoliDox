@@ -7,7 +7,7 @@
 #define MAXNUM 100
 
 
-CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
+CrdtClient::CrdtClient() {
     //TODO il vettore di simboli inizialmente è vuoto??
     this->_symbols=std::vector<std::vector<Char>>(1);
     this->_counter = 0; //TODO ?? siamo sicuri che sia inizializzato a zero?
@@ -528,6 +528,11 @@ void CrdtClient::printDebugChars(){
             });*/
         });
     });
+}
+
+CrdtClient* CrdtClient::fromJson(const QJsonObject &_JSONobj)
+{
+    return new CrdtClient();
 }
 
 

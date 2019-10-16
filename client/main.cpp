@@ -1,7 +1,7 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
-#include "ClientController.h"
+#include "Client.h"
 #include "Editor.h"
 
 int main(int argc, char *argv[])
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("PoliDox client");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
-    ClientController l_controller;
+    Client l_client;
 
     return app.exec();
 }

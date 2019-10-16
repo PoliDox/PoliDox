@@ -13,8 +13,7 @@ class ClientController;
 class CrdtClient : public QObject {
     Q_OBJECT
 
-private:
-    ClientController *m_controller;
+private:    
     int _siteID;
     int _counter;
     std::vector<std::vector<Char>> _symbols;
@@ -24,7 +23,7 @@ private:
     void printSymbols();
 
 public:
-    CrdtClient(ClientController *p_controller);
+    CrdtClient();
 
     void localInsert(int position, char value);
     void localDelete(int index);
@@ -40,9 +39,11 @@ public:
 
     void printDebugChars();
 
+    static CrdtClient* fromJson(const QJsonObject& _JSONobj);
+
 signals:
     void onLocalInsert(Char symbol);
-    void onLocalDelete(Char symbol);    
+    void onLocalDelete(Char symbol);
 };
 
 
