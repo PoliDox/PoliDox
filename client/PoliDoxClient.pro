@@ -7,6 +7,7 @@ QT += gui websockets
 INSTALLS += target
 
 HEADERS += \
+    CRDT.h \
     ClientController.h \
     CrdtClient.h \
     CrdtClient.h \
@@ -17,6 +18,7 @@ HEADERS += \
     Log_dialog.h
 
 SOURCES += \
+    CRDT.cpp \
     ClientController.cpp \
     CrdtClient.cpp \
     Editor.cpp \
