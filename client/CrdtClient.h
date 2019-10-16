@@ -16,18 +16,17 @@ class CrdtClient : public QObject {
 private:
     ClientController *m_controller;
     int _siteID;
-    int _counter;
     std::vector<std::vector<Char>> _symbols;
 
-    void _toMatrix(int position,int* row,int* index);
+    void _toMatrix(unsigned int position,unsigned int* row,unsigned int* index);
     int _toLinear(int row,int index);
     void printSymbols();
 
 public:
     CrdtClient(ClientController *p_controller);
 
-    void localInsert(int position, char value);
-    void localDelete(int index);
+    void localInsert(unsigned int position, char value);
+    void localDelete(unsigned int index);
 
     // These functions return the linear position
     // at which the character is added/deleted
@@ -35,8 +34,6 @@ public:
     int remoteDelete(const Char& symbol);
 
     int getSiteId();
-    int getCounter();
-    int getCounterAndIncrement();
 
     void printDebugChars();
 
