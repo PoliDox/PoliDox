@@ -268,3 +268,8 @@ void CrdtClient::printDebugChars(){
     });
 }
 
+CrdtClient *CrdtClient::fromJson(const QJsonObject &_JSONobj)
+{
+    return new CrdtClient();
+}
+
