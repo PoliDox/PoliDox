@@ -6,6 +6,8 @@
 #include <QWebSocket>
 #include <iostream>
 
+
+
 class ServerController : public QObject
 {
     Q_OBJECT
