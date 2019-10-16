@@ -3,9 +3,10 @@
 
 #endif // CRDT_H
 
-#include"Char.h"
+#include "Char.h"
+#include <QObject>
 
-class CRDT{
+class CRDT : public QObject {
 
 protected:
     std::vector<std::vector<Char>> _symbols;
@@ -23,7 +24,8 @@ protected:
 
 public:
 
-    CRDT();
+    CRDT();    
+    // TODO: Perché virtual?? Non vengono reimplementate nelle sottoclassi!
     virtual int remoteInsert(Char symbol);
     virtual int remoteDelete(const Char& symbol);
 
