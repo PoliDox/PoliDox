@@ -20,14 +20,21 @@ void Log_Dialog::setEditor(Editor *editor){
     this->editor = editor;
 }
 
+void Log_Dialog::displayFiles(const QList<QString> p_files)
+{
+    // TODO: replace "SignIn" and "Register" button with a box including all available files
+    // When a file is selected, emit the signal onFileSelected
+}
+
 void Log_Dialog::on_pushButton_login_clicked()
 {
     QString username = ui->lineEdit_username->text();
-    QString password = ui->lineEdit_password->text();
+    QString password = ui->lineEdit_password->text();   
 
-    /* TODO: implementare l' autenticazione con il database */
+    emit authDataSubmitted(username, password);
 
     /* stub di accesso - verra` sostituito con l' autenticazione al DB */
+    /*
     if(username == "minnoz" && password == "piedi") {
         QMessageBox::information(this, "Login", "Welcome back to PoliDox, " + username + "!");
         editor->show();
@@ -36,6 +43,7 @@ void Log_Dialog::on_pushButton_login_clicked()
     else {
         QMessageBox::warning(this,"Login", "Username and password is not correct");
     }
+    */
 }
 
 void Log_Dialog::on_pushButton_register_clicked()

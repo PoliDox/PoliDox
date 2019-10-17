@@ -2,12 +2,10 @@
 
 #include <QLabel>
 #include "ClientMessageFactory.h"
-#include "Log_dialog.h"
 
-ClientController::ClientController()
-{
-    m_crdt = new CrdtClient(this);
-
+ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket) :
+    m_crdt(p_crdt), m_socket(p_socket)
+{    
     /* ______________________________________________________________________________________
        takes every character from input and call CRDTclient::localInsert or
        CRDTclient::localDelete.
@@ -64,7 +62,7 @@ ClientController::ClientController()
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
-        m_socket.sendTextMessage(jsonString);
+        m_socket->sendTextMessage(jsonString);
     });
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
@@ -73,17 +71,12 @@ ClientController::ClientController()
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
-        m_socket.sendTextMessage(jsonString);
+        m_socket->sendTextMessage(jsonString);
     });
 
-    m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
-    connect(&m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
+    connect(m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
-    Log_Dialog loginWindow;
-    loginWindow.setEditor(&m_editor);
-    loginWindow.setModal(true);
-    loginWindow.exec();
-    //m_editor.show();
+    m_editor.show();
 }
 
 

@@ -253,5 +253,19 @@ int CRDT::remoteDelete(const Char& symbol) {
     return _LINEARpos;
 }
 
+QJsonArray CRDT::toJson() const
+{
+    QJsonArray _JSONchars;
+    for (auto it = _symbols.begin(); it != _symbols.end(); it++) {
+        QJsonArray l_row;
+        for (auto jt = it->begin(); jt != it->end(); jt++) {
+            l_row.push_back(*jt);
+        }
+        _JSONchars.push_back(l_row);
+    }
+
+    return _JSONchars;
+}
+
 
 

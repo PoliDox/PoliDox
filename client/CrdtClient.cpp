@@ -8,7 +8,8 @@
 #define MAXNUM 100
 //#define DEBUG_OUTPUT
 
-CrdtClient::CrdtClient(ClientController *p_controller) : m_controller(p_controller) {
+
+CrdtClient::CrdtClient() {
     //TODO il vettore di simboli inizialmente è vuoto??
     _siteID = 1; // ONLY FOR TESTING
 }
@@ -249,8 +250,6 @@ int CrdtClient::getSiteId() {
     return this->_siteID;
 }
 
-
-
 void CrdtClient::printDebugChars(){
     std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
         std::for_each(row.begin(), row.end(), [](Char val){
@@ -265,5 +264,18 @@ void CrdtClient::printDebugChars(){
             });*/
         });
     });
+}
+
+CrdtClient *CrdtClient::fromJson(const QJsonArray &_JSONarray)
+{
+    CrdtClient *retCrdt = new CrdtClient();
+    // TODO
+    /*
+    for(QJsonArray::iterator it = _JSONarray.begin(); it != _JSONarray.end(); it++){
+        QJsonArray row = it->
+        position.push_back(it->toInt());
+        //std::cout<< it->toInt() <<" ";
+    }
+    */
 }
 

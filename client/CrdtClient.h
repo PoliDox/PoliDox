@@ -14,14 +14,13 @@ class ClientController;
 class CrdtClient : public CRDT {
     Q_OBJECT
 
-private:
-    ClientController *m_controller;
+private:    
     int _siteID;
 
     void printSymbols();
 
 public:
-    CrdtClient(ClientController *p_controller);
+    CrdtClient();
 
     void localInsert(unsigned int position, char value);
     void localDelete(unsigned int index);
@@ -31,9 +30,11 @@ public:
 
     void printDebugChars();
 
+    CrdtClient* fromJson(const QJsonArray &_JSONarray);
+
 signals:
     void onLocalInsert(Char symbol);
-    void onLocalDelete(Char symbol);    
+    void onLocalDelete(Char symbol);
 };
 
 

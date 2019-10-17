@@ -15,7 +15,8 @@ HEADERS += \
     Editor.h \
     ClientMessageFactory.h \
     Account.h \
-    Log_dialog.h
+    Log_dialog.h \
+    Client.h
 
 SOURCES += \
     CRDT.cpp \
@@ -25,7 +26,8 @@ SOURCES += \
     Log_dialog.cpp \
     main.cpp \
     Char.cpp \
-    ClientMessageFactory.cpp
+    ClientMessageFactory.cpp \
+    Client.cpp
 
 DISTFILES += \
     images/filenew.png \
