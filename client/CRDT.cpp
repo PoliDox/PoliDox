@@ -1,4 +1,5 @@
 #include "CRDT.h"
+#include <future>
 
 CRDT::CRDT(){
     this->_symbols=std::vector<std::vector<Char>>(1);
