@@ -150,8 +150,8 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
     QString header = requestObjJSON["action"].toString();
     if (header == "openFileReq") {
         QString nameDocument = requestObjJSON["nameDocument"].toString();        
-        ServerController *fileServContr = nullptr;
 
+        ServerController *fileServContr = nullptr;
         if(! this->file2serverController.contains(nameDocument)){
             //query al db, aggiornare la mappa, costruire crdt, poi..?
             fileServContr = new ServerController(nameDocument, this);
@@ -161,7 +161,7 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
             fileServContr = this->file2serverController[nameDocument];
         }
 
-        //addclient
+        fileServContr->addClient(signalSender);
 
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
     } else if (header == "createFileReq"){
@@ -196,6 +196,9 @@ void Server::onNewConnection() {
 }
 
 
+DatabaseManager* Server::getDb(){
+    return this->dbOperations;
+}
 
 
 

@@ -23,6 +23,7 @@ private:
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
     Account* getAccount(QWebSocket *socketOfAccont);
+    DatabaseManager* getDb();
     virtual ~Server();
 
 /* ======================================================================

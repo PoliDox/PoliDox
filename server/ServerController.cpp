@@ -36,7 +36,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     this->notifyOtherClientsAndMe(socketToAdd);
 
     //da sistemare
-    //json = this->crdt.toJson();
+    //json = this->crdt->toJson();
     //socketToAdd->sendTextMessage(json)
 }
 
@@ -62,10 +62,38 @@ void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
 }
 
 
+void ServerController::createCrdt(QList<QString> orderedInserts){
+    //CRDT *crdt = new Crdt();
+    //this->crdt->fromJson(orderedInserts);
+}
+
+
 // The ServerController has to update the his crdt on the
 // base of the operation(insert/delete)
 void ServerController::handleRemoteOperation(const QString &messageReceivedByClient){
     //aggiorna crdt server controller
+    QJsonObject requestObjJSON;
+    QJsonDocument requestDocJSON;
+
+    requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
+    if (requestDocJSON.isNull()) {
+        // TODO: print some debug
+        return;
+    }
+    requestObjJSON = requestDocJSON.object();
+
+    // No switch case for strings in C++ :((
+    QString header = requestObjJSON["action"].toString();
+    if (header == "insert") {
+        //this->crdt->remoteInsert(...);
+        //this->server->getDb()->insertSymbol(...);
+    } else if(header == "delete"){
+        //this->crdt->remoteDelete(...);
+        //this->server->getDb()->deleteSymbol(...);
+    } else {
+        qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
+    }
+
 }
 
 
