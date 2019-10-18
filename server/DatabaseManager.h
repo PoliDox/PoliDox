@@ -21,8 +21,7 @@
 
 
 
-class DatabaseManager : public QObject {
-    Q_OBJECT
+class DatabaseManager {
 
 private:
     mongocxx::instance *instance;
@@ -40,8 +39,8 @@ public:
     bool insertNewDocument(QString documentName);
     bool insertSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition);
     bool deleteSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition);
-    void retrieveAllInserts(QString nameDocument);
-    QList<QString> retrieveAllDocuments();
+    QList<QString> getAllInserts(QString nameDocument);
+    QList<QString> getAllDocuments();
     mongocxx::database getDb();
     ~DatabaseManager();
 };

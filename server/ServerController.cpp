@@ -3,57 +3,77 @@
 #include <QThread>
 
 
-ServerController::ServerController()
-{
 
+ServerController::ServerController(QString nameDocumentAssociated, Server *server) {
+    this->nameDocumentAssociated = nameDocumentAssociated;
+    this->server = server;
+    //nothing else to do???
 }
 
-void ServerController::addClient(Account& p_account, QWebSocket *p_socket)
-{   
-    //qDebug() << "New client (" << p_account.getSiteId() << ")";
 
+// - We arrive on this slot when a client does a local operation(insert/delete),
+//   after that he sends a message to the server via socket,
+//   that message has to be duplicated on all the other
+//   clients which will do the remote operation
+void ServerController::replicateMessageOnOtherSockets(const QString &messageReceivedOnSocket) {
+    // The socket of the client which did the local operation
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
-    connect(p_socket, &QWebSocket::textFrameReceived, this, [&](const QString& p_message) {
-
-
-        qDebug() << "Received a message from a client";
-        QWebSocket *pSender = qobject_cast<QWebSocket *>(sender());
-        for(auto it = account2socket.constBegin(); it != account2socket.constEnd(); it++) {
-            const Account& l_client = it.key();
-            auto l_socket = it.value();                    
-            if (l_socket != pSender) { // don't echo message back to sender                
-                l_socket->sendTextMessage(p_message);
-            }
-        }
-
-    });
-
-    for (auto it = account2socket.constBegin(); it != account2socket.constEnd(); it++) {
-        // Notify existing client about the new entry        
-        const Account& l_client = it.key();
-        auto l_socket = it.value();
-        QString l_msg = ServerMessageFactory::createNewClientMessage(p_account);
-        l_socket->sendTextMessage(l_msg);
-
-        // Notify new entry about existing client
-        l_msg = ServerMessageFactory::createNewClientMessage(l_client);
-        p_socket->sendTextMessage(l_msg);
+    for(auto socket : this->socketsOnDocument){
+        if(socket != signalSender)
+            socket->sendTextMessage(messageReceivedOnSocket);
     }
-
-    qDebug() << "Inserting client " << p_account.getSiteId() << " with socket " << p_socket;
-    account2socket.insert(p_account, p_socket);
-
-
-    /*
-    connect(p_socket, &QWebSocket::disconnected, this, [&](){
-        QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-        if (pClient)
-        {
-            m_clients.removeAll(pClient);
-            pClient->deleteLater();
-        }
-    });
-    */
 }
+
+
+void ServerController::addClient(QWebSocket *socketToAdd){
+    this->socketsOnDocument.push_back(socketToAdd);
+
+    connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
+    connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
+    //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
+
+    this->notifyOtherClientsAndMe(socketToAdd);
+
+    //da sistemare
+    //json = this->crdt.toJson();
+    //socketToAdd->sendTextMessage(json)
+}
+
+
+// Pay attention that while I notify (.1)the other clients
+// about the new_client_connected(== newSocket) I notify also
+// (.2)the new_client_connected(me) about all the other clients already connected
+void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
+    Account *newAccount = this->server->getAccount(newSocket);
+    QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(*newAccount);
+
+    for(auto otherSocket : this->socketsOnDocument){
+        if(otherSocket != newSocket){
+            //(.1) notify other client
+            otherSocket->sendTextMessage(msgNewClient1);
+
+            //(.2) notify me
+            Account *otherAccount = this->server->getAccount(otherSocket);
+            QString msgNewClient2 = ServerMessageFactory::createNewClientMessage(*otherAccount);
+            newSocket->sendTextMessage(msgNewClient2);
+        }
+    }
+}
+
+
+// The ServerController has to update the his crdt on the
+// base of the operation(insert/delete)
+void ServerController::handleRemoteOperation(const QString &messageReceivedByClient){
+    //aggiorna crdt server controller
+}
+
+
+
+
+
+
+
+
 
 

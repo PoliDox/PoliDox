@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "ServerController.h"
 
 
 
@@ -14,6 +15,8 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Polidox Server"),
                                               QWebSocketServer::NonSecureMode, this);
 
+    this->dbOperations = new DatabaseManager();
+
     if (m_pWebSocketServer->listen(QHostAddress::Any, port))
     {
         QTextStream(stdout) << "PoliDox server listening on port " << port << '\n';
@@ -24,25 +27,31 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
     }
 
     // TEST: Initialize the open document list with an empty document
-    ServerController *l_firstFile = new ServerController();
-    file2serverController["firstFile"] = l_firstFile;
+    //ServerController *l_firstFile = new ServerController();
+    //file2serverController["firstFile"] = l_firstFile;
 
     //TEST DB
-    this->dbOperations = new DatabaseManager();
     //db.registerUser("provauser4","provapsw4","a");
     //std::cout << db.checkPassword("provauser4", "provapsw4") << "\n";
-    this->dbOperations->insertNewDocument("provadocument2");
+    //this->dbOperations->insertNewDocument("provadocument2");
 
-    std::vector<int> v = {7, 5, 16, 8};
-    std::vector<int> v2 = {7, 1};
-    this->dbOperations->insertSymbol("provadocument", "a", v2);
+    //std::vector<int> v = {7, 5, 16, 8};
+    //std::vector<int> v2 = {7, 1};
+    //this->dbOperations->insertSymbol("provadocument", "a", v2);
     //std::cout << db.deleteSymbol("provadocument", "a", v) << "\n";
 
-    this->dbOperations->retrieveAllDocuments();
-    for( auto elem : this->dbOperations->retrieveAllDocuments() ){
-        std::cout << elem.toUtf8().constData() << "\n";
-    }
+    //this->dbOperations->retrieveAllDocuments();
+    //for( auto elem : this->dbOperations->retrieveAllDocuments() ){
+    //    std::cout << elem.toUtf8().constData() << "\n";
+    //}
+
 }
+
+
+Account* Server::getAccount(QWebSocket *socketOfAccont){
+    return this->socket2account[socketOfAccont];
+}
+
 
 
 Server::~Server()
@@ -89,7 +98,7 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
             this->socket2account[signalSender] = loggedAccount;
 
             //TODO: restituire la lista dei file
-            nameDocuments = this->dbOperations->retrieveAllDocuments();
+            nameDocuments = this->dbOperations->getAllDocuments();
 
             //TODO: ricordarsi la disconnect e la connect a handleLoggedRequest
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
@@ -103,13 +112,13 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
         signalSender->sendTextMessage(sendMsgToClient);
     }
     else if (header == "registerUser"){
-        QJsonObject accountObj = requestObjJSON["account"].toObject();
+        QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
-        Account userToRegister = Account::fromJson(accountObj);
+        QByteArray image ;// = requestObjJSON["image"].toString();  //TODO: da sistemare, come convertire l'immagine ???
+                                                                    //      vedere anche Account::toJSON()
 
-        double result = this->dbOperations->registerUser(userToRegister.getName(),
-                                                         password,
-                                                         userToRegister.getImage());
+        double result = this->dbOperations->registerUser(name, password, image);
+
         //TODO: ci sono altre cose da fare???
 
         QByteArray sendMsgToClient = ServerMessageFactory::createRegistrationUserReply(result);
@@ -123,10 +132,43 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
 
 
 //- To handle requests by logged account
-//- The only valid actions can be "insert","delete","openFileReq","createFileReq"
+//- The only valid actions can be "openFileReq","createFileReq"
 void Server::handleLoggedRequests(const QString &genericRequestString){
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
+    QJsonObject requestObjJSON;
+    QJsonDocument requestDocJSON;
 
+    requestDocJSON = QJsonDocument::fromJson(genericRequestString.toUtf8());
+    if (requestDocJSON.isNull()) {
+        // TODO: print some debug
+        return;
+    }
+    requestObjJSON = requestDocJSON.object();
+
+    // No switch case for strings in C++ :((
+    QString header = requestObjJSON["action"].toString();
+    if (header == "openFileReq") {
+        QString nameDocument = requestObjJSON["nameDocument"].toString();        
+        ServerController *fileServContr = nullptr;
+
+        if(! this->file2serverController.contains(nameDocument)){
+            //query al db, aggiornare la mappa, costruire crdt, poi..?
+            fileServContr = new ServerController(nameDocument, this);
+            QList<QString> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
+            fileServContr->createCrdt(orderedInserts);
+        } else {
+            fileServContr = this->file2serverController[nameDocument];
+        }
+
+        //addclient
+
+        disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
+    } else if (header == "createFileReq"){
+
+    } else {
+        qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
+    }
 }
 
 
@@ -150,7 +192,7 @@ void Server::onNewConnection() {
     this->socket2account[newSocket] = nullptr;
 
     connect(newSocket, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
-    connect(newSocket, &QWebSocket::disconnected, this, &Server::disconnectAccount);
+    connect(newSocket, &QWebSocket::disconnected, this, &Server::disconnectAccount);    //TODO: da rivedere
 }
 
 

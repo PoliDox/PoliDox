@@ -206,7 +206,8 @@ bool DatabaseManager::deleteSymbol(QString nameDocument, QString symbol, std::ve
 //TODO: - anziché il for da stampare in output, capire
 //        bene cosa restituire. Un vector<Char> su cui
 //        poi verranno chiamate le remoteInsert??
-void DatabaseManager::retrieveAllInserts(QString nameDocument){
+QList<QString> DatabaseManager::getAllInserts(QString nameDocument){
+    QList<QString> resultInserts;
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
@@ -225,14 +226,16 @@ void DatabaseManager::retrieveAllInserts(QString nameDocument){
     //DA QUI IN POI E' ANCORA DA IMPLEMENTARE
     //TOGLIERE IL FOR QUI SOTTO
     for (auto elem : resultIterator) {
-        std::cout << bsoncxx::to_json(elem) << std::endl;
+        QString insert = QString::fromStdString(bsoncxx::to_json(elem));
+        resultInserts.push_back(insert);
     }
+    return resultInserts;
 }
 
 
 //TODO:: - valore di ritorno: come restituire i vari documenti?
 //         QList<QString> va bene?? per ora si
-QList<QString> DatabaseManager::retrieveAllDocuments(){
+QList<QString> DatabaseManager::getAllDocuments(){
     QList<QString> nameDocuments;
     mongocxx::collection documentCollection = (*this->db)["document"];
 

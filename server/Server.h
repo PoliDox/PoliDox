@@ -5,11 +5,10 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QThread>
-#include "ServerController.h"
 #include "DatabaseManager.h"
-#include"ServerMessageFactory.h"
+#include "ServerMessageFactory.h"
 
-
+class ServerController;
 
 class Server : public QObject
 {
@@ -23,6 +22,7 @@ private:
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
+    Account* getAccount(QWebSocket *socketOfAccont);
     virtual ~Server();
 
 /* ======================================================================

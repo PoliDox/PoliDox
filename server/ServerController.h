@@ -6,6 +6,7 @@
 #include <QWebSocket>
 #include <iostream>
 #include "Account.h"
+#include "Server.h"
 
 
 
@@ -13,18 +14,19 @@ class ServerController : public QObject {
     Q_OBJECT
 
 private:
-    //TODO: in realtà questa mappa andrebbe al contrario,
-    //io dalle slot sono in grado di risalire al socket,
-    //e quindi poi all'account
-    QMap<Account, QWebSocket*> account2socket;
+    QList<QWebSocket*> socketsOnDocument;
+    QString nameDocumentAssociated;
+    Server *server;
     //CRDT c;
 
 public:
-    ServerController();
+    ServerController(QString nameDocumentAssociated, Server *server);
+    void addClient(QWebSocket *socketToAdd);
+    void notifyOtherClientsAndMe(QWebSocket *newSocket);
 
 public slots:
-    void addClient(Account& p_account, QWebSocket *p_socket);
-
+    void replicateMessageOnOtherSockets(const QString &messageReceivedOnSocket);
+    void handleRemoteOperation(const QString &messageReceivedByClient);
 };
 
 #endif // SERVERCONTROLLER_H
