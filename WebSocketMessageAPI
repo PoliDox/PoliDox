@@ -1,0 +1,39 @@
+INSERT
+"action" = "insert"
+char = { ... }
+
+DELETE
+"action" = "delete"
+char = { ... }
+
+NEW CLIENT
+"action" = "newClient"
+account = { ... }
+
+LOGIN REQ
+"action" = "loginReq"
+"username" = ...
+"password" = ...
+
+LOGIN REPL
+"action" = "loginRepl"
+"response" = "ok"/"fail"
+"account" = { ... } // only if ok
+"files" = { ... }
+
+OPEN FILE REQ
+"action" = "openFileReq"
+"filename" = ...
+
+OPEN FILE REPL
+"action" = "openFileRepl"
+"response" = "ok"/"fail"
+"document" = { //here comes the crdt }
+
+CREATE FILE REQ
+
+
+CREATE FILE REPL
+
+NEW REMOTE FILE
+

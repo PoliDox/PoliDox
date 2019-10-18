@@ -11,13 +11,13 @@ class ClientController : public QObject
     Q_OBJECT
 
 public:
-    ClientController();
+    ClientController(CrdtClient *p_crdt, QWebSocket *p_socket);
     ~ClientController();
 
 private:
     Editor m_editor;
     CrdtClient *m_crdt; // TODO: use smart-pointer
-    QWebSocket m_socket;
+    QWebSocket *m_socket;
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);
