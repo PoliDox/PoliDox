@@ -14,8 +14,8 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="2">
-    <spacer name="horizontalSpacer_2">
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -40,8 +40,8 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer">
+   <item row="1" column="2">
+    <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -72,13 +72,6 @@
       <string>Authentication</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QPushButton" name="pushButton_login">
-        <property name="text">
-         <string>Sign In</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
@@ -92,6 +85,13 @@
          <widget class="QLineEdit" name="lineEdit_password"/>
         </item>
        </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="pushButton_login">
+        <property name="text">
+         <string>Sign In</string>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout">

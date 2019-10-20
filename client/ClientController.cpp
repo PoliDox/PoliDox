@@ -6,6 +6,7 @@
 ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket) :
     m_crdt(p_crdt), m_socket(p_socket)
 {    
+
     /* ______________________________________________________________________________________
        takes every character from input and call CRDTclient::localInsert or
        CRDTclient::localDelete.

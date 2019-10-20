@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include "Editor.h"
+#include "ListFiles.h"
 
 namespace Ui {
 class Log_Dialog;
@@ -32,6 +33,7 @@ private slots:
 private:
     Ui::Log_Dialog *ui;
     Editor *editor;
+    ListFiles *lf;
 };
 
 #endif // LOG_DIALOG_H
