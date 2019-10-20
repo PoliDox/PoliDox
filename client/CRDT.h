@@ -4,7 +4,7 @@
 #include "Char.h"
 #include <QObject>
 
-class CRDT : public QObject{
+class CRDT : public QObject {
 
 protected:
     std::vector<std::vector<Char>> _symbols;
@@ -21,16 +21,12 @@ protected:
     void searchGreaterSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
 
 public:
-
     CRDT();    
     // TODO: Perché virtual?? Non vengono reimplementate nelle sottoclassi!
     virtual int remoteInsert(Char symbol);
     virtual int remoteDelete(const Char& symbol);
-
     QJsonArray toJson() const;
-    static CRDT* fromJson(const QJsonArray &crdtJsonFormatted);
-
-    virtual ~CRDT();
+    void fromJson(const QJsonArray &crdtJsonFormatted);
 
 };
 

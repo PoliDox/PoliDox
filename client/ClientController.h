@@ -6,8 +6,7 @@
 #include "CrdtClient.h"
 #include "Editor.h"
 
-class ClientController : public QObject
-{
+class ClientController : public QObject {
     Q_OBJECT
 
 public:

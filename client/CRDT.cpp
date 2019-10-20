@@ -269,27 +269,20 @@ QJsonArray CRDT::toJson() const {
 }
 
 
-CRDT* CRDT::fromJson(const QJsonArray &crdtJsonFormatted){
-    CRDT *crdtToReturn = new CRDT();
-
+void CRDT::fromJson(const QJsonArray &crdtJsonFormatted){
     unsigned long rowIndex = 0;
     for(QJsonValue elem : crdtJsonFormatted){
        QJsonObject charObjJson = elem.toObject();
        Char charToAdd = Char::fromJson(charObjJson);
 
-       crdtToReturn->_symbols[rowIndex].push_back(charToAdd);
+       this->_symbols[rowIndex].push_back(charToAdd);
 
        if(charToAdd.getValue() == '\n')
            rowIndex++;
     }
-
-    return crdtToReturn;
 }
 
 
-CRDT::~CRDT(){
-    //TODO
-}
 
 
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <QWebSocket>
+#include <QObject>
 #include "Char.h"
 #include "CRDT.h"
 
@@ -15,22 +16,16 @@ class CrdtClient : public CRDT {
     Q_OBJECT
 
 private:    
-    int _siteID;
-
+    double siteId;
     void printSymbols();
 
 public:
-    CrdtClient();
-
+    CrdtClient(double siteId);
     void localInsert(unsigned int position, char value);
     void localDelete(unsigned int index);
-
-
-    int getSiteId();
-
     void printDebugChars();
-
-    static CrdtClient* fromJson(const QJsonArray &_JSONarray);
+    double getSiteId() const;
+    void setSiteId(double siteId);
 
 signals:
     void onLocalInsert(Char symbol);

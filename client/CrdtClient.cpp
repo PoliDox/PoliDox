@@ -5,13 +5,25 @@
 #include <QObject>
 #include <future>
 
+
+
 #define MAXNUM 100
 //#define DEBUG_OUTPUT
 
 
-CrdtClient::CrdtClient() {
+double CrdtClient::getSiteId() const {
+    return this->siteId;
+}
+
+
+void CrdtClient::setSiteId(double siteID) {
+    this->siteId = siteID;
+}
+
+
+CrdtClient::CrdtClient(double siteId) {
     //TODO il vettore di simboli inizialmente è vuoto??
-    _siteID = 1; // ONLY FOR TESTING
+    this->siteId = siteId;
 }
 
 bool existsPositionInVector(unsigned int position, std::vector<int> vector) {
@@ -140,7 +152,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 #endif
 
-    Char symbolToInsert(this->_siteID, 0, value);
+    Char symbolToInsert(this->siteId, 0, value);
 
     rowSize=this->_symbols[row].size();
 
@@ -246,9 +258,6 @@ void CrdtClient::localDelete(unsigned int position){
 
 }
 
-int CrdtClient::getSiteId() {
-    return this->_siteID;
-}
 
 void CrdtClient::printDebugChars(){
     std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
@@ -265,35 +274,3 @@ void CrdtClient::printDebugChars(){
         });
     });
 }
-
-CrdtClient *CrdtClient::fromJson(const QJsonArray &_JSONarray)
-{
-    CrdtClient *crdtToReturn = new CrdtClient();
-
-    unsigned long rowIndex = 0;
-    for(QJsonValue elem : _JSONarray){
-       QJsonObject charObjJson = elem.toObject();
-       Char charToAdd = Char::fromJson(charObjJson);
-
-       crdtToReturn->_symbols[rowIndex].push_back(charToAdd);
-
-       if(charToAdd.getValue() == '\n')
-           rowIndex++;
-    }
-
-    return crdtToReturn;
-
-
-
-
-    //CrdtClient *retCrdt = new CrdtClient();
-    // TODO
-    /*
-    for(QJsonArray::iterator it = _JSONarray.begin(); it != _JSONarray.end(); it++){
-        QJsonArray row = it->
-        position.push_back(it->toInt());
-        //std::cout<< it->toInt() <<" ";
-    }
-    */
-}
-
