@@ -21,7 +21,6 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
     {
         QTextStream(stdout) << "PoliDox server listening on port " << port << '\n';
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &Server::onNewConnection);
-
     } else {
         qDebug() << m_pWebSocketServer->errorString();
     }
@@ -53,17 +52,18 @@ Account* Server::getAccount(QWebSocket *socketOfAccont){
 }
 
 
-
-Server::~Server()
-{
+Server::~Server() {
     m_pWebSocketServer->close();
+
+    //TODO: vedere bene cosa altro distruggere?? ad esempio
+    //      tutti gli altri elementi dinamici nella
+    //      mappa socket2account ???
 }
 
 
 //TODO: - codice copiato da ClientController::onTextMessageReceived, RIFATTORIZZARE!!!
 //      - nella creazione dell'account, inserire anche l'immagine
 //        quindi checkPassword deve ritornare anche l'immagine oltre che il siteId
-//      - cos'è l'action "newClient" ?? sarebbe registrerUser??
 //      - inserire anche l'immagine nel valore di ritorno di checkPassword
 //- To handle requests by not logged account.
 //- The only valid actions can be "registerUser","loginReq"
@@ -93,21 +93,17 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
         QList<QString> nameDocuments;
         double result = this->dbOperations->checkPassword(name, password);
         if(result >= 0){
-            //in case of success, result will contain siteId and image(TODO!!)
+            loginSuccess = true;
+            //in case of success, result will contain siteId and [image(TODO!!)]
             loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
             this->socket2account[signalSender] = loggedAccount;
 
-            //TODO: restituire la lista dei file
             nameDocuments = this->dbOperations->getAllDocuments();
 
-            //TODO: ricordarsi la disconnect e la connect a handleLoggedRequest
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-
-            //TODO: ci sono altre cose da fare???
         }
 
-        //TODO: ricontrollare queste due righe!!
         QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);
     }
@@ -117,17 +113,25 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
         QByteArray image ;// = requestObjJSON["image"].toString();  //TODO: da sistemare, come convertire l'immagine ???
                                                                     //      vedere anche Account::toJSON()
 
-        double result = this->dbOperations->registerUser(name, password, image);
+        bool registrationSuccess = false;
+        double siteId = this->dbOperations->registerUser(name, password, image);
+        if(siteId >= 0)
+            registrationSuccess = true;
 
-        //TODO: ci sono altre cose da fare???
-
-        QByteArray sendMsgToClient = ServerMessageFactory::createRegistrationUserReply(result);
+        QByteArray sendMsgToClient = ServerMessageFactory::createRegistrationUserReply(registrationSuccess, siteId);
         signalSender->sendTextMessage(sendMsgToClient);
-
-    } else {
+    }
+    else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
 
+}
+
+
+ServerController* Server::initializeServerController(QString nameDocument, QList<QString> orderedInserts){
+    ServerController *fileServContr = new ServerController(nameDocument, this);
+    fileServContr->createCrdt(orderedInserts);
+    return fileServContr;
 }
 
 
@@ -147,26 +151,47 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
     requestObjJSON = requestDocJSON.object();
 
     // No switch case for strings in C++ :((
+    ServerController *fileServContr = nullptr;
+    QString nameDocument = requestObjJSON["nameDocument"].toString();
     QString header = requestObjJSON["action"].toString();
     if (header == "openFileReq") {
-        QString nameDocument = requestObjJSON["nameDocument"].toString();        
-
-        ServerController *fileServContr = nullptr;
-        if(! this->file2serverController.contains(nameDocument)){
-            //query al db, aggiornare la mappa, costruire crdt, poi..?
-            fileServContr = new ServerController(nameDocument, this);
+        if( !(this->file2serverController.contains(nameDocument)) ){
             QList<QString> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
-            fileServContr->createCrdt(orderedInserts);
-        } else {
-            fileServContr = this->file2serverController[nameDocument];
+            fileServContr = this->initializeServerController(nameDocument, orderedInserts);
         }
+        this->file2serverController[nameDocument] = fileServContr;
+
+        //TODO: gestire la open file reply nel caso in cui la richiesta
+        //      non vada a buon fine
 
         fileServContr->addClient(signalSender);
-
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-    } else if (header == "createFileReq"){
 
-    } else {
+        //da sistemare
+        QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, fileServContr->getCrdt());
+        signalSender->sendTextMessage(sendMsgToClient);
+    }
+    else if (header == "createFileReq"){
+        //create and open the file
+        double result = this->dbOperations->insertNewDocument(nameDocument);
+        if(result){
+            QList<QString> emptyList;
+            fileServContr = this->initializeServerController(nameDocument, emptyList);
+            this->file2serverController[nameDocument] = fileServContr;
+
+            fileServContr->addClient(signalSender);
+            disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
+
+            //TODO: per ora risponde con una openfilereply anziché
+            //      con una createCreateFileReply
+            QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, fileServContr->getCrdt());
+            signalSender->sendTextMessage(sendMsgToClient);
+        } else {
+            //TODO: gestire la reply in caso di fallimento
+        }
+
+    }
+    else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
 }
@@ -179,6 +204,11 @@ void Server::disconnectAccount(){
 
     Account *accountToDisconnet = this->socket2account[signalSender];
     delete (accountToDisconnet);
+
+    //TODO: la delete dell'oggetto socket presente(come chiave)
+    //      nella mappa va fatta oppure no ???
+
+    this->socket2account.remove(signalSender);
 
     //poi ????
 }

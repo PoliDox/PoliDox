@@ -1,5 +1,7 @@
 #include "CRDT.h"
 
+
+
 CRDT::CRDT(){
     this->_symbols=std::vector<std::vector<Char>>(1);
 }
@@ -248,18 +250,45 @@ int CRDT::remoteDelete(const Char& symbol) {
     return _LINEARpos;
 }
 
-QJsonArray CRDT::toJson() const
-{
-    QJsonArray _JSONchars;
-    for (auto it = _symbols.begin(); it != _symbols.end(); it++) {
-        QJsonArray l_row;
-        for (auto jt = it->begin(); jt != it->end(); jt++) {
-            l_row.push_back(*jt);
+
+QJsonArray CRDT::toJson() const {
+    QJsonArray crdtToReturn;
+
+    for (std::vector<Char> rowElem : this->_symbols) {
+        for (Char columnOfRowElem : rowElem) {
+            //da ricontrollare, vederne l'output
+            QJsonObject charFormattedJson = columnOfRowElem.toJson();
+            QJsonDocument json_doc(charFormattedJson);
+            QString json_string = json_doc.toJson();
+
+            crdtToReturn.push_back( QJsonValue(json_string) );
         }
-        _JSONchars.push_back(l_row);
     }
 
-    return _JSONchars;
+    return crdtToReturn;
+}
+
+
+CRDT* CRDT::fromJson(const QJsonArray &crdtJsonFormatted){
+    CRDT *crdtToReturn = new CRDT();
+
+    unsigned long rowIndex = 0;
+    for(QJsonValue elem : crdtJsonFormatted){
+       QJsonObject charObjJson = elem.toObject();
+       Char charToAdd = Char::fromJson(charObjJson);
+
+       crdtToReturn->_symbols[rowIndex].push_back(charToAdd);
+
+       if(charToAdd.getValue() == '\n')
+           rowIndex++;
+    }
+
+    return crdtToReturn;
+}
+
+
+CRDT::~CRDT(){
+    //TODO
 }
 
 

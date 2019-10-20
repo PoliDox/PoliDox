@@ -1,12 +1,10 @@
 #ifndef CRDT_H
 #define CRDT_H
 
-#endif // CRDT_H
-
 #include "Char.h"
 #include <QObject>
 
-class CRDT : public QObject {
+class CRDT : public QObject{
 
 protected:
     std::vector<std::vector<Char>> _symbols;
@@ -30,5 +28,11 @@ public:
     virtual int remoteDelete(const Char& symbol);
 
     QJsonArray toJson() const;
+    static CRDT* fromJson(const QJsonArray &crdtJsonFormatted);
+
+    virtual ~CRDT();
 
 };
+
+
+#endif // CRDT_H

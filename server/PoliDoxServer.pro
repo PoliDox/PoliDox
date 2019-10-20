@@ -38,6 +38,8 @@ SOURCES += \
     ServerController.cpp \
     main.cpp \
     Account.cpp \
+    CRDT.cpp \
+    Char.cpp \
     ServerMessageFactory.cpp
 
 
@@ -51,4 +53,6 @@ HEADERS += \
     DatabaseManager.h \
     Server.h \
     ServerController.h \
+    CRDT.h \
+    Char.h \
     ServerMessageFactory.h
