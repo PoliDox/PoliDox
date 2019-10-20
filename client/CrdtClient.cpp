@@ -268,7 +268,25 @@ void CrdtClient::printDebugChars(){
 
 CrdtClient *CrdtClient::fromJson(const QJsonArray &_JSONarray)
 {
-    CrdtClient *retCrdt = new CrdtClient();
+    CrdtClient *crdtToReturn = new CrdtClient();
+
+    unsigned long rowIndex = 0;
+    for(QJsonValue elem : _JSONarray){
+       QJsonObject charObjJson = elem.toObject();
+       Char charToAdd = Char::fromJson(charObjJson);
+
+       crdtToReturn->_symbols[rowIndex].push_back(charToAdd);
+
+       if(charToAdd.getValue() == '\n')
+           rowIndex++;
+    }
+
+    return crdtToReturn;
+
+
+
+
+    //CrdtClient *retCrdt = new CrdtClient();
     // TODO
     /*
     for(QJsonArray::iterator it = _JSONarray.begin(); it != _JSONarray.end(); it++){
