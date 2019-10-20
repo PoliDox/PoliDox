@@ -7,6 +7,7 @@
 ServerController::ServerController(QString nameDocumentAssociated, Server *server) {
     this->nameDocumentAssociated = nameDocumentAssociated;
     this->server = server;
+    this->crdt = nullptr;
     //nothing else to do???
 }
 
@@ -34,10 +35,6 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
 
     this->notifyOtherClientsAndMe(socketToAdd);
-
-    //da sistemare
-    //json = this->crdt->toJson();
-    //socketToAdd->sendTextMessage(json)
 }
 
 
@@ -46,7 +43,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
 // (.2)the new_client_connected(me) about all the other clients already connected
 void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
     Account *newAccount = this->server->getAccount(newSocket);
-    QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(*newAccount);
+    QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(newAccount);
 
     for(auto otherSocket : this->socketsOnDocument){
         if(otherSocket != newSocket){
@@ -55,7 +52,7 @@ void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
 
             //(.2) notify me
             Account *otherAccount = this->server->getAccount(otherSocket);
-            QString msgNewClient2 = ServerMessageFactory::createNewClientMessage(*otherAccount);
+            QString msgNewClient2 = ServerMessageFactory::createNewClientMessage(otherAccount);
             newSocket->sendTextMessage(msgNewClient2);
         }
     }
@@ -63,15 +60,19 @@ void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
 
 
 void ServerController::createCrdt(QList<QString> orderedInserts){
-    //CRDT *crdt = new Crdt();
-    //this->crdt->fromJson(orderedInserts);
+    if(orderedInserts.size() == 0){
+        this->crdt = new CRDT();
+        return;
+    }
+
+    QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
+    this->crdt = this->crdt->fromJson(arrayJson);
 }
 
 
 // The ServerController has to update the his crdt on the
 // base of the operation(insert/delete)
 void ServerController::handleRemoteOperation(const QString &messageReceivedByClient){
-    //aggiorna crdt server controller
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -84,16 +85,27 @@ void ServerController::handleRemoteOperation(const QString &messageReceivedByCli
 
     // No switch case for strings in C++ :((
     QString header = requestObjJSON["action"].toString();
+    QJsonObject charJson = requestObjJSON["char"].toObject();
+    Char charObj = Char::fromJson(charJson);
     if (header == "insert") {
-        //this->crdt->remoteInsert(...);
-        //this->server->getDb()->insertSymbol(...);
-    } else if(header == "delete"){
-        //this->crdt->remoteDelete(...);
-        //this->server->getDb()->deleteSymbol(...);
-    } else {
+        this->crdt->remoteInsert(charObj);
+        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, QString(charObj.getValue()),
+                                            charObj.getFractionalPosition());
+    }
+    else if(header == "delete"){
+        this->crdt->remoteDelete(charObj);
+        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, QString(charObj.getValue()),
+                                            charObj.getFractionalPosition());
+    }
+    else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
 
+}
+
+
+CRDT* ServerController::getCrdt(){
+    return this->crdt;
 }
 
 

@@ -20,6 +20,8 @@ private:
     QMap<QString, ServerController*> file2serverController;
     DatabaseManager *dbOperations;
 
+    ServerController* initializeServerController(QString nameDocument, QList<QString> orderedInserts);
+
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
     Account* getAccount(QWebSocket *socketOfAccont);
