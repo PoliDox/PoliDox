@@ -1,6 +1,8 @@
 #include "CRDT.h"
 #include <future>
 
+
+
 CRDT::CRDT(){
     this->_symbols=std::vector<std::vector<Char>>(1);
 }
@@ -272,7 +274,7 @@ QJsonArray CRDT::toJson() const {
 }
 
 
-CRDT* CRDT::fromJson(QJsonArray crdtJsonFormatted){
+CRDT* CRDT::fromJson(const QJsonArray &crdtJsonFormatted){
     CRDT *crdtToReturn = new CRDT();
 
     unsigned long rowIndex = 0;
@@ -289,6 +291,10 @@ CRDT* CRDT::fromJson(QJsonArray crdtJsonFormatted){
     return crdtToReturn;
 }
 
+
+CRDT::~CRDT(){
+    //TODO
+}
 
 
 
