@@ -5,6 +5,7 @@
 #include <QWebSocket>
 #include "CrdtClient.h"
 #include "Editor.h"
+#include "ListFiles.h"
 
 class ClientController : public QObject
 {
@@ -18,6 +19,7 @@ private:
     Editor m_editor;
     CrdtClient *m_crdt; // TODO: use smart-pointer
     QWebSocket *m_socket;
+    ListFiles *lf;
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);

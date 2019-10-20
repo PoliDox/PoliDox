@@ -15,16 +15,20 @@ HEADERS += \
     Editor.h \
     ClientMessageFactory.h \
     Account.h \
+    ListFiles.h \
     Log_dialog.h \
-    Client.h
+    Client.h \
+    NewFileDialog.h
 
 SOURCES += \
     CRDT.cpp \
     ClientController.cpp \
     CrdtClient.cpp \
     Editor.cpp \
+    ListFiles.cpp \
     Log_dialog.cpp \
     Account.cpp \
+    NewFileDialog.cpp \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp \
@@ -37,7 +41,9 @@ DISTFILES += \
 
 FORMS += \
     editor.ui \
+    listfiles.ui \
     log_dialog.ui \
+    newfiledialog.ui
 
 RESOURCES += \
     Resources.qrc

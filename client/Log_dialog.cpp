@@ -1,6 +1,7 @@
 #include "Log_dialog.h"
 #include "ui_log_dialog.h"
 #include <QMessageBox>
+#include <QDebug>
 
 Log_Dialog::Log_Dialog(QWidget *parent) :
     QDialog(parent),
@@ -20,6 +21,13 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
     this->ui->lineEdit_username->setStyleSheet( "background-color:transparent");
     this->ui->lineEdit_password->setStyleSheet( "background-color:transparent");
     setWindowTitle("PoliDox");
+
+    lf = new ListFiles();
+
+    /*AGGANCIARE L' EDITOR IN CASO DI NEW, VEDERE PERCHE' NON PARTE*/
+    /*connect(lf, &ListFiles::makeNewEditor_fromNew, this, [&](QString filename){
+        setEditor(new Editor());
+    });*/
 }
 
 Log_Dialog::~Log_Dialog()
@@ -31,6 +39,7 @@ void Log_Dialog::setEditor(Editor *editor){
     this->editor = editor;
 }
 
+/* METODO SPOSTATO IN LISTFILES */
 void Log_Dialog::displayFiles(const QList<QString> p_files)
 {
     // TODO: replace "SignIn" and "Register" button with a box including all available files
@@ -48,8 +57,9 @@ void Log_Dialog::on_pushButton_login_clicked()
 
     if(username == "minnoz" && password == "piedi") {
         QMessageBox::information(this, "Login", "Welcome back to PoliDox, " + username + "!");
-        setEditor(new Editor());
-        editor->show();
+        //setEditor(new Editor());
+        lf->show();
+        //editor->show();
         hide();
     }
     else {
