@@ -24,6 +24,7 @@ SOURCES += \
     CrdtClient.cpp \
     Editor.cpp \
     Log_dialog.cpp \
+    Account.cpp \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp \

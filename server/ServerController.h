@@ -6,22 +6,30 @@
 #include <QWebSocket>
 #include <iostream>
 #include "Account.h"
+#include "Server.h"
+#include "CRDT.h"
 
 
 
-class ServerController : public QObject
-{
+class ServerController : public QObject {
     Q_OBJECT
 
 private:
-    QMap<Account, QWebSocket*> m_clients;
+    QList<QWebSocket*> socketsOnDocument;
+    QString nameDocumentAssociated;
+    Server *server;
+    CRDT *crdt;
 
 public:
-    ServerController();
+    ServerController(QString nameDocumentAssociated, Server *server);
+    void addClient(QWebSocket *socketToAdd);
+    void notifyOtherClientsAndMe(QWebSocket *newSocket);
+    void createCrdt(QList<QString> orderedInserts);
+    CRDT* getCrdt();
 
 public slots:
-    void addClient(Account& p_account, QWebSocket *p_socket);
-
+    void replicateMessageOnOtherSockets(const QString &messageReceivedOnSocket);
+    void handleRemoteOperation(const QString &messageReceivedByClient);
 };
 
 #endif // SERVERCONTROLLER_H

@@ -58,7 +58,8 @@ DatabaseManager::DatabaseManager() {
 
 //TODO: - sistemare il blocco catch
 //      - inserire l'immagine
-bool DatabaseManager::registerUser(QString name, QString password, QByteArray image){
+// - Returns siteId if the registration success, -1 otherwise
+double DatabaseManager::registerUser(QString name, QString password, QByteArray image){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     double siteId = this->getCounterOfCollection("user");
@@ -86,15 +87,17 @@ bool DatabaseManager::registerUser(QString name, QString password, QByteArray im
         userCollection.insert_one(userToInsertView);
     } catch (std::exception e) {
         //caso utente con "name" già presente
-        return false;
+        return -1;
     }
 
     this->incrementCounterOfCollection("user");
-    return true;
+    return siteId;
 }
 
 
-bool DatabaseManager::checkPassword(QString name, QString password){
+//TODO: - oltre al siteId, ritornare anche l'immagine
+//it returns the id of the account, -1 otherwise
+double DatabaseManager::checkPassword(QString name, QString password){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
@@ -107,10 +110,14 @@ bool DatabaseManager::checkPassword(QString name, QString password){
     bsoncxx::document::view userToCheckView = userToCheck.view();
 
     bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = userCollection.find_one(userToCheckView);
-    if(queryResult)
-        return true;
-    else
-        return false;
+    if(queryResult){
+        bsoncxx::document::view a = (*queryResult).view();
+        bsoncxx::document::element element = a["siteId"];
+        return element.get_double().value;
+    }
+    else{
+        return -1;
+    }
 }
 
 
@@ -199,7 +206,8 @@ bool DatabaseManager::deleteSymbol(QString nameDocument, QString symbol, std::ve
 //TODO: - anziché il for da stampare in output, capire
 //        bene cosa restituire. Un vector<Char> su cui
 //        poi verranno chiamate le remoteInsert??
-void DatabaseManager::retrieveAllInserts(QString nameDocument){
+QList<QString> DatabaseManager::getAllInserts(QString nameDocument){
+    QList<QString> resultInserts;
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
@@ -218,8 +226,29 @@ void DatabaseManager::retrieveAllInserts(QString nameDocument){
     //DA QUI IN POI E' ANCORA DA IMPLEMENTARE
     //TOGLIERE IL FOR QUI SOTTO
     for (auto elem : resultIterator) {
-        std::cout << bsoncxx::to_json(elem) << std::endl;
+        QString insert = QString::fromStdString(bsoncxx::to_json(elem));
+        resultInserts.push_back(insert);
     }
+    return resultInserts;
+}
+
+
+//TODO:: - valore di ritorno: come restituire i vari documenti?
+//         QList<QString> va bene?? per ora si
+QList<QString> DatabaseManager::getAllDocuments(){
+    QList<QString> nameDocuments;
+    mongocxx::collection documentCollection = (*this->db)["document"];
+
+    mongocxx::cursor resultIterator = documentCollection.find({});
+    for(auto elem : resultIterator) {
+        bsoncxx::document::element nameDocument = elem["_id"];
+        bsoncxx::stdx::string_view nameDocumentView = nameDocument.get_utf8().value;
+        QString appo = QString::fromStdString( nameDocumentView.to_string() );
+
+        nameDocuments.append(appo);
+    }
+
+    return nameDocuments;
 }
 
 

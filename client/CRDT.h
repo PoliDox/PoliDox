@@ -31,6 +31,7 @@ public:
     virtual int remoteDelete(const Char& symbol);
 
     QJsonArray toJson() const;
+    static CRDT* fromJson(QJsonArray crdtJsonFormatted);
 
 
 

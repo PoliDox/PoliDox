@@ -5,10 +5,10 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QThread>
-#include "ServerController.h"
 #include "DatabaseManager.h"
+#include "ServerMessageFactory.h"
 
-
+class ServerController;
 
 class Server : public QObject
 {
@@ -16,11 +16,16 @@ class Server : public QObject
 
 private:
     QWebSocketServer *m_pWebSocketServer;
-    QMap<QString, ServerController*> m_documents;
+    QMap<QWebSocket*, Account*> socket2account;
+    QMap<QString, ServerController*> file2serverController;
     DatabaseManager *dbOperations;
+
+    ServerController* initializeServerController(QString nameDocument, QList<QString> orderedInserts);
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
+    Account* getAccount(QWebSocket *socketOfAccont);
+    DatabaseManager* getDb();
     virtual ~Server();
 
 /* ======================================================================
@@ -30,7 +35,9 @@ public:
 */
 public slots:
     void onNewConnection();
-
+    void handleNotLoggedRequests(const QString &genericRequestString);
+    void handleLoggedRequests(const QString &genericRequestString);
+    void disconnectAccount();
 };
 
 #endif // SERVER_H
