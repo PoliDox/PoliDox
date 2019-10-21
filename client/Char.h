@@ -15,15 +15,15 @@ using namespace std;
 
 class Char {
 private:
-    int siteId;
+    double siteId;
     int counter;
     char value;
     vector<int> position;
 
 public:
-    Char(int siteId, int counter, char value) : siteId(siteId), counter(counter), value(value){};
+    Char(double siteId, int counter, char value);
     ~Char();
-    int getSiteId() const;
+    double getSiteId() const;
     void setPosition(std::vector<int> x);
     vector<int> getPosition();
     char getValue() const;

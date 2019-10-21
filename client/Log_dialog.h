@@ -24,6 +24,7 @@ public:
 
 signals:
     void authDataSubmitted(QString p_user, QString p_passw);
+    void signupDataSubmitted(QString p_user, QString p_passw);
     void fileSelected(QString p_filename);
 
 private slots:

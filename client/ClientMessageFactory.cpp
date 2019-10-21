@@ -25,11 +25,22 @@ QByteArray ClientMessageFactory::createDeleteMessage(const Char &p_char)
     return l_doc.toJson(QJsonDocument::Indented);
 }
 
+QByteArray ClientMessageFactory::createRegisterMessage(const QString &p_user, const QString &p_passw)
+{
+    QJsonObject l_obj;
+    l_obj.insert("action", "registerUser");
+    l_obj.insert("name", p_user);
+    l_obj.insert("password", p_passw);
+
+    QJsonDocument l_doc(l_obj);
+    return l_doc.toJson(QJsonDocument::Indented);
+}
+
 QByteArray ClientMessageFactory::createLoginMessage(const QString &p_user, const QString &p_passw)
 {
     QJsonObject l_obj;
     l_obj.insert("action", "loginReq");
-    l_obj.insert("username", p_user);
+    l_obj.insert("name", p_user);
     l_obj.insert("password", p_passw);
 
     QJsonDocument l_doc(l_obj);

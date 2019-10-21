@@ -60,13 +60,12 @@ void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
 
 
 void ServerController::createCrdt(QList<QString> orderedInserts){
-    if(orderedInserts.size() == 0){
-        this->crdt = new CRDT();
+    this->crdt = new CRDT();
+    if(orderedInserts.size() == 0)
         return;
-    }
 
     QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
-    this->crdt = this->crdt->fromJson(arrayJson);
+    this->crdt->fromJson(arrayJson);
 }
 
 

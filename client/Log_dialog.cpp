@@ -52,20 +52,6 @@ void Log_Dialog::on_pushButton_login_clicked()
     QString password = ui->lineEdit_password->text();   
 
     emit authDataSubmitted(username, password);
-
-    /* stub di accesso - verra` sostituito con l' autenticazione al DB */
-
-    if(username == "minnoz" && password == "piedi") {
-        QMessageBox::information(this, "Login", "Welcome back to PoliDox, " + username + "!");
-        //setEditor(new Editor());
-        lf->show();
-        //editor->show();
-        hide();
-    }
-    else {
-        QMessageBox::warning(this,"Login", "Username and password is not correct");
-    }
-
 }
 
 void Log_Dialog::on_pushButton_register_clicked()
@@ -73,13 +59,5 @@ void Log_Dialog::on_pushButton_register_clicked()
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_password->text();
 
-    /* IMPLEMENTARE LA REGISTRAZIONE DELL' UTENTE NEL DATABASE */
-
-    /* IF SUCCESS
-     * register
-     * editor->show();
-     * hide();
-    //ELSE
-     * QMessageBox::warning(this,"Login", "error message here");
-     */
+    emit signupDataSubmitted(username, password);
 }

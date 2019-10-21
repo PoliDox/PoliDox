@@ -7,8 +7,7 @@
 #include "Editor.h"
 #include "ListFiles.h"
 
-class ClientController : public QObject
-{
+class ClientController : public QObject {
     Q_OBJECT
 
 public:

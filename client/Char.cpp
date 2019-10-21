@@ -1,12 +1,17 @@
 #include "Char.h"
 
 
-Char::~Char()
-{
+
+Char::Char(double siteId, int counter, char value) : siteId(siteId), counter(counter), value(value){
+    //nothing else to do??
 }
 
-int Char::getSiteId() const
-{
+
+Char::~Char(){
+    //TODO
+}
+
+double Char::getSiteId() const {
     return siteId;
 }
 

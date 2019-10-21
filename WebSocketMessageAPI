@@ -6,34 +6,45 @@ DELETE
 "action" = "delete"
 char = { ... }
 
-NEW CLIENT
+NEW CLIENT CONNECTED ON DOCUMENT
 "action" = "newClient"
 account = { ... }
 
 LOGIN REQ
 "action" = "loginReq"
-"username" = ...
+"name" = ...
 "password" = ...
 
 LOGIN REPL
 "action" = "loginRepl"
 "response" = "ok"/"fail"
-"account" = { ... } // only if ok
-"files" = { ... }
+"account" = { ... }        //only if ok, null otherwise
+"nameDocuments" = { ... }  //only if ok, empty otherwise
+
+REGISTER USER REQ 
+"action" = "registerUser"
+"name" = ...
+"password" = ...
+"image" = ...
+
+REGISTER USER REPL
+"action" = "registerUserRepl"
+"response" = "ok"/"fail"
+"siteId" = ...           // number >= 0 only if ok, -1 otherwise 
 
 OPEN FILE REQ
 "action" = "openFileReq"
-"filename" = ...
+"nameDocument" = ...
 
 OPEN FILE REPL
 "action" = "openFileRepl"
 "response" = "ok"/"fail"
-"document" = { //here comes the crdt }
+"crdt" = { ... }        // here comes the crdt formatted in json array 
 
 CREATE FILE REQ
+"action" = "createFileReq"
+"nameDocument" = ...
 
+CREATE FILE REPL       //TODO
 
-CREATE FILE REPL
-
-NEW REMOTE FILE
-
+NEW REMOTE FILE        // ???
