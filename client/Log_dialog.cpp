@@ -77,7 +77,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
 void Log_Dialog::on_pushButton_login_clicked()
 {
     QString username = ui->lineEdit_username->text();
-    QString password = ui->lineEdit_password->text();   
+    QString password = ui->lineEdit_password->text();
 
     emit authDataSubmitted(username, password);
 
@@ -93,5 +93,6 @@ void Log_Dialog::on_pushButton_register_clicked()
 
 void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
-    std::cout << "SLOT CALLED" << std::endl;
+    std::cout << "SELECTED FILE: "<< item->text().toUtf8().constData() << std::endl;
+    emit(*item);
 }
