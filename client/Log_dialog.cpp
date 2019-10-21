@@ -2,6 +2,7 @@
 #include "ui_log_dialog.h"
 #include <QMessageBox>
 #include <QDebug>
+#include <QListWidget>
 
 Log_Dialog::Log_Dialog(QWidget *parent) :
     QDialog(parent),
@@ -45,6 +46,17 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     // TODO: replace "SignIn" and "Register" button with a box including all available files
     // When a file is selected, emit the signal onFileSelected
 
+    QObjectList list=this->ui->groupBox->children();
+
+    for(auto it=list.begin();it!=list.end();it++)
+        delete *it;
+
+    this->ui->groupBox->setFixedSize(330,400);
+
+    QListWidget* files=new QListWidget(this->ui->groupBox);
+    files->addItems(p_files);
+    files->show();
+
 
 }
 
@@ -54,16 +66,6 @@ void Log_Dialog::on_pushButton_login_clicked()
     QString password = ui->lineEdit_password->text();   
 
     emit authDataSubmitted(username, password);
-
-    QObjectList list=this->ui->groupBox->children();
-
-    for(auto it=list.begin();it!=list.end();it++)
-        delete *it;
-
-    this->ui->groupBox->setFixedSize(330,400);
-
-    QLabel* test=new QLabel("Qui ci sarà la lista di file",this->ui->groupBox);
-    test->show();
 
 }
 
