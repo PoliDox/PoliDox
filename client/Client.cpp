@@ -65,7 +65,8 @@ void Client::onMessageReceived(const QString &p_msg)
         // TODO: Check if response is "ok"
 
         QJsonArray JSONcrdt = _JSONobj["document"].toArray();
-        CrdtClient *crdt = CrdtClient::fromJson(JSONcrdt);
+        CrdtClient *crdt = new CrdtClient(-1);      //TODO: impostare qui il siteId corretto(si trova nella json reply)
+        crdt->fromJson(JSONcrdt);
         m_document = new ClientController(crdt, &m_socket);
 
     } else {
