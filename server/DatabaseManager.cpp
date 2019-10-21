@@ -23,6 +23,26 @@ void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
 }
 
 
+void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, double initialValue){
+    mongocxx::collection countersCollection = (*this->db)["counter"];
+
+    auto elementBuilder = bsoncxx::builder::stream::document{};
+    bsoncxx::document::value elemToInsert =
+        elementBuilder << "_id"      << nameDocument.toUtf8().constData()
+                       << "sequentialCounter"   << initialValue
+                       << bsoncxx::builder::stream::finalize;
+    bsoncxx::document::view elemToInsertView = elemToInsert.view();
+
+    try {
+        countersCollection.insert_one(elemToInsertView);
+    } catch (std::exception e) {
+        //caso elemento con "_id" già presente
+        //TODO: gestire l'eccezione. ritornare un valore di errore ?
+    }
+
+}
+
+
 double DatabaseManager::getCounterOfCollection(QString nameCollection){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
@@ -39,7 +59,11 @@ double DatabaseManager::getCounterOfCollection(QString nameCollection){
         return element.get_double().value;
     }
     else{
-        return (double)-1;
+        //it's the first time; so insert new element in counter collection
+        //with fields: "_id":nameCollection , "sequentialCounter":firstValue
+        double initialValue = 0;
+        insertNewElemInCounterCollection(nameCollection, initialValue);
+        return initialValue;
     }
 }
 
