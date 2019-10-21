@@ -87,10 +87,15 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
 
+        qDebug() << "loginReq received: " << name << " / " << password;
+
         bool loginSuccess = false;
         Account *loggedAccount = nullptr;
         QList<QString> nameDocuments;
         double result = this->dbOperations->checkPassword(name, password);
+
+        qDebug() << "Authentication result: " << result;
+
         if(result >= 0){
             loginSuccess = true;
             //in case of success, result will contain siteId and [image(TODO!!)]
@@ -101,8 +106,7 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
 
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-        }
-        // TODO: else? I.e. if password is wrong?
+        }        
 
         QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);

@@ -50,7 +50,11 @@ void Client::onMessageReceived(const QString &p_msg)
 
     if (l_header == "loginRepl") {
         QString replCode = _JSONobj["response"].toString();
-        // TODO: Check if response is "ok"
+
+        if (replCode != "ok") {
+            qDebug() << "Authentication failed";
+            return;
+        }
 
         QJsonObject accountObj = _JSONobj["account"].toObject();
         m_user = Account::fromJson(accountObj);
@@ -63,11 +67,18 @@ void Client::onMessageReceived(const QString &p_msg)
 
     } else if (l_header == "registerUserRepl") {
         QString replCode = _JSONobj["response"].toString();
-        qDebug() << "registerUserRepl: " << replCode;
+        if (replCode != "ok") {
+            qDebug() << "Registration failed";
+            return;
+        }
+
 
     } else if (l_header == "openFileRepl") {
         QString replCode = _JSONobj["response"].toString();
-        // TODO: Check if response is "ok"
+        if (replCode != "ok") {
+            qDebug() << "Couldn't open file";
+            return;
+        }
 
         QJsonArray JSONcrdt = _JSONobj["document"].toArray();
         CrdtClient *crdt = new CrdtClient(-1);      //TODO: impostare qui il siteId corretto(si trova nella json reply)
