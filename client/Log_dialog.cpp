@@ -56,7 +56,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
 
     QListWidget* files=new QListWidget(this->ui->groupBox);
     connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
-    QString file1("file1");
+    QString file1("Create new file");
     QString file2("file2");
     QString file3("file3");
     QString file4("file4");
@@ -94,5 +94,10 @@ void Log_Dialog::on_pushButton_register_clicked()
 void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
     std::cout << "SELECTED FILE: "<< item->text().toUtf8().constData() << std::endl;
-    emit(*item);
+
+    if(item->text()=="Creaete new file")
+        emit newFileSelected(item->text());
+    else
+        emit fileSelected(item->text());
+
 }
