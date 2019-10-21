@@ -45,6 +45,9 @@ CREATE FILE REQ
 "action" = "createFileReq"
 "nameDocument" = ...
 
-CREATE FILE REPL       //TODO
+CREATE FILE REPL
+"action" = "createFileRepl"
+"response" = "ok"/"fail"
+"crdt" = { //empty }
 
 NEW REMOTE FILE        // ???
