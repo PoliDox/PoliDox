@@ -30,7 +30,7 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
     //file2serverController["firstFile"] = l_firstFile;
 
     //TEST DB
-    //db.registerUser("provauser4","provapsw4","a");
+    this->dbOperations->registerUser("provauser5","provapsw5","a");
     //std::cout << db.checkPassword("provauser4", "provapsw4") << "\n";
     //this->dbOperations->insertNewDocument("provadocument2");
 
