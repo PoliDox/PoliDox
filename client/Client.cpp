@@ -64,6 +64,7 @@ void Client::onMessageReceived(const QString &p_msg)
         for(QJsonArray::iterator it=_JSONfiles.begin();it!=_JSONfiles.end();it++){
             m_files.push_back(it->toString());
         }
+        loginWindow.displayFiles(m_files);
 
     } else if (l_header == "registerUserRepl") {
         QString replCode = _JSONobj["response"].toString();
