@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include "Editor.h"
+#include "ListFiles.h"
 
 namespace Ui {
 class Log_Dialog;
@@ -23,6 +24,7 @@ public:
 
 signals:
     void authDataSubmitted(QString p_user, QString p_passw);
+    void signupDataSubmitted(QString p_user, QString p_passw);
     void fileSelected(QString p_filename);
 
 private slots:
@@ -32,6 +34,7 @@ private slots:
 private:
     Ui::Log_Dialog *ui;
     Editor *editor;
+    ListFiles *lf;
 };
 
 #endif // LOG_DIALOG_H

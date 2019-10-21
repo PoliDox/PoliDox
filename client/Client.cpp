@@ -1,5 +1,4 @@
 #include "Client.h"
-#include "Log_dialog.h"
 #include "ClientMessageFactory.h"
 #include "CrdtClient.h"
 #include <QDebug>
@@ -9,13 +8,16 @@ Client::Client()
     m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
     // TODO: CHECK IF OPEN SUCCEEDS!
 
-    Log_Dialog loginWindow;
-    // loginWindow.setEditor(&m_editor); TODO: this should become set document
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
     connect(&loginWindow, &Log_Dialog::authDataSubmitted, this, [&](QString p_user, QString p_passw) {
         QByteArray message = ClientMessageFactory::createLoginMessage(p_user, p_passw);
+        m_socket.sendTextMessage(message);
+    });
+
+    connect(&loginWindow, &Log_Dialog::signupDataSubmitted, this, [&](QString p_user, QString p_passw) {
+        QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw);
         m_socket.sendTextMessage(message);
     });
 
@@ -48,7 +50,11 @@ void Client::onMessageReceived(const QString &p_msg)
 
     if (l_header == "loginRepl") {
         QString replCode = _JSONobj["response"].toString();
-        // TODO: Check if response is "ok"
+
+        if (replCode != "ok") {
+            qDebug() << "Authentication failed";
+            return;
+        }
 
         QJsonObject accountObj = _JSONobj["account"].toObject();
         m_user = Account::fromJson(accountObj);
@@ -59,10 +65,20 @@ void Client::onMessageReceived(const QString &p_msg)
             m_files.push_back(it->toString());
         }
 
+    } else if (l_header == "registerUserRepl") {
+        QString replCode = _JSONobj["response"].toString();
+        if (replCode != "ok") {
+            qDebug() << "Registration failed";
+            return;
+        }
+
 
     } else if (l_header == "openFileRepl") {
         QString replCode = _JSONobj["response"].toString();
-        // TODO: Check if response is "ok"
+        if (replCode != "ok") {
+            qDebug() << "Couldn't open file";
+            return;
+        }
 
         QJsonArray JSONcrdt = _JSONobj["document"].toArray();
         CrdtClient *crdt = new CrdtClient(-1);      //TODO: impostare qui il siteId corretto(si trova nella json reply)

@@ -15,6 +15,7 @@ protected:
     void mergeRows(std::vector<Char>& current,std::vector<Char>& next);
     void splitRows(std::vector<Char>& current,const unsigned int& row,const unsigned int& index);
     void insertSymbolAt(std::vector<Char>&row,Char& symbol,const unsigned int index);
+    void deleteSymbolAt(std::vector<Char>& row,unsigned int index);
     void deleteRowAt(unsigned int row);
     void inserRowAtEnd(std::vector<Char>& row);
     void searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
@@ -27,6 +28,8 @@ public:
     virtual int remoteDelete(const Char& symbol);
     QJsonArray toJson() const;
     void fromJson(const QJsonArray &crdtJsonFormatted);
+
+
 
 };
 

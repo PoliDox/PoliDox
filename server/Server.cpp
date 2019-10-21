@@ -70,8 +70,7 @@ Server::~Server() {
 //- Note that "genericRequestString" is a String type but interally
 //  it's formatted in JSON
 void Server::handleNotLoggedRequests(const QString &genericRequestString){
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
-
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());  
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -88,10 +87,15 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
 
+        qDebug() << "loginReq received: " << name << " / " << password;
+
         bool loginSuccess = false;
         Account *loggedAccount = nullptr;
         QList<QString> nameDocuments;
         double result = this->dbOperations->checkPassword(name, password);
+
+        qDebug() << "Authentication result: " << result;
+
         if(result >= 0){
             loginSuccess = true;
             //in case of success, result will contain siteId and [image(TODO!!)]
@@ -102,7 +106,7 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
 
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-        }
+        }        
 
         QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);
@@ -110,6 +114,8 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
     else if (header == "registerUser"){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
+        qDebug() << "Registering user " << name << " with password " << password;
+
         QByteArray image ;// = requestObjJSON["image"].toString();  //TODO: da sistemare, come convertire l'immagine ???
                                                                     //      vedere anche Account::toJSON()
 
