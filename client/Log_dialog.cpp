@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QListWidget>
+#include <iostream>
 
 Log_Dialog::Log_Dialog(QWidget *parent) :
     QDialog(parent),
@@ -54,7 +55,20 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     this->ui->groupBox->setFixedSize(330,400);
 
     QListWidget* files=new QListWidget(this->ui->groupBox);
-    files->addItems(p_files);
+    connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
+    QString file1("file1");
+    QString file2("file2");
+    QString file3("file3");
+    QString file4("file4");
+    files->addItem(file1);
+    files->addItem(file2);
+    files->addItem(file3);
+    files->addItem(file4);
+
+    //files->addItems(p_files);
+    QVBoxLayout* layout = new QVBoxLayout();
+    auto grid_layout = new QGridLayout(this->ui->groupBox);
+    grid_layout->addWidget(files);
     files->show();
 
 
@@ -75,4 +89,9 @@ void Log_Dialog::on_pushButton_register_clicked()
     QString password = ui->lineEdit_password->text();
 
     emit signupDataSubmitted(username, password);
+}
+
+void Log_Dialog::onClickedFile(QListWidgetItem* item){
+
+    std::cout << "SLOT CALLED" << std::endl;
 }

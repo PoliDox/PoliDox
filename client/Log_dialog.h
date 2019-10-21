@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QList>
 #include <QString>
+#include <QListWidgetItem>
 #include "Editor.h"
 #include "ListFiles.h"
 
@@ -30,6 +31,7 @@ signals:
 private slots:
     void on_pushButton_login_clicked();
     void on_pushButton_register_clicked();
+    void onClickedFile(QListWidgetItem *item);
 
 private:
     Ui::Log_Dialog *ui;
