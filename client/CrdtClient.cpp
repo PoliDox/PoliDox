@@ -231,7 +231,7 @@ void CrdtClient::localDelete(unsigned int position){
         mergeRows(this->_symbols[row],this->_symbols[row+1]);
         deleteRowAt(row+1);
     }else
-        this->_symbols[row].erase(this->_symbols[row].begin()+index);
+        deleteSymbolAt(this->_symbols[row],index);
 
     if(this->_symbols[row].size()==0 && this->_symbols.size()>1) //editor empty=one empty row so don't clear last row
         deleteRowAt(row);

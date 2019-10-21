@@ -8,7 +8,18 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
     ui(new Ui::Log_Dialog)
 {
     ui->setupUi(this);
-    this->setStyleSheet("background-color:#d0e0e2;");
+    this->setFixedSize(374,575);
+    this->ui->logo->setStyleSheet("background-image: url(./logo.png);background-repeat:none;background-position:center;");
+
+    this->ui->pushButton_register->setStyleSheet("color:crimson");
+    //this->ui->pushButton_login->setStyleSheet("background-color:#4d79ff;color:white");
+
+    this->ui->line->setStyleSheet("background-color:#003879");
+    this->ui->label->setStyleSheet( "background-color:transparent;color:#003879");
+    this->ui->label_2->setStyleSheet( "background-color:transparent;color:#003879");
+
+    this->ui->lineEdit_username->setStyleSheet( "background-color:transparent");
+    this->ui->lineEdit_password->setStyleSheet( "background-color:transparent");
     setWindowTitle("PoliDox");
 
     lf = new ListFiles();
