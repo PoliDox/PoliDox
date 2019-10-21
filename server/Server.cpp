@@ -70,8 +70,7 @@ Server::~Server() {
 //- Note that "genericRequestString" is a String type but interally
 //  it's formatted in JSON
 void Server::handleNotLoggedRequests(const QString &genericRequestString){
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
-
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());  
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -103,6 +102,7 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
         }
+        // TODO: else? I.e. if password is wrong?
 
         QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);
@@ -110,6 +110,8 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
     else if (header == "registerUser"){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
+        qDebug() << "Registering user " << name << " with password " << password;
+
         QByteArray image ;// = requestObjJSON["image"].toString();  //TODO: da sistemare, come convertire l'immagine ???
                                                                     //      vedere anche Account::toJSON()
 
