@@ -112,6 +112,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_username">
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
           <property name="text">
            <string/>
           </property>
