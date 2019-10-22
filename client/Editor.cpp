@@ -14,11 +14,13 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <iostream>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
 
 {
     ui->setupUi(this);
+    this->ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
     this->ui->textEdit->setStyleSheet( "background-color:white");
     this->ui->toolBar_2->setStyleSheet( "background-color:transparent");
@@ -166,3 +168,45 @@ void Editor::on_actionRedo_triggered()
     m_textEdit->redo();
 }
 
+
+void Editor::on_actionBold_triggered()
+{
+
+    QTextCharFormat fmt;
+    fmt.setFontWeight(this->ui->textRichToolBar->actions().at(1)->isChecked() ? QFont::Bold : QFont::Normal);
+
+    QTextCursor cursor = m_textEdit->textCursor();
+       if (!cursor.hasSelection())
+           cursor.select(QTextCursor::WordUnderCursor);
+       cursor.mergeCharFormat(fmt);
+       m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+void Editor::on_actionItalic_triggered()
+{
+
+    QFont font(m_textEdit->font());
+
+    if(font.italic())
+        font.setItalic(false);
+    else
+        font.setItalic(true);
+
+    m_textEdit->setFont(font);
+
+}
+
+void Editor::on_actionUnderlined_triggered()
+{
+
+    QFont font(m_textEdit->font());
+
+    if(font.underline())
+        font.setUnderline(false);
+    else
+        font.setUnderline(true);
+
+    m_textEdit->setFont(font);
+
+}

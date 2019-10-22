@@ -4,5 +4,8 @@
         <file>images/open_file.png</file>
         <file>images/save_all_files.png</file>
         <file>images/save_file.png</file>
+        <file>images/bold.png</file>
+        <file>images/italic.png</file>
+        <file>images/underlined.png</file>
     </qresource>
 </RCC>
