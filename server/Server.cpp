@@ -162,9 +162,10 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
     }
     else if (header == "createFileReq"){
         //create and open the file
-        double result = this->dbOperations->insertNewDocument(nameDocument);
+        bool result = this->dbOperations->insertNewDocument(nameDocument);
 
         if(result){
+
             QList<QString> emptyList;
             fileServContr = this->initializeServerController(nameDocument, emptyList);
             this->file2serverController[nameDocument] = fileServContr;
