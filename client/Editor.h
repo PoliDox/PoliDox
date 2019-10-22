@@ -44,6 +44,9 @@ private slots:
     void on_actionItalic_triggered();
     void on_actionUnderlined_triggered();
 
+    void fontSizeChanged(int i);
+    void fontFamilyChanged(const QFont& font);
+
 private:
     void createActions();
     void createStatusBar();

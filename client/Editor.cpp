@@ -14,6 +14,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QSpinBox>
+#include <QFontComboBox>
 #include <iostream>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
@@ -39,6 +41,19 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
         }
     });
 
+
+    /* SETTING TOOLBAR */
+    QFontComboBox* font=new QFontComboBox(this->ui->textRichToolBar);
+    m_textEdit->setFont(font->currentFont());
+    this->ui->textRichToolBar->addWidget(font);
+    connect(font,&QFontComboBox::currentFontChanged,this,&Editor::fontFamilyChanged);
+    m_textEdit->setFontPointSize(15);
+    QSpinBox* spinBox=new QSpinBox(this->ui->textRichToolBar);
+    spinBox->setValue(m_textEdit->fontPointSize());
+    std::cout << spinBox->value() << std::endl;
+    QAction* spinAction=this->ui->textRichToolBar->addWidget(spinBox);
+    connect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),this,&Editor::fontSizeChanged);
+
     int TLines = ui->textEdit->document()->blockCount();
     ui->statusbar->showMessage(QString("Col:1 Line:1 TotLines:%3").arg(TLines));
 
@@ -49,6 +64,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
 
         ui->statusbar->showMessage(QString("Col:%1 Line:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
     });
+
 
 }
 
@@ -191,6 +207,7 @@ void Editor::on_actionBold_triggered()
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
+
 }
 
 void Editor::on_actionItalic_triggered()
@@ -214,6 +231,23 @@ void Editor::on_actionUnderlined_triggered()
 
     QTextCursor cursor = m_textEdit->textCursor();
 
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+void Editor::fontSizeChanged(int i){
+
+    m_textEdit->setFontPointSize(i);
+
+}
+
+void Editor::fontFamilyChanged(const QFont& font){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFont(font);
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
