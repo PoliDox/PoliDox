@@ -56,3 +56,13 @@ QByteArray ClientMessageFactory::createOpenFileMessage(const QString &p_filename
     QJsonDocument l_doc(l_obj);
     return l_doc.toJson(QJsonDocument::Indented);
 }
+
+QByteArray ClientMessageFactory::createNewFileMessage(const QString &p_filename)
+{
+    QJsonObject l_obj;
+    l_obj.insert("action", "createFileReq");
+    l_obj.insert("filename", p_filename);
+
+    QJsonDocument l_doc(l_obj);
+    return l_doc.toJson(QJsonDocument::Indented);
+}

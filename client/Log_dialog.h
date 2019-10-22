@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QList>
 #include <QString>
+#include <QListWidgetItem>
 #include "Editor.h"
 #include "ListFiles.h"
 
@@ -26,10 +27,12 @@ signals:
     void authDataSubmitted(QString p_user, QString p_passw);
     void signupDataSubmitted(QString p_user, QString p_passw);
     void fileSelected(QString p_filename);
+    void newFileSelected(QString p_filename);
 
 private slots:
     void on_pushButton_login_clicked();
     void on_pushButton_register_clicked();
+    void onClickedFile(QListWidgetItem *item);
 
 private:
     Ui::Log_Dialog *ui;

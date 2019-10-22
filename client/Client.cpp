@@ -26,6 +26,11 @@ Client::Client()
         m_socket.sendTextMessage(message);
     });
 
+    connect(&loginWindow, &Log_Dialog::newFileSelected, this, [&](const QString& p_filename) {
+        QByteArray message = ClientMessageFactory::createNewFileMessage(p_filename);
+        m_socket.sendTextMessage(message);
+    });
+
     loginWindow.setModal(true);
     loginWindow.exec();
 
@@ -50,7 +55,11 @@ void Client::onMessageReceived(const QString &p_msg)
 
     if (l_header == "loginRepl") {
         QString replCode = _JSONobj["response"].toString();
-        // TODO: Check if response is "ok"
+
+        if (replCode != "ok") {
+            qDebug() << "Authentication failed";
+            return;
+        }
 
         QJsonObject accountObj = _JSONobj["account"].toObject();
         m_user = Account::fromJson(accountObj);
@@ -60,14 +69,22 @@ void Client::onMessageReceived(const QString &p_msg)
         for(QJsonArray::iterator it=_JSONfiles.begin();it!=_JSONfiles.end();it++){
             m_files.push_back(it->toString());
         }
+        loginWindow.displayFiles(m_files);
 
     } else if (l_header == "registerUserRepl") {
         QString replCode = _JSONobj["response"].toString();
-        qDebug() << "registerUserRepl: " << replCode;
+        if (replCode != "ok") {
+            qDebug() << "Registration failed";
+            return;
+        }
 
-    } else if (l_header == "openFileRepl") {
+
+    } else if (l_header == "openFileRepl" || l_header == "createFileRepl") {
         QString replCode = _JSONobj["response"].toString();
-        // TODO: Check if response is "ok"
+        if (replCode != "ok") {
+            qDebug() << "Couldn't open file";
+            return;
+        }
 
         QJsonArray JSONcrdt = _JSONobj["document"].toArray();
         CrdtClient *crdt = new CrdtClient(-1);      //TODO: impostare qui il siteId corretto(si trova nella json reply)

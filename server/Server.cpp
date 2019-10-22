@@ -24,26 +24,6 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
     } else {
         qDebug() << m_pWebSocketServer->errorString();
     }
-
-    // TEST: Initialize the open document list with an empty document
-    //ServerController *l_firstFile = new ServerController();
-    //file2serverController["firstFile"] = l_firstFile;
-
-    //TEST DB
-    //db.registerUser("provauser4","provapsw4","a");
-    //std::cout << db.checkPassword("provauser4", "provapsw4") << "\n";
-    //this->dbOperations->insertNewDocument("provadocument2");
-
-    //std::vector<int> v = {7, 5, 16, 8};
-    //std::vector<int> v2 = {7, 1};
-    //this->dbOperations->insertSymbol("provadocument", "a", v2);
-    //std::cout << db.deleteSymbol("provadocument", "a", v) << "\n";
-
-    //this->dbOperations->retrieveAllDocuments();
-    //for( auto elem : this->dbOperations->retrieveAllDocuments() ){
-    //    std::cout << elem.toUtf8().constData() << "\n";
-    //}
-
 }
 
 
@@ -87,10 +67,15 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
 
+        qDebug() << "loginReq received: " << name << " / " << password;
+
         bool loginSuccess = false;
         Account *loggedAccount = nullptr;
         QList<QString> nameDocuments;
         double result = this->dbOperations->checkPassword(name, password);
+
+        qDebug() << "Authentication result: " << result;
+
         if(result >= 0){
             loginSuccess = true;
             //in case of success, result will contain siteId and [image(TODO!!)]
@@ -101,8 +86,7 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
 
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-        }
-        // TODO: else? I.e. if password is wrong?
+        }        
 
         QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);
@@ -160,8 +144,11 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
         if( !(this->file2serverController.contains(nameDocument)) ){
             QList<QString> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
             fileServContr = this->initializeServerController(nameDocument, orderedInserts);
+
+            this->file2serverController[nameDocument] = fileServContr;
+        } else {
+            fileServContr = this->file2serverController[nameDocument];
         }
-        this->file2serverController[nameDocument] = fileServContr;
 
         //TODO: gestire la open file reply nel caso in cui la richiesta
         //      non vada a buon fine
