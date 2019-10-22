@@ -7,6 +7,7 @@
 #include <QListWidgetItem>
 #include "Editor.h"
 #include "ListFiles.h"
+#include "NewFileDialog.h"
 
 namespace Ui {
 class Log_Dialog;
@@ -38,6 +39,7 @@ private:
     Ui::Log_Dialog *ui;
     Editor *editor;
     ListFiles *lf;
+    NewFileDialog *nfd;
 };
 
 #endif // LOG_DIALOG_H

@@ -42,7 +42,6 @@ void Client::onMessageReceived(const QString &p_msg)
 {
     QJsonObject _JSONobj;
     QJsonDocument _JSONdoc;
-
      _JSONdoc = QJsonDocument::fromJson(p_msg.toUtf8());
 
     if (_JSONdoc.isNull()) {
@@ -87,7 +86,7 @@ void Client::onMessageReceived(const QString &p_msg)
         }
 
         QJsonArray JSONcrdt = _JSONobj["document"].toArray();
-        CrdtClient *crdt = new CrdtClient(-1);      //TODO: impostare qui il siteId corretto(si trova nella json reply)
+        CrdtClient *crdt = new CrdtClient(m_user.getSiteId());      //TODO: controllare se il siteId `e corretto
         crdt->fromJson(JSONcrdt);
         m_document = new ClientController(crdt, &m_socket);
 
