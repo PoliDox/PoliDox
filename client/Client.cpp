@@ -61,9 +61,10 @@ void Client::onMessageReceived(const QString &p_msg)
 
         QJsonObject accountObj = _JSONobj["account"].toObject();
         m_user = Account::fromJson(accountObj);
-        qDebug() << "Authenticated with siteId" << m_user.getSiteId();
+        qDebug() << "Authenticated with siteId" << m_user.getSiteId();       
 
-        QJsonArray _JSONfiles=_JSONobj["files"].toArray();
+        QJsonArray _JSONfiles=_JSONobj["nameDocuments"].toArray();
+
         for(QJsonArray::iterator it=_JSONfiles.begin();it!=_JSONfiles.end();it++){
             m_files.push_back(it->toString());
         }
