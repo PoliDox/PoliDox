@@ -44,6 +44,8 @@ private slots:
     void on_actionItalic_triggered();
     void on_actionUnderlined_triggered();
 
+    void fontSizeChanged(int i);
+
 private:
     void createActions();
     void createStatusBar();

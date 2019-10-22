@@ -14,6 +14,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QSpinBox>
+#include <QLineEdit>
 #include <iostream>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
@@ -38,6 +40,19 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
            emit textChanged(position, charsRemoved, charsAdded);
         }
     });
+
+    /* SETTING TOOLBAR */
+    m_textEdit->setFontFamily("Times");
+    QLineEdit* fontNameLine=new QLineEdit(this->ui->textRichToolBar);
+    fontNameLine->setText(m_textEdit->fontFamily());
+    fontNameLine->setFixedSize(100,20);
+    QAction* LineAction=this->ui->textRichToolBar->addWidget(fontNameLine);
+    m_textEdit->setFontPointSize(15);
+    QSpinBox* spinBox=new QSpinBox(this->ui->textRichToolBar);
+    spinBox->setValue(m_textEdit->fontPointSize());
+    std::cout << spinBox->value() << std::endl;
+    QAction* spinAction=this->ui->textRichToolBar->addWidget(spinBox);
+    connect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),this,&Editor::fontSizeChanged);
 
 }
 
@@ -180,6 +195,7 @@ void Editor::on_actionBold_triggered()
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
+
 }
 
 void Editor::on_actionItalic_triggered()
@@ -205,5 +221,11 @@ void Editor::on_actionUnderlined_triggered()
 
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+void Editor::fontSizeChanged(int i){
+
+    m_textEdit->setFontPointSize(i);
 
 }
