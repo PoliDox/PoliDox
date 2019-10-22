@@ -165,6 +165,7 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
         bool result = this->dbOperations->insertNewDocument(nameDocument);
 
         if(result){
+
             QList<QString> emptyList;
             fileServContr = this->initializeServerController(nameDocument, emptyList);
             this->file2serverController[nameDocument] = fileServContr;

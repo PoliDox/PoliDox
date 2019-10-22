@@ -31,7 +31,6 @@ Client::Client()
         m_socket.sendTextMessage(message);
     });
 
-    loginWindow.setModal(true);
     loginWindow.exec();
 
 
@@ -89,6 +88,7 @@ void Client::onMessageReceived(const QString &p_msg)
         CrdtClient *crdt = new CrdtClient(m_user.getSiteId());      //TODO: controllare se il siteId `e corretto
         crdt->fromJson(JSONcrdt);
         m_document = new ClientController(crdt, &m_socket);
+        loginWindow.hide();
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
