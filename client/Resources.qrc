@@ -7,5 +7,8 @@
         <file>images/bold.png</file>
         <file>images/italic.png</file>
         <file>images/underlined.png</file>
+        <file>images/justify.png</file>
+        <file>images/leftAll.png</file>
+        <file>images/rightAll.png</file>
     </qresource>
 </RCC>

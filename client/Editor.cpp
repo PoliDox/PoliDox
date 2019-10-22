@@ -15,7 +15,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QSpinBox>
-#include <QLineEdit>
+#include <QFontComboBox>
 #include <iostream>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
@@ -43,11 +43,10 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
 
 
     /* SETTING TOOLBAR */
-    m_textEdit->setFontFamily("Times");
-    QLineEdit* fontNameLine=new QLineEdit(this->ui->textRichToolBar);
-    fontNameLine->setText(m_textEdit->fontFamily());
-    fontNameLine->setFixedSize(100,20);
-    QAction* LineAction=this->ui->textRichToolBar->addWidget(fontNameLine);
+    QFontComboBox* font=new QFontComboBox(this->ui->textRichToolBar);
+    m_textEdit->setFont(font->currentFont());
+    this->ui->textRichToolBar->addWidget(font);
+    connect(font,&QFontComboBox::currentFontChanged,this,&Editor::fontFamilyChanged);
     m_textEdit->setFontPointSize(15);
     QSpinBox* spinBox=new QSpinBox(this->ui->textRichToolBar);
     spinBox->setValue(m_textEdit->fontPointSize());
@@ -240,5 +239,16 @@ void Editor::on_actionUnderlined_triggered()
 void Editor::fontSizeChanged(int i){
 
     m_textEdit->setFontPointSize(i);
+
+}
+
+void Editor::fontFamilyChanged(const QFont& font){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFont(font);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
 
 }
