@@ -39,6 +39,17 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
         }
     });
 
+    int TLines = ui->textEdit->document()->blockCount();
+    ui->statusbar->showMessage(QString("Col:1 Line:1 TotLines:%3").arg(TLines));
+
+    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
+        int line = ui->textEdit->textCursor().blockNumber()+1;
+        int pos = ui->textEdit->textCursor().columnNumber()+1;
+        int TLines = ui->textEdit->document()->blockCount();
+
+        ui->statusbar->showMessage(QString("Col:%1 Line:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
+    });
+
 }
 
 Editor::~Editor()
