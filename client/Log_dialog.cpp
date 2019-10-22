@@ -25,7 +25,12 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
     setWindowTitle("PoliDox");
 
     lf = new ListFiles();
-    nfd = new NewFileDialog();
+    nfd = new NewFileDialog(this);
+
+    connect(nfd, &NewFileDialog::getFileName, this, [&](QString newfilename){
+        emit newFileSelected(newfilename);
+    });
+
 }
 
 Log_Dialog::~Log_Dialog()
@@ -52,17 +57,11 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
 
     QListWidget* files=new QListWidget(this->ui->groupBox);
     connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
-    QString file1("Create new file");
-    QString file2("file2");
-    QString file3("file3");
-    QString file4("provadocument2");
-    files->addItem(file1);
-    files->addItem(file2);
-    files->addItem(file3);
-    files->addItem(file4);
 
-    //files->addItems(p_files);
-    QVBoxLayout* layout = new QVBoxLayout();
+    QString new_file("Create new file");
+    files->addItem(new_file);
+    files->addItems(p_files);
+
     auto grid_layout = new QGridLayout(this->ui->groupBox);
     grid_layout->addWidget(files);
     files->show();
@@ -91,13 +90,8 @@ void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
     qDebug() << "SELECTED FILE: "<< item->text();
 
-
     if(item->text().compare("Create new file") == 0){
         nfd->show();
-        this->hide();
-        connect(nfd, &NewFileDialog::getFileName, this, [&](QString newfilename){
-            emit newFileSelected(newfilename);
-        });
     }
     else{
         this->hide();
