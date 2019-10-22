@@ -49,7 +49,7 @@ Server::~Server() {
 //- The only valid actions can be "registerUser","loginReq"
 //- Note that "genericRequestString" is a String type but interally
 //  it's formatted in JSON
-void Server::handleNotLoggedRequests(const QString &genericRequestString){
+void Server::handleNotLoggedRequests(const QString& genericRequestString){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());  
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
@@ -114,7 +114,7 @@ void Server::handleNotLoggedRequests(const QString &genericRequestString){
 }
 
 
-ServerController* Server::initializeServerController(QString nameDocument, QList<QString> orderedInserts){
+ServerController* Server::initializeServerController(QString& nameDocument, QList<QString>& orderedInserts){
     ServerController *fileServContr = new ServerController(nameDocument, this);
     fileServContr->createCrdt(orderedInserts);
     return fileServContr;
@@ -123,7 +123,7 @@ ServerController* Server::initializeServerController(QString nameDocument, QList
 
 //- To handle requests by logged account
 //- The only valid actions can be "openFileReq","createFileReq"
-void Server::handleLoggedRequests(const QString &genericRequestString){
+void Server::handleLoggedRequests(const QString& genericRequestString){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
     QJsonObject requestObjJSON;
@@ -162,7 +162,6 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
         bool result = this->dbOperations->insertNewDocument(nameDocument);
 
         if(result){
-
             QList<QString> emptyList;
             fileServContr = this->initializeServerController(nameDocument, emptyList);
             this->file2serverController[nameDocument] = fileServContr;

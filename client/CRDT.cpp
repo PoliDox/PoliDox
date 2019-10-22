@@ -1,5 +1,6 @@
 #include "CRDT.h"
 #include <future>
+#include <QDebug>
 
 
 
@@ -37,7 +38,7 @@ void CRDT::deleteSymbolAt(std::vector<Char>& row,unsigned int index){
     row.erase(row.begin()+index);
 }
 
-void CRDT::searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
+void CRDT::searchEqualSymbol(Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
 
     _ROWhit=std::find_if(this->_symbols.begin(),this->_symbols.end(),[&](std::vector<Char>& row)->bool{
         _row++;
@@ -65,7 +66,7 @@ void CRDT::searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int&
 
 }
 
-void CRDT::searchGreaterSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
+void CRDT::searchGreaterSymbol(Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
 
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
             _index=0; //newline
@@ -147,8 +148,7 @@ int CRDT::_toLinear(int row,int index){
 
 
 
-int CRDT::remoteInsert(Char symbol){
-
+int CRDT::remoteInsert(Char& symbol){
     std::vector<std::vector<Char>>::iterator _ROWhit;
     std::vector<Char>::iterator _INDEXhit;
 
@@ -214,7 +214,7 @@ int CRDT::remoteInsert(Char symbol){
 };
 
 
-int CRDT::remoteDelete(const Char& symbol) {
+int CRDT::remoteDelete(Char& symbol) {
 
     std::vector<Char>::iterator _indexHIT;
     std::vector<std::vector<Char>>::iterator _rowHIT;
@@ -274,7 +274,7 @@ QJsonArray CRDT::toJson() const {
 }
 
 
-void CRDT::fromJson(const QJsonArray &crdtJsonFormatted){
+void CRDT::fromJson(const QJsonArray& crdtJsonFormatted){
     unsigned long rowIndex = 0;
     for(QJsonValue elem : crdtJsonFormatted){
        QJsonObject charObjJson = elem.toObject();

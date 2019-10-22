@@ -4,7 +4,7 @@
 
 
 
-ServerController::ServerController(QString nameDocumentAssociated, Server *server) {
+ServerController::ServerController(QString &nameDocumentAssociated, Server *server) {
     this->nameDocumentAssociated = nameDocumentAssociated;
     this->server = server;
     this->crdt = nullptr;
@@ -16,7 +16,7 @@ ServerController::ServerController(QString nameDocumentAssociated, Server *serve
 //   after that he sends a message to the server via socket,
 //   that message has to be duplicated on all the other
 //   clients which will do the remote operation
-void ServerController::replicateMessageOnOtherSockets(const QString &messageReceivedOnSocket) {
+void ServerController::replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket) {
     // The socket of the client which did the local operation
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
@@ -65,7 +65,7 @@ void ServerController::notifyOtherClients(QWebSocket *newSocket){
 }
 
 
-void ServerController::createCrdt(QList<QString> orderedInserts){
+void ServerController::createCrdt(QList<QString>& orderedInserts){
     this->crdt = new CRDT();
     if(orderedInserts.size() == 0)
         return;
@@ -77,7 +77,7 @@ void ServerController::createCrdt(QList<QString> orderedInserts){
 
 // The ServerController has to update the his crdt on the
 // base of the operation(insert/delete)
-void ServerController::handleRemoteOperation(const QString &messageReceivedByClient){
+void ServerController::handleRemoteOperation(const QString& messageReceivedByClient){
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -87,20 +87,20 @@ void ServerController::handleRemoteOperation(const QString &messageReceivedByCli
         return;
     }
     requestObjJSON = requestDocJSON.object();
-
     // No switch case for strings in C++ :((
     QString header = requestObjJSON["action"].toString();
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
+    qDebug() << charObj.getFractionalPosition();
+    QString charValue(charObj.getValue());
+    std::vector<int> fractPos(charObj.getFractionalPosition());
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
-        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, QString(charObj.getValue()),
-                                            charObj.getFractionalPosition());
+        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, fractPos);
     }
     else if(header == "delete"){
         this->crdt->remoteDelete(charObj);
-        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, QString(charObj.getValue()),
-                                            charObj.getFractionalPosition());
+        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, fractPos);
     }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();

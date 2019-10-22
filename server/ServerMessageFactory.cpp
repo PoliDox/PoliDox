@@ -60,7 +60,7 @@ QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, doub
 }
 
 
-QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, QList<Account*> accounts){
+QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts){
     QJsonObject objToReturn;
     QJsonArray crdtFormattedJson;
     QJsonArray accountsFormattedJson;

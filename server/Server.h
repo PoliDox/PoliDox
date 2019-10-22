@@ -10,8 +10,7 @@
 
 class ServerController;
 
-class Server : public QObject
-{
+class Server : public QObject {
     Q_OBJECT
 
 private:
@@ -20,7 +19,7 @@ private:
     QMap<QString, ServerController*> file2serverController;
     DatabaseManager *dbOperations;
 
-    ServerController* initializeServerController(QString nameDocument, QList<QString> orderedInserts);
+    ServerController* initializeServerController(QString& nameDocument, QList<QString>& orderedInserts);
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
@@ -35,8 +34,8 @@ public:
 */
 public slots:
     void onNewConnection();
-    void handleNotLoggedRequests(const QString &genericRequestString);
-    void handleLoggedRequests(const QString &genericRequestString);
+    void handleNotLoggedRequests(const QString& genericRequestString);
+    void handleLoggedRequests(const QString& genericRequestString);
     void disconnectAccount();
 };
 
