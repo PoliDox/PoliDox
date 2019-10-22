@@ -91,7 +91,6 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     QString header = requestObjJSON["action"].toString();
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
-    qDebug() << charObj.getFractionalPosition();
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
     if (header == "insert") {
