@@ -3,7 +3,7 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket) :
+ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, QList<Account> accounts) :
     m_crdt(p_crdt), m_socket(p_socket)
 {    
 
@@ -50,6 +50,10 @@ ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket) :
 
     });
 
+
+    for (Account ac : accounts) {
+        m_editor.addClient(ac);
+    }
 
     /* ______________________________________________________________________________________
        CRDTclient signal onLocalInsert connected to CLIENTcontroller lambda slot.

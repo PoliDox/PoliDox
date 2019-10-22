@@ -8,7 +8,7 @@ char = { ... }
 
 NEW CLIENT CONNECTED ON DOCUMENT
 "action" = "newClient"
-account = { ... }
+"account" = { ... }
 
 LOGIN REQ
 "action" = "loginReq"
@@ -40,6 +40,7 @@ OPEN FILE REPL
 "action" = "openFileRepl"
 "response" = "ok"/"fail"
 "crdt" = { ... }        // here comes the crdt formatted in json array 
+"accounts" = { // array of client already present }
 
 CREATE FILE REQ
 "action" = "createFileReq"
