@@ -31,29 +31,35 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     this->socketsOnDocument.push_back(socketToAdd);
 
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
-    connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
+    //connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
     //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
 
-    this->notifyOtherClientsAndMe(socketToAdd);
+    this->notifyOtherClients(socketToAdd);
+
+    QList<Account*> accounts;
+    for(auto otherSocket : this->socketsOnDocument) {
+        if(otherSocket != socketToAdd){
+            Account *otherAccount = this->server->getAccount(otherSocket);
+            accounts.append(otherAccount);
+        }
+    }
+
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, crdt, accounts);
+    socketToAdd->sendTextMessage(sendMsgToClient);
+
 }
 
 
 // Pay attention that while I notify (.1)the other clients
 // about the new_client_connected(== newSocket) I notify also
 // (.2)the new_client_connected(me) about all the other clients already connected
-void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
+void ServerController::notifyOtherClients(QWebSocket *newSocket){
     Account *newAccount = this->server->getAccount(newSocket);
     QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(newAccount);
 
     for(auto otherSocket : this->socketsOnDocument){
-        if(otherSocket != newSocket){
-            //(.1) notify other client
-            otherSocket->sendTextMessage(msgNewClient1);
-
-            //(.2) notify me
-            Account *otherAccount = this->server->getAccount(otherSocket);
-            QString msgNewClient2 = ServerMessageFactory::createNewClientMessage(otherAccount);
-            newSocket->sendTextMessage(msgNewClient2);
+        if(otherSocket != newSocket){            
+            otherSocket->sendTextMessage(msgNewClient1);            
         }
     }
 }

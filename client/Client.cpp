@@ -88,8 +88,16 @@ void Client::onMessageReceived(const QString &p_msg)
         QJsonArray JSONcrdt = _JSONobj["document"].toArray();
         CrdtClient *crdt = new CrdtClient(m_user.getSiteId());      //TODO: controllare se il siteId `e corretto
         crdt->fromJson(JSONcrdt);
-        m_document = new ClientController(crdt, &m_socket);
+
+        QList<Account> accounts;
+        QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
+        for (QJsonValue ac : JSONaccounts) {
+            accounts.append(Account::fromJson(ac.toObject()));
+        }
+
+        m_document = new ClientController(crdt, &m_socket, accounts);
         loginWindow.hide();
+        disconnect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();

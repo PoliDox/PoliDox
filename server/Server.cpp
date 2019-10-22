@@ -156,9 +156,6 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
         fileServContr->addClient(signalSender);
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
 
-        //da sistemare
-        QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, fileServContr->getCrdt());
-        signalSender->sendTextMessage(sendMsgToClient);
     }
     else if (header == "createFileReq"){
         //create and open the file
@@ -173,10 +170,7 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
             fileServContr->addClient(signalSender);
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
 
-            //TODO: per ora risponde con una openfilereply anziché
-            //      con una createCreateFileReply
-            QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, fileServContr->getCrdt());
-            signalSender->sendTextMessage(sendMsgToClient);
+
         } else {
             //TODO: gestire la reply in caso di fallimento
         }

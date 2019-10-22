@@ -59,9 +59,9 @@ void Editor::addClient(Account& user)
     int siteId = user.getSiteId();
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
     // TODO: Uncomment these lines when siteId is supported
-    //m_remoteCursors[siteId]->setVisible(true);
-    //QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
-    //m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
+    m_remoteCursors[siteId]->setVisible(true);
+    QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
+    m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
 }
 
 void Editor::remoteInsert(int siteId, int position, char ch)

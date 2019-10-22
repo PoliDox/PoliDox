@@ -60,20 +60,26 @@ QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, doub
 }
 
 
-QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt){
+QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, QList<Account*> accounts){
     QJsonObject objToReturn;
     QJsonArray crdtFormattedJson;
+    QJsonArray accountsFormattedJson;
     QString responseString;
-    if(response)
-        responseString = "ok";
-    else
-        responseString = "fail";
+    responseString = response ? "ok" : "fail";
 
-    objToReturn.insert("action","openFileRepl");
-    objToReturn.insert("response",responseString);
-    if(crdt != nullptr)
+    objToReturn.insert("action", "openFileRepl");
+    objToReturn.insert("response", responseString);
+
+    if (response) {
         crdtFormattedJson = crdt->toJson();
-    objToReturn.insert("crdt", crdtFormattedJson);
+        objToReturn.insert("crdt", crdtFormattedJson);
+
+        for (Account* ac : accounts) {
+            QJsonValue jsonAccount = QJsonValue(ac->toJson());
+            accountsFormattedJson.append(jsonAccount);
+        }
+        objToReturn.insert("accounts", accountsFormattedJson);
+    }
 
     QJsonDocument docOfObj(objToReturn);
     return docOfObj.toJson(QJsonDocument::Indented);
