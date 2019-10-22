@@ -18,7 +18,8 @@ HEADERS += \
     ListFiles.h \
     Log_dialog.h \
     Client.h \
-    NewFileDialog.h
+    NewFileDialog.h \
+    Styler.h
 
 SOURCES += \
     CRDT.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
     Log_dialog.cpp \
     Account.cpp \
     NewFileDialog.cpp \
+    Styler.cpp \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp \

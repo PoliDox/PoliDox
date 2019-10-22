@@ -57,6 +57,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
 
     QListWidget* files=new QListWidget(this->ui->groupBox);
     connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
+
     QString new_file("Create new file");
     files->addItem(new_file);
     files->addItems(p_files);

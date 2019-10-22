@@ -14,11 +14,13 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <iostream>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
 
 {
     ui->setupUi(this);
+    this->ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
     this->ui->textEdit->setStyleSheet( "background-color:white");
     this->ui->toolBar_2->setStyleSheet( "background-color:transparent");
@@ -57,9 +59,9 @@ void Editor::addClient(Account& user)
     int siteId = user.getSiteId();
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
     // TODO: Uncomment these lines when siteId is supported
-    //m_remoteCursors[siteId]->setVisible(true);
-    //QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
-    //m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
+    m_remoteCursors[siteId]->setVisible(true);
+    QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
+    m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
 }
 
 void Editor::remoteInsert(int siteId, int position, char ch)
@@ -166,3 +168,42 @@ void Editor::on_actionRedo_triggered()
     m_textEdit->redo();
 }
 
+
+void Editor::on_actionBold_triggered()
+{
+
+    QTextCharFormat fmt;
+    fmt.setFontWeight(this->ui->textRichToolBar->actions().at(1)->isChecked() ? QFont::Bold : QFont::Normal);
+
+    QTextCursor cursor = m_textEdit->textCursor();
+
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+void Editor::on_actionItalic_triggered()
+{
+
+    QTextCharFormat fmt;
+    fmt.setFontItalic(this->ui->textRichToolBar->actions().at(2)->isChecked());
+
+    QTextCursor cursor = m_textEdit->textCursor();
+
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+void Editor::on_actionUnderlined_triggered()
+{
+
+    QTextCharFormat fmt;
+    fmt.setFontUnderline(this->ui->textRichToolBar->actions().at(3)->isChecked());
+
+    QTextCursor cursor = m_textEdit->textCursor();
+
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
