@@ -176,37 +176,34 @@ void Editor::on_actionBold_triggered()
     fmt.setFontWeight(this->ui->textRichToolBar->actions().at(1)->isChecked() ? QFont::Bold : QFont::Normal);
 
     QTextCursor cursor = m_textEdit->textCursor();
-       if (!cursor.hasSelection())
-           cursor.select(QTextCursor::WordUnderCursor);
-       cursor.mergeCharFormat(fmt);
-       m_textEdit->mergeCurrentCharFormat(fmt);
+
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
 
 }
 
 void Editor::on_actionItalic_triggered()
 {
 
-    QFont font(m_textEdit->font());
+    QTextCharFormat fmt;
+    fmt.setFontItalic(this->ui->textRichToolBar->actions().at(2)->isChecked());
 
-    if(font.italic())
-        font.setItalic(false);
-    else
-        font.setItalic(true);
+    QTextCursor cursor = m_textEdit->textCursor();
 
-    m_textEdit->setFont(font);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
 
 }
 
 void Editor::on_actionUnderlined_triggered()
 {
 
-    QFont font(m_textEdit->font());
+    QTextCharFormat fmt;
+    fmt.setFontUnderline(this->ui->textRichToolBar->actions().at(3)->isChecked());
 
-    if(font.underline())
-        font.setUnderline(false);
-    else
-        font.setUnderline(true);
+    QTextCursor cursor = m_textEdit->textCursor();
 
-    m_textEdit->setFont(font);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
 
 }

@@ -36,11 +36,11 @@ SOURCES += \
     DatabaseManager.cpp \
     Server.cpp \
     ServerController.cpp \
-    main.cpp \
     Account.cpp \
     CRDT.cpp \
     Char.cpp \
-    ServerMessageFactory.cpp
+    ServerMessageFactory.cpp \
+    main.cpp
 
 
 # Default rules for deployment.
