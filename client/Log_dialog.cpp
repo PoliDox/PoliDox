@@ -59,7 +59,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     QString file1("Create new file");
     QString file2("file2");
     QString file3("file3");
-    QString file4("file4");
+    QString file4("provadocument2");
     files->addItem(file1);
     files->addItem(file2);
     files->addItem(file3);
