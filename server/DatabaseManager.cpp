@@ -83,7 +83,7 @@ DatabaseManager::DatabaseManager() {
 //TODO: - sistemare il blocco catch
 //      - inserire l'immagine
 // - Returns siteId if the registration success, -1 otherwise
-double DatabaseManager::registerUser(QString name, QString password, QByteArray image){
+double DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     double siteId = this->getCounterOfCollection("user");
@@ -121,7 +121,7 @@ double DatabaseManager::registerUser(QString name, QString password, QByteArray 
 
 //TODO: - oltre al siteId, ritornare anche l'immagine
 //it returns the id of the account, -1 otherwise
-double DatabaseManager::checkPassword(QString name, QString password){
+double DatabaseManager::checkPassword(QString& name, QString& password){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
@@ -146,7 +146,7 @@ double DatabaseManager::checkPassword(QString name, QString password){
 
 
 //TODO: - sistemare bene l'eccezione
-bool DatabaseManager::insertNewDocument(QString documentName){
+bool DatabaseManager::insertNewDocument(QString& documentName){
     mongocxx::collection documentCollection = (*this->db)["document"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
@@ -167,7 +167,7 @@ bool DatabaseManager::insertNewDocument(QString documentName){
 
 //TODO: - sistemare il valore di ritorno
 //      - implementare il vincolo di integrità su nameDocument
-bool DatabaseManager::insertSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition) {
+bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     double counterInsert = this->getCounterOfCollection("insert");
@@ -201,7 +201,7 @@ bool DatabaseManager::insertSymbol(QString nameDocument, QString symbol, std::ve
 //        eventuale eccezione alzata dalla delete_one
 //A symbol is uniquely identified by his fractional position and belonging document,
 //so "symbol parameter" is useful, we pass it only for sake of completeness
-bool DatabaseManager::deleteSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition){
+bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition){
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     auto array_builder = bsoncxx::builder::basic::array{};
@@ -230,7 +230,7 @@ bool DatabaseManager::deleteSymbol(QString nameDocument, QString symbol, std::ve
 //TODO: - anziché il for da stampare in output, capire
 //        bene cosa restituire. Un vector<Char> su cui
 //        poi verranno chiamate le remoteInsert??
-QList<QString> DatabaseManager::getAllInserts(QString nameDocument){
+QList<QString> DatabaseManager::getAllInserts(QString& nameDocument){
     QList<QString> resultInserts;
     mongocxx::collection insertCollection = (*this->db)["insert"];
 

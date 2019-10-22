@@ -35,12 +35,12 @@ private:
 
 public:
     DatabaseManager();
-    double registerUser(QString name, QString password, QByteArray image);
-    double checkPassword(QString name, QString password);
-    bool insertNewDocument(QString documentName);
-    bool insertSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition);
-    bool deleteSymbol(QString nameDocument, QString symbol, std::vector<int> fractionalPosition);
-    QList<QString> getAllInserts(QString nameDocument);
+    double registerUser(QString& name, QString& password, QByteArray& image);
+    double checkPassword(QString& name, QString& password);
+    bool insertNewDocument(QString& documentName);
+    bool insertSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition);
+    bool deleteSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition);
+    QList<QString> getAllInserts(QString& nameDocument);
     QList<QString> getAllDocuments();
     mongocxx::database getDb();
     ~DatabaseManager();

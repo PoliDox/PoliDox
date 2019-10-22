@@ -12,7 +12,7 @@
 class ClientController;
 
 /* modella un'istanza di un editor condiviso */
-class CrdtClient : public CRDT {
+class CrdtClient : public QObject, public CRDT {
     Q_OBJECT
 
 private:    
@@ -28,8 +28,8 @@ public:
     void setSiteId(double siteId);
 
 signals:
-    void onLocalInsert(Char symbol);
-    void onLocalDelete(Char symbol);
+    void onLocalInsert(Char& symbol);
+    void onLocalDelete(Char& symbol);
 };
 
 

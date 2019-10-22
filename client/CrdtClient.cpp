@@ -142,7 +142,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
 
     /* !!! SOLUTION TO 2ND BUG ON LOCAL INSERT !!! */
     if(row>=this->_symbols.size()){
-        this->_symbols.insert(this->_symbols.begin() + (row), vector<Char>());
+        this->_symbols.insert(this->_symbols.begin() + (row), std::vector<Char>());
     }
 
 #ifdef DEBUG_OUTPUT
@@ -218,7 +218,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
 
     if(middleNewLine==1) {
         this->_symbols.insert(this->_symbols.begin() + (row + 1),
-                               vector<Char>(this->_symbols[row].begin() + index + 1, this->_symbols[row].end()));
+                               std::vector<Char>(this->_symbols[row].begin() + index + 1, this->_symbols[row].end()));
         this->_symbols[row].erase(this->_symbols[row].begin() + index + 1, this->_symbols[row].end());
 
     }

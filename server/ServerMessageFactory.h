@@ -17,7 +17,7 @@ public:
     static QByteArray createNewClientMessage(const Account *account);
     static QByteArray createLoginReply(bool response, const Account *account, QList<QString>& nameDocuments);
     static QByteArray createRegistrationUserReply(bool response, double siteIdOfRegisteredUser);
-    static QByteArray createOpenFileReply(bool responde, CRDT *crdt);
+    static QByteArray createOpenFileReply(bool responde, CRDT *crdt, QList<Account*>& accounts);
 };
 
 

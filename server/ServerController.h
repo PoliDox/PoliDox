@@ -21,15 +21,15 @@ private:
     CRDT *crdt;
 
 public:
-    ServerController(QString nameDocumentAssociated, Server *server);
+    ServerController(QString &nameDocumentAssociated, Server *server);
     void addClient(QWebSocket *socketToAdd);
-    void notifyOtherClientsAndMe(QWebSocket *newSocket);
-    void createCrdt(QList<QString> orderedInserts);
+    void notifyOtherClients(QWebSocket *newSocket);
+    void createCrdt(QList<QString>& orderedInserts);
     CRDT* getCrdt();
 
 public slots:
-    void replicateMessageOnOtherSockets(const QString &messageReceivedOnSocket);
-    void handleRemoteOperation(const QString &messageReceivedByClient);
+    void replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket);
+    void handleRemoteOperation(const QString& messageReceivedByClient);
 };
 
 #endif // SERVERCONTROLLER_H

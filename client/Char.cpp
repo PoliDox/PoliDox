@@ -15,7 +15,7 @@ double Char::getSiteId() const {
     return siteId;
 }
 
-void Char::setPosition(std::vector<int> x)
+void Char::setPosition(std::vector<int>& x)
 {
     this->position = x;
 }
@@ -61,18 +61,18 @@ Char Char::fromJson(const QJsonObject& _JSONobj){
     return symbol;
 }
 
-vector<int> Char::getPosition() {
-    return position;
+std::vector<int> Char::getPosition() {
+    return this->position;
 }
 
 char Char::getValue() const {
-    return value;
+    return this->value;
 }
 
-void Char::setFractionalPosition(vector<int> fractionalPosition) {
+void Char::setFractionalPosition(std::vector<int>& fractionalPosition) {
         this->position = fractionalPosition;
 }
 
-vector<int> Char::getFractionalPosition() const {
+std::vector<int> Char::getFractionalPosition() {
     return position;
 }

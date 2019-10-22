@@ -4,7 +4,7 @@
 
 
 
-ServerController::ServerController(QString nameDocumentAssociated, Server *server) {
+ServerController::ServerController(QString &nameDocumentAssociated, Server *server) {
     this->nameDocumentAssociated = nameDocumentAssociated;
     this->server = server;
     this->crdt = nullptr;
@@ -16,7 +16,7 @@ ServerController::ServerController(QString nameDocumentAssociated, Server *serve
 //   after that he sends a message to the server via socket,
 //   that message has to be duplicated on all the other
 //   clients which will do the remote operation
-void ServerController::replicateMessageOnOtherSockets(const QString &messageReceivedOnSocket) {
+void ServerController::replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket) {
     // The socket of the client which did the local operation
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
@@ -34,32 +34,38 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
     //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
 
-    this->notifyOtherClientsAndMe(socketToAdd);
+    this->notifyOtherClients(socketToAdd);
+
+    QList<Account*> accounts;
+    for(auto otherSocket : this->socketsOnDocument) {
+        if(otherSocket != socketToAdd){
+            Account *otherAccount = this->server->getAccount(otherSocket);
+            accounts.append(otherAccount);
+        }
+    }
+
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, crdt, accounts);
+    socketToAdd->sendTextMessage(sendMsgToClient);
+
 }
 
 
 // Pay attention that while I notify (.1)the other clients
 // about the new_client_connected(== newSocket) I notify also
 // (.2)the new_client_connected(me) about all the other clients already connected
-void ServerController::notifyOtherClientsAndMe(QWebSocket *newSocket){
+void ServerController::notifyOtherClients(QWebSocket *newSocket){
     Account *newAccount = this->server->getAccount(newSocket);
     QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(newAccount);
 
     for(auto otherSocket : this->socketsOnDocument){
-        if(otherSocket != newSocket){
-            //(.1) notify other client
-            otherSocket->sendTextMessage(msgNewClient1);
-
-            //(.2) notify me
-            Account *otherAccount = this->server->getAccount(otherSocket);
-            QString msgNewClient2 = ServerMessageFactory::createNewClientMessage(otherAccount);
-            newSocket->sendTextMessage(msgNewClient2);
+        if(otherSocket != newSocket){            
+            otherSocket->sendTextMessage(msgNewClient1);            
         }
     }
 }
 
 
-void ServerController::createCrdt(QList<QString> orderedInserts){
+void ServerController::createCrdt(QList<QString>& orderedInserts){
     this->crdt = new CRDT();
     if(orderedInserts.size() == 0)
         return;
@@ -71,7 +77,7 @@ void ServerController::createCrdt(QList<QString> orderedInserts){
 
 // The ServerController has to update the his crdt on the
 // base of the operation(insert/delete)
-void ServerController::handleRemoteOperation(const QString &messageReceivedByClient){
+void ServerController::handleRemoteOperation(const QString& messageReceivedByClient){
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -81,20 +87,20 @@ void ServerController::handleRemoteOperation(const QString &messageReceivedByCli
         return;
     }
     requestObjJSON = requestDocJSON.object();
-
     // No switch case for strings in C++ :((
     QString header = requestObjJSON["action"].toString();
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
+    qDebug() << charObj.getFractionalPosition();
+    QString charValue(charObj.getValue());
+    std::vector<int> fractPos(charObj.getFractionalPosition());
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
-        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, QString(charObj.getValue()),
-                                            charObj.getFractionalPosition());
+        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, fractPos);
     }
     else if(header == "delete"){
         this->crdt->remoteDelete(charObj);
-        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, QString(charObj.getValue()),
-                                            charObj.getFractionalPosition());
+        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, fractPos);
     }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();

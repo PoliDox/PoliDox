@@ -41,6 +41,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
         }
     });
 
+
     /* SETTING TOOLBAR */
     m_textEdit->setFontFamily("Times");
     QLineEdit* fontNameLine=new QLineEdit(this->ui->textRichToolBar);
@@ -53,6 +54,18 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
     std::cout << spinBox->value() << std::endl;
     QAction* spinAction=this->ui->textRichToolBar->addWidget(spinBox);
     connect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),this,&Editor::fontSizeChanged);
+
+    int TLines = ui->textEdit->document()->blockCount();
+    ui->statusbar->showMessage(QString("Col:1 Line:1 TotLines:%3").arg(TLines));
+
+    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
+        int line = ui->textEdit->textCursor().blockNumber()+1;
+        int pos = ui->textEdit->textCursor().columnNumber()+1;
+        int TLines = ui->textEdit->document()->blockCount();
+
+        ui->statusbar->showMessage(QString("Col:%1 Line:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
+    });
+
 
 }
 
@@ -74,9 +87,9 @@ void Editor::addClient(Account& user)
     int siteId = user.getSiteId();
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
     // TODO: Uncomment these lines when siteId is supported
-    //m_remoteCursors[siteId]->setVisible(true);
-    //QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
-    //m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
+    m_remoteCursors[siteId]->setVisible(true);
+    QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
+    m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
 }
 
 void Editor::remoteInsert(int siteId, int position, char ch)

@@ -11,24 +11,24 @@
 #include <QJsonDocument>
 #include <iostream>
 
-using namespace std;
+
 
 class Char {
 private:
     double siteId;
     int counter;
     char value;
-    vector<int> position;
+    std::vector<int> position;
 
 public:
     Char(double siteId, int counter, char value);
     ~Char();
     double getSiteId() const;
-    void setPosition(std::vector<int> x);
-    vector<int> getPosition();
+    void setPosition(std::vector<int>& x);
+    std::vector<int> getPosition();
     char getValue() const;
-    void setFractionalPosition(vector<int> fractionalPosition);
-    vector<int> getFractionalPosition() const;
+    void setFractionalPosition(std::vector<int>& fractionalPosition);
+    std::vector<int> getFractionalPosition();
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;

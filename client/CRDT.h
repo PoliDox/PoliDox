@@ -4,7 +4,7 @@
 #include "Char.h"
 #include <QObject>
 
-class CRDT : public QObject {
+class CRDT {
 
 protected:
     std::vector<std::vector<Char>> _symbols;
@@ -14,23 +14,19 @@ protected:
 
     void mergeRows(std::vector<Char>& current,std::vector<Char>& next);
     void splitRows(std::vector<Char>& current,const unsigned int& row,const unsigned int& index);
-    void insertSymbolAt(std::vector<Char>&row,Char& symbol,const unsigned int index);
+    void insertSymbolAt(std::vector<Char>& row,Char& symbol,const unsigned int index);
     void deleteSymbolAt(std::vector<Char>& row,unsigned int index);
     void deleteRowAt(unsigned int row);
     void inserRowAtEnd(std::vector<Char>& row);
-    void searchEqualSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
-    void searchGreaterSymbol(const Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
+    void searchEqualSymbol(Char& symbol,unsigned int& _row,unsigned int& _index,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
+    void searchGreaterSymbol(Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit);
 
 public:
     CRDT();    
-    // TODO: Perché virtual?? Non vengono reimplementate nelle sottoclassi!
-    virtual int remoteInsert(Char symbol);
-    virtual int remoteDelete(const Char& symbol);
+    int remoteInsert(Char& symbol);
+    int remoteDelete(Char& symbol);
     QJsonArray toJson() const;
-    void fromJson(const QJsonArray &crdtJsonFormatted);
-
-
-
+    void fromJson(const QJsonArray& crdtJsonFormatted);
 };
 
 
