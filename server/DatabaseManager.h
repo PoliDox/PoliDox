@@ -31,6 +31,7 @@ private:
 
     void incrementCounterOfCollection(QString nameCollection);
     double getCounterOfCollection(QString nameCollection);
+    void insertNewElemInCounterCollection(QString nameDocument, double initialValue);
 
 public:
     DatabaseManager();

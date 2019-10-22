@@ -26,6 +26,11 @@ Client::Client()
         m_socket.sendTextMessage(message);
     });
 
+    connect(&loginWindow, &Log_Dialog::newFileSelected, this, [&](const QString& p_filename) {
+        QByteArray message = ClientMessageFactory::createNewFileMessage(p_filename);
+        m_socket.sendTextMessage(message);
+    });
+
     loginWindow.setModal(true);
     loginWindow.exec();
 
@@ -74,7 +79,7 @@ void Client::onMessageReceived(const QString &p_msg)
         }
 
 
-    } else if (l_header == "openFileRepl") {
+    } else if (l_header == "openFileRepl" || l_header == "createFileRepl") {
         QString replCode = _JSONobj["response"].toString();
         if (replCode != "ok") {
             qDebug() << "Couldn't open file";

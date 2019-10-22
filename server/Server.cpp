@@ -24,26 +24,6 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
     } else {
         qDebug() << m_pWebSocketServer->errorString();
     }
-
-    // TEST: Initialize the open document list with an empty document
-    //ServerController *l_firstFile = new ServerController();
-    //file2serverController["firstFile"] = l_firstFile;
-
-    //TEST DB
-    //db.registerUser("provauser4","provapsw4","a");
-    //std::cout << db.checkPassword("provauser4", "provapsw4") << "\n";
-    //this->dbOperations->insertNewDocument("provadocument2");
-
-    //std::vector<int> v = {7, 5, 16, 8};
-    //std::vector<int> v2 = {7, 1};
-    //this->dbOperations->insertSymbol("provadocument", "a", v2);
-    //std::cout << db.deleteSymbol("provadocument", "a", v) << "\n";
-
-    //this->dbOperations->retrieveAllDocuments();
-    //for( auto elem : this->dbOperations->retrieveAllDocuments() ){
-    //    std::cout << elem.toUtf8().constData() << "\n";
-    //}
-
 }
 
 
@@ -164,8 +144,11 @@ void Server::handleLoggedRequests(const QString &genericRequestString){
         if( !(this->file2serverController.contains(nameDocument)) ){
             QList<QString> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
             fileServContr = this->initializeServerController(nameDocument, orderedInserts);
+
+            this->file2serverController[nameDocument] = fileServContr;
+        } else {
+            fileServContr = this->file2serverController[nameDocument];
         }
-        this->file2serverController[nameDocument] = fileServContr;
 
         //TODO: gestire la open file reply nel caso in cui la richiesta
         //      non vada a buon fine
