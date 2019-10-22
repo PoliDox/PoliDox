@@ -2,6 +2,7 @@
 #include "ui_log_dialog.h"
 #include <QMessageBox>
 #include <QDebug>
+#include <QListWidget>
 
 Log_Dialog::Log_Dialog(QWidget *parent) :
     QDialog(parent),
@@ -60,4 +61,11 @@ void Log_Dialog::on_pushButton_register_clicked()
     QString password = ui->lineEdit_password->text();
 
     emit signupDataSubmitted(username, password);
+
+    this->ui->widget_int->deleteLater();
+    QListWidget *listWidget = new QListWidget(this->ui->groupBox_ext);
+
+    listWidget->show();
+
+    ///this->ui->widget_int->
 }
