@@ -25,11 +25,7 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
     setWindowTitle("PoliDox");
 
     lf = new ListFiles();
-
-    /*AGGANCIARE L' EDITOR IN CASO DI NEW, VEDERE PERCHE' NON PARTE*/
-    /*connect(lf, &ListFiles::makeNewEditor_fromNew, this, [&](QString filename){
-        setEditor(new Editor());
-    });*/
+    nfd = new NewFileDialog();
 }
 
 Log_Dialog::~Log_Dialog()
@@ -93,11 +89,19 @@ void Log_Dialog::on_pushButton_register_clicked()
 
 void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
-    std::cout << "SELECTED FILE: "<< item->text().toUtf8().constData() << std::endl;
+    qDebug() << "SELECTED FILE: "<< item->text();
 
-    if(item->text()=="Creaete new file")
-        emit newFileSelected(item->text());
-    else
+
+    if(item->text().compare("Create new file") == 0){
+        nfd->show();
+        this->hide();
+        connect(nfd, &NewFileDialog::getFileName, this, [&](QString newfilename){
+            emit newFileSelected(newfilename);
+        });
+    }
+    else{
+        this->hide();
         emit fileSelected(item->text());
+    }
 
 }

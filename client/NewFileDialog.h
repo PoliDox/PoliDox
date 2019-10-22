@@ -25,6 +25,7 @@ private:
 
 signals:
     void startNewFileEditor(QString newfilename);
+    void getFileName(QString newfilename);
 };
 
 #endif // NEWFILEDIALOG_H
