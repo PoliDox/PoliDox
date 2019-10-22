@@ -31,7 +31,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     this->socketsOnDocument.push_back(socketToAdd);
 
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
-    //connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
+    connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
     //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
 
     this->notifyOtherClients(socketToAdd);
