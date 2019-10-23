@@ -115,7 +115,11 @@
    <addaction name="actionBold"/>
    <addaction name="actionItalic"/>
    <addaction name="actionUnderlined"/>
+   <addaction name="separator"/>
    <addaction name="actionLeftAllignmet"/>
+   <addaction name="actionAlignCenter"/>
+   <addaction name="actionAlignRight"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -229,12 +233,39 @@
    </property>
   </action>
   <action name="actionLeftAllignmet">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
      <normaloff>:/images/images/leftAll.png</normaloff>:/images/images/leftAll.png</iconset>
    </property>
    <property name="text">
     <string>LeftAllignmet</string>
+   </property>
+  </action>
+  <action name="actionAlignCenter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/align-center-2.png</normaloff>:/images/images/align-center-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignCenter</string>
+   </property>
+  </action>
+  <action name="actionAlignRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/align-right-1.png</normaloff>:/images/images/align-right-1.png</iconset>
+   </property>
+   <property name="text">
+    <string>AlignRight</string>
    </property>
   </action>
  </widget>

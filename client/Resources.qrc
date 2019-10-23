@@ -9,6 +9,7 @@
         <file>images/underlined.png</file>
         <file>images/justify.png</file>
         <file>images/leftAll.png</file>
-        <file>images/rightAll.png</file>
+        <file>images/align-center-2.png</file>
+        <file>images/align-right-1.png</file>
     </qresource>
 </RCC>
