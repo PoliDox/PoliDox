@@ -101,16 +101,30 @@ void Log_Dialog::on_pushButton_register_clicked()
     usr->setObjectName("user");
     pwd->setObjectName("pwd");
 
+    name->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
+    surname->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
+    usr->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
+    pwd->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
 
     QLineEdit* name_form=new QLineEdit(ui->groupBox);
     QLineEdit* surname_form=new QLineEdit(ui->groupBox);
     QLineEdit* usr_form=new QLineEdit(ui->groupBox);
     QLineEdit* pwd_form=new QLineEdit(ui->groupBox);
 
+    name_form->setStyleSheet("background-color:transparent;");
+    surname_form->setStyleSheet("background-color:transparent;");
+    usr_form->setStyleSheet("background-color:transparent;");
+    pwd_form->setStyleSheet("background-color:transparent;");
+
     name_form->setObjectName("name_line");
     surname_form->setObjectName("surname_line");
     usr_form->setObjectName("user_line");
     pwd_form->setObjectName("pwd_line");
+
+    name_form->setPlaceholderText("Insert your name");
+    surname_form->setPlaceholderText("Insert your surname");
+    usr_form->setPlaceholderText("Insert your username");
+    pwd_form->setPlaceholderText("Insert your password");
 
     QPushButton* submit=new QPushButton("Submit",ui->groupBox);
 
@@ -179,7 +193,7 @@ void Log_Dialog::manageRegistrationData(){
     ui->lineEdit_username->setText(username);
     ui->lineEdit_password->setText(password);
 
-
+    //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
 
     emit signupDataSubmitted(username, password);
 
