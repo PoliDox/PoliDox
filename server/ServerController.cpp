@@ -87,12 +87,13 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         return;
     }
     requestObjJSON = requestDocJSON.object();
-    // No switch case for strings in C++ :((
-    QString header = requestObjJSON["action"].toString();
+
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
+
+    QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, fractPos);
