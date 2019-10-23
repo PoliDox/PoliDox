@@ -79,7 +79,7 @@ QChar Editor::at(int pos)
     return m_textDoc->characterAt(pos);
 }
 
-void Editor::addClient(Account& user)
+void Editor::addClient(const Account& user)
 {
     m_users.append(user);
 

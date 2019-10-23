@@ -22,7 +22,7 @@ public:
     ~Editor();
 
     QChar at(int pos);
-    void addClient(Account& user);
+    void addClient(const Account& user);
     void remoteInsert(int siteId, int position, char ch);
     void remoteDelete(int siteId, int position);
 

@@ -85,8 +85,9 @@ void Client::onMessageReceived(const QString &p_msg)
             return;
         }
 
-        QJsonArray JSONcrdt = _JSONobj["document"].toArray();
-        CrdtClient *crdt = new CrdtClient(m_user.getSiteId());      //TODO: controllare se il siteId `e corretto
+        QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
+        qDebug() << "CRDT: " << JSONcrdt;
+        CrdtClient *crdt = new CrdtClient(m_user.getSiteId()); //TODO: controllare se il siteId `e corretto
         crdt->fromJson(JSONcrdt);
 
         QList<Account> accounts;
