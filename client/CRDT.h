@@ -26,8 +26,11 @@ public:
     int remoteInsert(Char& symbol);
     int remoteDelete(Char& symbol);
     QJsonArray toJson() const;
-    void fromJson(const QJsonArray& crdtJsonFormatted);
+    static std::vector<std::vector<Char>> fromJson(const QJsonArray& crdtJsonFormatted);
     void fromJson(const QList<Char>& crdtJsonFormatted);
+    void setSymbols(std::vector<std::vector<Char>> toSet);
+    std::vector<std::vector<Char>> getSymbols();
+
 };
 
 

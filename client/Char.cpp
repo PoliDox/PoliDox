@@ -64,6 +64,33 @@ Char Char::fromJson(const QJsonObject& _JSONobj){
 }
 
 
+Char Char::fromJson2(const QString& stringReturnedFromDb){
+    QJsonObject stringObjJSON;
+    QJsonDocument stringDocJSON;
+
+    stringDocJSON = QJsonDocument::fromJson(stringReturnedFromDb.toUtf8());
+    if (stringDocJSON.isNull()) {
+        // TODO: print some debug
+        return Char(-1,-1,'z');     //TODO: da sistemare, questa riga va cancellata, bisogna lanciare l'eccezione
+    }
+    stringObjJSON = stringDocJSON.object();
+
+    QString value = stringObjJSON["value"].toString();
+    int counter = stringObjJSON["counter"].toInt();
+    double siteId = stringObjJSON["siteId"].toDouble();
+    QJsonArray fractionalPositionObjJSON = stringObjJSON["position"].toArray();
+
+    std::vector<int> fractionalPosition;
+    for(auto elem : fractionalPositionObjJSON)
+        fractionalPosition.push_back(elem.toInt());
+
+    Char result(siteId, counter, value.at(0).toLatin1())    ;  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
+    result.setFractionalPosition(fractionalPosition);
+    return result;
+}
+
+
+
 // Used in DatabaseManager::getAllInserts where
 // we take the documents of the collection "insert",
 // that are strings formatted in Json inside

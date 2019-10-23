@@ -8,6 +8,17 @@ CRDT::CRDT(){
     this->_symbols=std::vector<std::vector<Char>>(1);
 }
 
+void CRDT::setSymbols(std::vector<std::vector<Char>> toSet){
+    this->_symbols = toSet;
+}
+
+
+std::vector<std::vector<Char>> CRDT::getSymbols(){
+    return this->_symbols;
+}
+
+
+
 void CRDT::mergeRows(std::vector<Char>& current,std::vector<Char>& next){
 
     current.erase(current.end()-1);
@@ -274,19 +285,30 @@ QJsonArray CRDT::toJson() const {
 }
 
 
-void CRDT::fromJson(const QJsonArray& crdtJsonFormatted){
+std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatted){
+    std::vector<std::vector<Char>> result;
+    result.clear();
+    result.push_back(std::vector<Char>());
+
     unsigned long rowIndex = 0;
     for(QJsonValue elem : crdtJsonFormatted){
-       QJsonObject charObjJson = elem.toObject();
-       Char charToAdd = Char::fromJson(charObjJson);
+       //QJsonObject charObjJson = elem.toObject();   //CHAROBJJSON E' VUOTO
+       //Char charToAdd = Char::fromJson(charObjJson);
+        Char charToAdd = Char::fromJson2(elem.toString());
 
-       this->_symbols[rowIndex].push_back(charToAdd);
+       result[rowIndex].push_back(charToAdd);
 
        if(charToAdd.getValue() == '\n'){
            rowIndex++;
-           this->_symbols.push_back(std::vector<Char>());
+           //inserts the next row in the matrix
+           result.push_back(std::vector<Char>());
        }
     }
+
+
+    int a=0;
+    int b = a+2;
+    return result;
 }
 
 
