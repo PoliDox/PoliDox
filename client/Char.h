@@ -36,6 +36,7 @@ public:
     QJsonObject toJson() const;
     static Char fromJson(const QJsonObject& _JSONobj);
     static Char fromJson(const QString& stringReturnedFromDb);
+    static Char fromJson2(const QString& stringReturnedFromDb);
 };
 
 

@@ -3,7 +3,7 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(QWebSocket *p_socket, int p_siteId) :
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
     m_socket(p_socket)
 {    
     m_crdt = new CrdtClient(p_siteId);
@@ -39,23 +39,21 @@ ClientController::~ClientController()
     delete m_crdt;
 }
 
-void ClientController::init(const QJsonArray &p_crdt, const QJsonArray &p_accounts)
-{
-    qDebug() << "CRDT: " << p_crdt;
-    m_crdt->fromJson(p_crdt);
 
-    // Initialize editor
+//TODO: da ottimizzare, evire le copie, soprattutto sui vettori
+void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accounts) {
+    std::vector<std::vector<Char>> symbolsOfOpenedDocument = CRDT::fromJson(p_crdt);
+    this->m_crdt->setSymbols(symbolsOfOpenedDocument);
+
     QString text;
-    for (const QJsonValue& ch : p_crdt) {
-        Char charToAdd = Char::fromJson(ch.toObject());
-        text += charToAdd.getValue();
-    }
-    qDebug() << "Plaintext: "  << text;
+    for(std::vector<Char> elem : this->m_crdt->getSymbols())
+        for(Char symbol : elem)
+            text += symbol.getValue();
     m_editor.init(text);
 
     // Initialize accounts
     for (const QJsonValue& ac : p_accounts) {
-        Account account = Account::fromJson(ac.toObject());
+        Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
         m_editor.addClient(account);
     }
 }
