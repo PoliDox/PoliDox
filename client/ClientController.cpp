@@ -41,6 +41,7 @@ ClientController::~ClientController()
 
 void ClientController::init(const QJsonArray &p_crdt, const QJsonArray &p_accounts)
 {
+    qDebug() << "CRDT: " << p_crdt;
     m_crdt->fromJson(p_crdt);
 
     // Initialize editor
