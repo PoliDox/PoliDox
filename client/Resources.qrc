@@ -7,9 +7,9 @@
         <file>images/bold.png</file>
         <file>images/italic.png</file>
         <file>images/underlined.png</file>
-        <file>images/justify.png</file>
         <file>images/leftAll.png</file>
         <file>images/align-center-2.png</file>
         <file>images/align-right-1.png</file>
+        <file>images/Editing-Align-Justify-icon.png</file>
     </qresource>
 </RCC>

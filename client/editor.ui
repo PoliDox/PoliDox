@@ -119,6 +119,7 @@
    <addaction name="actionLeftAllignmet"/>
    <addaction name="actionAlignCenter"/>
    <addaction name="actionAlignRight"/>
+   <addaction name="actionJustify"/>
    <addaction name="separator"/>
   </widget>
   <action name="actionNew">
@@ -266,6 +267,18 @@
    </property>
    <property name="text">
     <string>AlignRight</string>
+   </property>
+  </action>
+  <action name="actionJustify">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/Editing-Align-Justify-icon.png</normaloff>:/images/images/Editing-Align-Justify-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Justify</string>
    </property>
   </action>
  </widget>

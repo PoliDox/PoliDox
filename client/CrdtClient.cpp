@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QObject>
 #include <future>
+#include <QDate>
+#include <QDateTime>
 
 
 
@@ -41,6 +43,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
      unsigned int i=0,
                   j=0;
+
 
     unsigned long moreSmallVector, precedingSize=preceding.size(), followingSize=following.size();
     if(precedingSize < followingSize)
@@ -138,6 +141,9 @@ void CrdtClient::localInsert(unsigned int position, char value) {
 
     unsigned long rowSize=0;
 
+    QDateTime asd(QDateTime::currentDateTime());
+    uint unixTime = asd.toTime_t();
+
     this->_toMatrix(position,&row,&index);
 
     /* !!! SOLUTION TO 2ND BUG ON LOCAL INSERT !!! */
@@ -171,10 +177,12 @@ void CrdtClient::localInsert(unsigned int position, char value) {
             if(row!=0){
                 precedingFractionalNumber = this->_symbols[row - 1].at(this->_symbols[row - 1].size() - 1).getFractionalPosition();
                 std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber,fakeVector);
+                newFractionalPosition.push_back(unixTime);
                 symbolToInsert.setFractionalPosition(newFractionalPosition);
                 this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
 
             }else{
+                firstElem.push_back(unixTime);
                 symbolToInsert.setFractionalPosition(firstElem);
                 this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
             }
@@ -189,6 +197,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
 
             std::vector<int> followingFractionalNumber = this->_symbols[row].at(0).getFractionalPosition();
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
+            newFractionalPosition.push_back(unixTime);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
             this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
@@ -202,6 +211,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
             std::vector<int> fakeVector{MAXNUM};
 
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, fakeVector);
+            newFractionalPosition.push_back(unixTime);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
             this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
@@ -211,6 +221,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
             std::vector<int> followingFractionalNumber = this->_symbols[row].at(index).getFractionalPosition();
 
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
+            newFractionalPosition.push_back(unixTime);
             symbolToInsert.setFractionalPosition(newFractionalPosition);
             this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
@@ -224,6 +235,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
     }
 
     emit onLocalInsert(symbolToInsert);
+
 }
 
 

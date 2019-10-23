@@ -270,13 +270,12 @@ void Editor::fontFamilyChanged(const QFont& font){
 
 void Editor::on_actionLeftAllignmet_triggered()
 {
-    QAction* center=this->ui->textRichToolBar->actions().at(5);
-    QAction* right=this->ui->textRichToolBar->actions().at(6);
+    QAction* center=this->ui->textRichToolBar->actions().at(6);
+    QAction* right=this->ui->textRichToolBar->actions().at(7);
 
     if(center->isChecked())
         center->setChecked(false);
-
-    if(right->isChecked())
+    else if(right->isChecked())
         right->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignLeft);
@@ -284,13 +283,12 @@ void Editor::on_actionLeftAllignmet_triggered()
 
 void Editor::on_actionAlignCenter_triggered()
 {
-    QAction* left=this->ui->textRichToolBar->actions().at(4);
-    QAction* right=this->ui->textRichToolBar->actions().at(6);
+    QAction* left=this->ui->textRichToolBar->actions().at(5);
+    QAction* right=this->ui->textRichToolBar->actions().at(7);
 
     if(left->isChecked())
         left->setChecked(false);
-
-    if(right->isChecked())
+    else if(right->isChecked())
         right->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignCenter);
@@ -299,14 +297,30 @@ void Editor::on_actionAlignCenter_triggered()
 
 void Editor::on_actionAlignRight_triggered()
 {
-    QAction* left=this->ui->textRichToolBar->actions().at(4);
-    QAction* center=this->ui->textRichToolBar->actions().at(5);
+    QAction* left=this->ui->textRichToolBar->actions().at(5);
+    QAction* center=this->ui->textRichToolBar->actions().at(6);
 
     if(left->isChecked())
         left->setChecked(false);
-
-    if(center->isChecked())
+    else if(center->isChecked())
         center->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignRight);
+}
+
+void Editor::on_actionJustify_triggered()
+{
+    QAction* left=this->ui->textRichToolBar->actions().at(5);
+    QAction* center=this->ui->textRichToolBar->actions().at(6);
+    QAction* right=this->ui->textRichToolBar->actions().at(7);
+
+    if(left->isChecked())
+        left->setChecked(false);
+    else if(center->isChecked())
+        center->setChecked(false);
+    else if(right->isChecked())
+        right->setChecked(false);
+
+    m_textEdit->setAlignment(Qt::AlignJustify);
+
 }

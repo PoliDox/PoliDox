@@ -50,6 +50,7 @@ private slots:
     void on_actionLeftAllignmet_triggered();
     void on_actionAlignCenter_triggered();
     void on_actionAlignRight_triggered();
+    void on_actionJustify_triggered();
 
 private:
     void createActions();
