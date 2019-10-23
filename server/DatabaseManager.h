@@ -14,6 +14,8 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 
+#include "Char.h"
+
 //TODO: - gestire eccezioni e controllare tipi di ritorno
 //      - vedere mongodb autenticazione sicura  al db e chiavi primarie/autoincrement/foreign key/join
 //      - fare un unico metodo generateBuilder in cui gli si passa un array di campi e uno di valori
@@ -40,7 +42,7 @@ public:
     bool insertNewDocument(QString& documentName);
     bool insertSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition);
     bool deleteSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition);
-    QList<QString> getAllInserts(QString& nameDocument);
+    QList<Char> getAllInserts(QString& nameDocument);
     QList<QString> getAllDocuments();
     mongocxx::database getDb();
     ~DatabaseManager();

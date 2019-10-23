@@ -114,7 +114,7 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
 }
 
 
-ServerController* Server::initializeServerController(QString& nameDocument, QList<QString>& orderedInserts){
+ServerController* Server::initializeServerController(QString& nameDocument, QList<Char>& orderedInserts){
     ServerController *fileServContr = new ServerController(nameDocument, this);
     fileServContr->createCrdt(orderedInserts);
     return fileServContr;
@@ -142,7 +142,7 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     QString header = requestObjJSON["action"].toString();
     if (header == "openFileReq") {
         if( !(this->file2serverController.contains(nameDocument)) ){
-            QList<QString> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
+            QList<Char> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
             fileServContr = this->initializeServerController(nameDocument, orderedInserts);
 
             this->file2serverController[nameDocument] = fileServContr;
@@ -162,14 +162,12 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
         bool result = this->dbOperations->insertNewDocument(nameDocument);
 
         if(result){
-            QList<QString> emptyList;
+            QList<Char> emptyList;
             fileServContr = this->initializeServerController(nameDocument, emptyList);
             this->file2serverController[nameDocument] = fileServContr;
 
             fileServContr->addClient(signalSender);
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-
-
         } else {
             //TODO: gestire la reply in caso di fallimento
         }

@@ -282,12 +282,33 @@ void CRDT::fromJson(const QJsonArray& crdtJsonFormatted){
 
        this->_symbols[rowIndex].push_back(charToAdd);
 
-       if(charToAdd.getValue() == '\n')
+       if(charToAdd.getValue() == '\n'){
            rowIndex++;
+           this->_symbols.push_back(std::vector<Char>());
+       }
     }
 }
 
 
+// - For the list that comes from the db
+//   by means of the method DatabaseManager::getAllInserts
+//   called in Server::handleLoggedRequests.
+// - PAY ATTENTION that the list "crdtJsonFormatted" MUST
+//   arrived here ALREADY ORDERED by fractionalPosition(that is inside
+//   Char object) in ascending order.
+//   Furthermore, no one can access the array
+//   this->_symbols while this function is in execution.
+void CRDT::fromJson(const QList<Char>& crdtJsonFormatted){
+    unsigned long rowIndex = 0;
+    for(Char elem : crdtJsonFormatted){
+       this->_symbols[rowIndex].push_back(elem);
 
+       if(elem.getValue() == '\n'){
+           rowIndex++;
+           //add a new row to the matrix
+           this->_symbols.push_back(std::vector<Char>());
+       }
+    }
+}
 
 

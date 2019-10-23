@@ -24,7 +24,7 @@ public:
     ServerController(QString &nameDocumentAssociated, Server *server);
     void addClient(QWebSocket *socketToAdd);
     void notifyOtherClients(QWebSocket *newSocket);
-    void createCrdt(QList<QString>& orderedInserts);
+    void createCrdt(QList<Char>& orderedInserts);
     CRDT* getCrdt();
 
 public slots:

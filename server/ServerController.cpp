@@ -44,9 +44,8 @@ void ServerController::addClient(QWebSocket *socketToAdd){
         }
     }
 
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, crdt, accounts);
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accounts);
     socketToAdd->sendTextMessage(sendMsgToClient);
-
 }
 
 
@@ -65,14 +64,15 @@ void ServerController::notifyOtherClients(QWebSocket *newSocket){
 }
 
 
-void ServerController::createCrdt(QList<QString>& orderedInserts){
+void ServerController::createCrdt(QList<Char>& orderedInserts){
     this->crdt = new CRDT();
 
     if(orderedInserts.size() == 0)
         return;
 
-    QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
-    this->crdt->fromJson(arrayJson);
+    //QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
+    //this->crdt->fromJson(arrayJson);
+    this->crdt->fromJson(orderedInserts);
 }
 
 

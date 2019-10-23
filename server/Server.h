@@ -19,7 +19,7 @@ private:
     QMap<QString, ServerController*> file2serverController;
     DatabaseManager *dbOperations;
 
-    ServerController* initializeServerController(QString& nameDocument, QList<QString>& orderedInserts);
+    ServerController* initializeServerController(QString& nameDocument, QList<Char>& orderedInserts);
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
