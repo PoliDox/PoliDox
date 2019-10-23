@@ -89,7 +89,7 @@ void Client::onMessageReceived(const QString &p_msg)
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
 
         m_document = new ClientController(&m_socket, m_user.getSiteId());
-        m_document->init(JSONcrdt, JSONaccounts);
+        //m_document->init(JSONcrdt, JSONaccounts);
 
         loginWindow.hide();
         disconnect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);

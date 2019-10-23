@@ -62,7 +62,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     files->addItem(new_file);
     files->addItems(p_files);
 
-    auto grid_layout = new QGridLayout(this->ui->groupBox);
+    QGridLayout* grid_layout = new QGridLayout(this->ui->groupBox);
     grid_layout->addWidget(files);
     files->show();
 
@@ -83,7 +83,50 @@ void Log_Dialog::on_pushButton_register_clicked()
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_password->text();
 
+    QList<QWidget*> list=this->ui->groupBox->findChildren<QWidget*>();
+    this->ui->groupBox->setFixedSize(327,400);
+
+    for(auto it=list.begin();it!=list.end();it++)
+            (*it)->hide();
+
+    QLabel* name=new QLabel("Name",this->ui->groupBox);
+    QLabel* surname=new QLabel("Surname",this->ui->groupBox);
+    QLabel* usr=new QLabel("Username",this->ui->groupBox);
+    QLabel* pwd=new QLabel("Password",this->ui->groupBox);
+
+
+    QLineEdit* name_form=new QLineEdit(this->ui->groupBox);
+    QLineEdit* surname_form=new QLineEdit(this->ui->groupBox);
+    QLineEdit* usr_form=new QLineEdit(this->ui->groupBox);
+    QLineEdit* pwd_form=new QLineEdit(this->ui->groupBox);
+
+    QPushButton* submit=new QPushButton("Submit",this->ui->groupBox);
+
+    QGridLayout* grid_layout = static_cast<QGridLayout*>(this->ui->groupBox->layout());
+
+    name->setFixedSize(300,30);
+    surname->setFixedSize(300,30);
+    usr->setFixedSize(300,30);
+    pwd->setFixedSize(300,30);
+
+
+
+
+    grid_layout->addWidget(name,0,0,0);
+    grid_layout->addWidget(name_form,1,0,0);
+    grid_layout->addWidget(surname,2,0,0);
+    grid_layout->addWidget(surname_form,3,0,0);
+    grid_layout->addWidget(usr,4,0,0);
+    grid_layout->addWidget(usr_form,5,0,0);
+    grid_layout->addWidget(pwd,6,0,0);
+    grid_layout->addWidget(pwd_form,7,0,0);
+    grid_layout->addWidget(submit,9,0,0);
+
+    grid_layout->setVerticalSpacing(1);
+
+
     emit signupDataSubmitted(username, password);
+
 }
 
 void Log_Dialog::onClickedFile(QListWidgetItem* item){

@@ -51,7 +51,7 @@ void ClientController::init(const QJsonArray &p_crdt, const QJsonArray &p_accoun
         text += charToAdd.getValue();
     }
     qDebug() << "Plaintext: "  << text;
-    m_editor.init(text);
+    //m_editor.init(text);
 
     // Initialize accounts
     for (const QJsonValue& ac : p_accounts) {
