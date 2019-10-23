@@ -3,15 +3,10 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, const QList<Account>& accounts) :
-    m_crdt(p_crdt), m_socket(p_socket)
+ClientController::ClientController(QWebSocket *p_socket, int p_siteId) :
+    m_socket(p_socket)
 {    
-
-
-
-    for (Account ac : accounts) {
-        m_editor.addClient(ac);
-    }
+    m_crdt = new CrdtClient(p_siteId);
 
     connect(&m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
@@ -42,6 +37,26 @@ ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, con
 ClientController::~ClientController()
 {
     delete m_crdt;
+}
+
+void ClientController::init(const QJsonArray &p_crdt, const QJsonArray &p_accounts)
+{
+    m_crdt->fromJson(p_crdt);
+
+    // Initialize editor
+    QString text;
+    for (const QJsonValue& ch : p_crdt) {
+        Char charToAdd = Char::fromJson(ch.toObject());
+        text += charToAdd.getValue();
+    }
+    qDebug() << "Plaintext: "  << text;
+    m_editor.init(text);
+
+    // Initialize accounts
+    for (const QJsonValue& ac : p_accounts) {
+        Account account = Account::fromJson(ac.toObject());
+        m_editor.addClient(account);
+    }
 }
 
 

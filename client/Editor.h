@@ -21,6 +21,7 @@ public:
     explicit Editor(QWidget *parent = nullptr);
     ~Editor();
 
+    void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
     void remoteInsert(int siteId, int position, char ch);
