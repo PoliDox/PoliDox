@@ -3,63 +3,12 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, QList<Account> accounts) :
-    m_crdt(p_crdt), m_socket(p_socket)
+ClientController::ClientController(QWebSocket *p_socket, int p_siteId) :
+    m_socket(p_socket)
 {    
+    m_crdt = new CrdtClient(p_siteId);
 
-    /* ______________________________________________________________________________________
-       takes every character from input and call CRDTclient::localInsert or
-       CRDTclient::localDelete.
-       //TODO   implementare localDelete.
-       ______________________________________________________________________________________      */
-
-    connect(&m_editor, &Editor::textChanged, this, [&](int position, int charsRemoved, int charsAdded) {
-
-        // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
-        // Probably we should delete everything first and then insert..
-
-        qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
-
-        if (charsAdded > 1 && position == 0 &&
-                m_editor.at(0) != QChar::ParagraphSeparator) {
-            // When copying to the beginning everything is deleted and copied anew
-            charsAdded--;
-            if (!charsRemoved) {
-                //qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
-            }
-            charsRemoved--;
-        }
-
-        // It could happen that some chars were removed and some others were added at the same time
-        for (int i = 0; i < charsRemoved; i++) {
-            m_crdt->localDelete(position);
-        }
-
-        for (int i = 0; i < charsAdded; i++) {
-
-            QChar qchar = m_editor.at(position+i);
-            char _char;
-            if (qchar == QChar::ParagraphSeparator) {
-                qDebug() << "ParagraphSeparator";
-                _char = '\n';
-            } else {
-                _char =  qchar.toLatin1();
-            }
-            m_crdt->localInsert(position+i, _char);
-        }
-
-    });
-
-
-    for (Account ac : accounts) {
-        m_editor.addClient(ac);
-    }
-
-    /* ______________________________________________________________________________________
-       CRDTclient signal onLocalInsert connected to CLIENTcontroller lambda slot.
-       This lamba has to prepare the message that will be sent to the server:
-       //TODO    gestire eventuale fallimento serializzazione
-       ______________________________________________________________________________________      */
+    connect(&m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
@@ -88,6 +37,27 @@ ClientController::ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, QLi
 ClientController::~ClientController()
 {
     delete m_crdt;
+}
+
+void ClientController::init(const QJsonArray &p_crdt, const QJsonArray &p_accounts)
+{
+    qDebug() << "CRDT: " << p_crdt;
+    m_crdt->fromJson(p_crdt);
+
+    // Initialize editor
+    QString text;
+    for (const QJsonValue& ch : p_crdt) {
+        Char charToAdd = Char::fromJson(ch.toObject());
+        text += charToAdd.getValue();
+    }
+    qDebug() << "Plaintext: "  << text;
+    m_editor.init(text);
+
+    // Initialize accounts
+    for (const QJsonValue& ac : p_accounts) {
+        Account account = Account::fromJson(ac.toObject());
+        m_editor.addClient(account);
+    }
 }
 
 
@@ -147,5 +117,41 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     //} catch (std::string _excp) {
         //TODO manage exception
     //}
+
+}
+
+void ClientController::onTextChanged(int position, int charsRemoved, int charsAdded)
+{
+    // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
+    // Probably we should delete everything first and then insert..
+
+    qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
+
+    if (charsAdded > 1 && position == 0 &&
+            m_editor.at(0) != QChar::ParagraphSeparator) {
+        // When copying to the beginning everything is deleted and copied anew
+        charsAdded--;
+        if (!charsRemoved) {
+            //qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
+        }
+        charsRemoved--;
+    }
+
+    // It could happen that some chars were removed and some others were added at the same time
+    for (int i = 0; i < charsRemoved; i++) {
+        m_crdt->localDelete(position);
+    }
+
+    for (int i = 0; i < charsAdded; i++) {
+        QChar qchar = m_editor.at(position+i);
+        char _char;
+        if (qchar == QChar::ParagraphSeparator) {
+            qDebug() << "ParagraphSeparator";
+            _char = '\n';
+        } else {
+            _char =  qchar.toLatin1();
+        }
+        m_crdt->localInsert(position+i, _char);
+    }
 
 }

@@ -67,6 +67,7 @@ void ServerController::notifyOtherClients(QWebSocket *newSocket){
 
 void ServerController::createCrdt(QList<QString>& orderedInserts){
     this->crdt = new CRDT();
+
     if(orderedInserts.size() == 0)
         return;
 
