@@ -82,6 +82,11 @@
    <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave_as"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionCut"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
   </widget>
   <widget class="QToolBar" name="textRichToolBar">
    <property name="enabled">
@@ -125,7 +130,7 @@
   <action name="actionNew">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/images/images/new_file.png</normaloff>:/images/images/new_file.png</iconset>
+     <normaloff>:/images/images/filenew.png</normaloff>:/images/images/filenew.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
@@ -134,7 +139,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/images/images/open_file.png</normaloff>:/images/images/open_file.png</iconset>
+     <normaloff>:/images/images/fileopen.png</normaloff>:/images/images/fileopen.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -143,33 +148,53 @@
   <action name="actionSave_as">
    <property name="icon">
     <iconset resource="Resources.qrc">
-     <normaloff>:/images/images/save_file.png</normaloff>:/images/images/save_file.png</iconset>
+     <normaloff>:/images/images/filesave.png</normaloff>:/images/images/filesave.png</iconset>
    </property>
    <property name="text">
     <string>Save as</string>
    </property>
   </action>
   <action name="actionCopy">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/editcopy.png</normaloff>:/images/images/editcopy.png</iconset>
+   </property>
    <property name="text">
     <string>Copy</string>
    </property>
   </action>
   <action name="actionPaste">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/editpaste.png</normaloff>:/images/images/editpaste.png</iconset>
+   </property>
    <property name="text">
     <string>Paste</string>
    </property>
   </action>
   <action name="actionCut">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/editcut.png</normaloff>:/images/images/editcut.png</iconset>
+   </property>
    <property name="text">
     <string>Cut</string>
    </property>
   </action>
   <action name="actionUndo">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/editundo.png</normaloff>:/images/images/editundo.png</iconset>
+   </property>
    <property name="text">
     <string>Undo</string>
    </property>
   </action>
   <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/editredo.png</normaloff>:/images/images/editredo.png</iconset>
+   </property>
    <property name="text">
     <string>Redo</string>
    </property>
