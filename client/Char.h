@@ -14,6 +14,7 @@
 
 
 class Char {
+
 private:
     double siteId;
     int counter;
@@ -29,10 +30,12 @@ public:
     char getValue() const;
     void setFractionalPosition(std::vector<int>& fractionalPosition);
     std::vector<int> getFractionalPosition();
+    bool operator < (const Char& other) const;
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;
     static Char fromJson(const QJsonObject& _JSONobj);
+    static Char fromJson(const QString& stringReturnedFromDb);
 };
 
 

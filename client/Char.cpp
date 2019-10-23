@@ -11,6 +11,7 @@ Char::~Char(){
     //TODO
 }
 
+
 double Char::getSiteId() const {
     return siteId;
 }
@@ -38,8 +39,9 @@ QJsonObject Char::toJson() const {
     return _JSONobj;
 }
 
-Char Char::fromJson(const QJsonObject& _JSONobj){
 
+//TODO: dove viene usata questa funzione?
+Char Char::fromJson(const QJsonObject& _JSONobj){
     // TODO: What if some value is missing? E.g. There is no "value"
     QString value=_JSONobj["value"].toString();
     int counter=_JSONobj["counter"].toInt();
@@ -61,18 +63,54 @@ Char Char::fromJson(const QJsonObject& _JSONobj){
     return symbol;
 }
 
+
+// Used in DatabaseManager::getAllInserts where
+// we take the documents of the collection "insert",
+// that are strings formatted in Json inside
+Char Char::fromJson(const QString& stringReturnedFromDb){
+    QJsonObject stringObjJSON;
+    QJsonDocument stringDocJSON;
+
+    stringDocJSON = QJsonDocument::fromJson(stringReturnedFromDb.toUtf8());
+    if (stringDocJSON.isNull()) {
+        // TODO: print some debug
+        return Char(-1,-1,'z');     //TODO: da sistemare, questa riga va cancellata, bisogna lanciare l'eccezione
+    }
+    stringObjJSON = stringDocJSON.object();
+
+    QString symbol = stringObjJSON["symbol"].toString();
+    QJsonArray fractionalPositionObjJSON = stringObjJSON["fractionalPosition"].toArray();
+
+    std::vector<int> fractionalPosition;
+    for(auto elem : fractionalPositionObjJSON)
+        fractionalPosition.push_back(elem.toInt());
+
+    Char result(-1, -1, symbol.at(0).toLatin1());  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
+    result.setFractionalPosition(fractionalPosition);
+    return result;
+}
+
+
 std::vector<int> Char::getPosition() {
     return this->position;
 }
+
 
 char Char::getValue() const {
     return this->value;
 }
 
+
 void Char::setFractionalPosition(std::vector<int>& fractionalPosition) {
         this->position = fractionalPosition;
 }
 
+
 std::vector<int> Char::getFractionalPosition() {
     return position;
+}
+
+
+bool Char::operator < (const Char& other) const {
+    return this->position < other.position;
 }

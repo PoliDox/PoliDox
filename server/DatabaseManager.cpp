@@ -227,11 +227,8 @@ bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::
 }
 
 
-//TODO: - anziché il for da stampare in output, capire
-//        bene cosa restituire. Un vector<Char> su cui
-//        poi verranno chiamate le remoteInsert??
-QList<QString> DatabaseManager::getAllInserts(QString& nameDocument){
-    QList<QString> resultInserts;
+QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
+    QList<Char> orderedChars;
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
@@ -240,20 +237,21 @@ QList<QString> DatabaseManager::getAllInserts(QString& nameDocument){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view insertsToRetrieveView = insertsToRetrieve.view();
 
-    //settings needed to order the result by fractionalPosition
-    auto order = bsoncxx::builder::stream::document{} << "fractionalPosition" << 1 << bsoncxx::builder::stream::finalize;
-    auto opts = mongocxx::options::find{};
-    opts.sort(order.view());
+    mongocxx::cursor resultIterator = insertCollection.find(insertsToRetrieveView);
 
-    mongocxx::cursor resultIterator = insertCollection.find(insertsToRetrieveView, opts);
-
-    //DA QUI IN POI E' ANCORA DA IMPLEMENTARE
-    //TOGLIERE IL FOR QUI SOTTO
+    //(.1)Save them in local before ordering
     for (auto elem : resultIterator) {
         QString insert = QString::fromStdString(bsoncxx::to_json(elem));
-        resultInserts.push_back(insert);
+        Char charToInsert = Char::fromJson(insert);
+
+        orderedChars.push_back(charToInsert);
     }
-    return resultInserts;
+
+    //(.2)Now ordering.
+    //It orders according to the order established in Char object,
+    //so will be returned a vector in fractionalPosition ascending order
+    std::sort(orderedChars.begin(), orderedChars.end());
+    return orderedChars;
 }
 
 

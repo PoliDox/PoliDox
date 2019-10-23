@@ -1,4 +1,5 @@
 #include "ServerMessageFactory.h"
+#include <QDebug>
 
 
 //QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);

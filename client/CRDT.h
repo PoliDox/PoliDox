@@ -27,6 +27,7 @@ public:
     int remoteDelete(Char& symbol);
     QJsonArray toJson() const;
     void fromJson(const QJsonArray& crdtJsonFormatted);
+    void fromJson(const QList<Char>& crdtJsonFormatted);
 };
 
 

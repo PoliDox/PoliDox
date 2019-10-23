@@ -44,9 +44,8 @@ void ServerController::addClient(QWebSocket *socketToAdd){
         }
     }
 
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, crdt, accounts);
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accounts);
     socketToAdd->sendTextMessage(sendMsgToClient);
-
 }
 
 
@@ -65,14 +64,15 @@ void ServerController::notifyOtherClients(QWebSocket *newSocket){
 }
 
 
-void ServerController::createCrdt(QList<QString>& orderedInserts){
+void ServerController::createCrdt(QList<Char>& orderedInserts){
     this->crdt = new CRDT();
 
     if(orderedInserts.size() == 0)
         return;
 
-    QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
-    this->crdt->fromJson(arrayJson);
+    //QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
+    //this->crdt->fromJson(arrayJson);
+    this->crdt->fromJson(orderedInserts);
 }
 
 
@@ -88,12 +88,13 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         return;
     }
     requestObjJSON = requestDocJSON.object();
-    // No switch case for strings in C++ :((
-    QString header = requestObjJSON["action"].toString();
+
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
+
+    QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, fractPos);
