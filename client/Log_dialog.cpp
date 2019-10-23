@@ -81,6 +81,10 @@ void Log_Dialog::on_pushButton_login_clicked()
 void Log_Dialog::on_pushButton_register_clicked()
 {
 
+    /*QSizePolicy sp_retain = ui->groupBox->sizePolicy();
+    sp_retain.setRetainSizeWhenHidden(true);
+    ui->groupBox->setSizePolicy(sp_retain);*/
+
     QList<QWidget*> list=ui->groupBox->findChildren<QWidget*>();
     ui->groupBox->setFixedSize(330,400);
 
@@ -166,11 +170,15 @@ void Log_Dialog::manageRegistrationData(){
 
     delete submit;
 
-    ui->groupBox->setFixedSize(330,265);
+    ui->groupBox->setFixedSize(335,265);
 
     QList<QWidget*> list=this->ui->groupBox->findChildren<QWidget*>();
     for(auto it=list.begin();it!=list.end();it++)
             (*it)->show();
+
+    ui->lineEdit_username->setText(username);
+    ui->lineEdit_password->setText(password);
+
 
 
     emit signupDataSubmitted(username, password);
