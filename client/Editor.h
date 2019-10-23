@@ -21,8 +21,9 @@ public:
     explicit Editor(QWidget *parent = nullptr);
     ~Editor();
 
+    void init(const QString &p_text);
     QChar at(int pos);
-    void addClient(Account& user);
+    void addClient(const Account& user);
     void remoteInsert(int siteId, int position, char ch);
     void remoteDelete(int siteId, int position);
 
@@ -44,9 +45,18 @@ private slots:
     void on_actionItalic_triggered();
     void on_actionUnderlined_triggered();
 
+    void fontSizeChanged(int i);
+    void fontFamilyChanged(const QFont& font);
+
+    void on_actionLeftAllignmet_triggered();
+    void on_actionAlignCenter_triggered();
+    void on_actionAlignRight_triggered();
+
 private:
     void createActions();
     void createStatusBar();
+
+    void setRichTextToolBar();
 
     bool handlingRemoteOp;
     QTextEdit *m_textEdit;

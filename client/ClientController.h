@@ -11,8 +11,10 @@ class ClientController : public QObject {
     Q_OBJECT
 
 public:
-    ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, QList<Account> accounts);
+    ClientController(QWebSocket *p_socket, int p_siteId);
     ~ClientController();
+
+    void init(const QJsonArray& p_crdt, const QJsonArray& p_accounts);
 
 private:
     Editor m_editor;
@@ -21,6 +23,7 @@ private:
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);
+    void onTextChanged(int position, int charsRemoved, int charsAdded);
 
 };
 

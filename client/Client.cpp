@@ -85,17 +85,12 @@ void Client::onMessageReceived(const QString &p_msg)
             return;
         }
 
-        QJsonArray JSONcrdt = _JSONobj["document"].toArray();
-        CrdtClient *crdt = new CrdtClient(m_user.getSiteId());      //TODO: controllare se il siteId `e corretto
-        crdt->fromJson(JSONcrdt);
-
-        QList<Account> accounts;
+        QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
-        for (QJsonValue ac : JSONaccounts) {
-            accounts.append(Account::fromJson(ac.toObject()));
-        }
 
-        m_document = new ClientController(crdt, &m_socket, accounts);
+        m_document = new ClientController(&m_socket, m_user.getSiteId());
+        m_document->init(JSONcrdt, JSONaccounts);
+
         loginWindow.hide();
         disconnect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 

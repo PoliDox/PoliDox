@@ -14,6 +14,8 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QSpinBox>
+#include <QFontComboBox>
 #include <iostream>
 
 Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
@@ -39,22 +41,59 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
         }
     });
 
+
+    setRichTextToolBar();
+
+
     int TLines = ui->textEdit->document()->blockCount();
-    ui->statusbar->showMessage(QString("Col:1 Line:1 TotLines:%3").arg(TLines));
+    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
 
     connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
         int line = ui->textEdit->textCursor().blockNumber()+1;
         int pos = ui->textEdit->textCursor().columnNumber()+1;
         int TLines = ui->textEdit->document()->blockCount();
 
-        ui->statusbar->showMessage(QString("Col:%1 Line:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
+        ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
     });
 
+
 }
+
+void Editor::setRichTextToolBar(){
+
+
+    QFontComboBox* font=new QFontComboBox(this->ui->textRichToolBar);
+    QSpinBox* spinBox=new QSpinBox(this->ui->textRichToolBar);
+
+    m_textEdit->setFont(font->currentFont());
+    m_textEdit->setFontPointSize(15);
+    spinBox->setValue(m_textEdit->fontPointSize());
+
+    this->ui->textRichToolBar->addWidget(font);
+    this->ui->textRichToolBar->addWidget(spinBox);
+
+    connect(font,&QFontComboBox::currentFontChanged,this,&Editor::fontFamilyChanged);
+    connect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),this,&Editor::fontSizeChanged);
+
+    QAction* separator1=this->ui->toolBar_2->actions().at(0);
+    QAction* separator2=this->ui->textRichToolBar->actions().at(0);
+    delete separator1;
+    delete separator2;
+
+}
+
 
 Editor::~Editor()
 {
     delete ui;
+}
+
+void Editor::init(const QString &p_text)
+{
+    handlingRemoteOp = true;
+    m_textEdit->setPlainText(p_text);
+    m_textEdit->show();
+    handlingRemoteOp = false;
 }
 
 
@@ -63,7 +102,7 @@ QChar Editor::at(int pos)
     return m_textDoc->characterAt(pos);
 }
 
-void Editor::addClient(Account& user)
+void Editor::addClient(const Account& user)
 {
     m_users.append(user);
 
@@ -191,6 +230,7 @@ void Editor::on_actionBold_triggered()
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
+
 }
 
 void Editor::on_actionItalic_triggered()
@@ -217,4 +257,64 @@ void Editor::on_actionUnderlined_triggered()
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
+}
+
+void Editor::fontSizeChanged(int i){
+
+    m_textEdit->setFontPointSize(i);
+
+}
+
+void Editor::fontFamilyChanged(const QFont& font){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFont(font);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+void Editor::on_actionLeftAllignmet_triggered()
+{
+    QAction* center=this->ui->textRichToolBar->actions().at(5);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);
+
+    if(center->isChecked())
+        center->setChecked(false);
+
+    if(right->isChecked())
+        right->setChecked(false);
+
+    m_textEdit->setAlignment(Qt::AlignLeft);
+}
+
+void Editor::on_actionAlignCenter_triggered()
+{
+    QAction* left=this->ui->textRichToolBar->actions().at(4);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);
+
+    if(left->isChecked())
+        left->setChecked(false);
+
+    if(right->isChecked())
+        right->setChecked(false);
+
+    m_textEdit->setAlignment(Qt::AlignCenter);
+}
+
+
+void Editor::on_actionAlignRight_triggered()
+{
+    QAction* left=this->ui->textRichToolBar->actions().at(4);
+    QAction* center=this->ui->textRichToolBar->actions().at(5);
+
+    if(left->isChecked())
+        left->setChecked(false);
+
+    if(center->isChecked())
+        center->setChecked(false);
+
+    m_textEdit->setAlignment(Qt::AlignRight);
 }
