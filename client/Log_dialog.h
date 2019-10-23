@@ -34,6 +34,7 @@ private slots:
     void on_pushButton_login_clicked();
     void on_pushButton_register_clicked();
     void onClickedFile(QListWidgetItem *item);
+    void manageRegistrationData();
 
 private:
     Ui::Log_Dialog *ui;
