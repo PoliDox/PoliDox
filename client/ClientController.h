@@ -11,8 +11,10 @@ class ClientController : public QObject {
     Q_OBJECT
 
 public:
-    ClientController(CrdtClient *p_crdt, QWebSocket *p_socket, const QList<Account>& accounts);
+    ClientController(QWebSocket *p_socket, int p_siteId);
     ~ClientController();
+
+    void init(const QJsonArray& p_crdt, const QJsonArray& p_accounts);
 
 private:
     Editor m_editor;

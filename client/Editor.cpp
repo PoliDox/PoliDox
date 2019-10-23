@@ -88,6 +88,14 @@ Editor::~Editor()
     delete ui;
 }
 
+void Editor::init(const QString &p_text)
+{
+    handlingRemoteOp = true;
+    m_textEdit->setPlainText(p_text);
+    m_textEdit->show();
+    handlingRemoteOp = false;
+}
+
 
 QChar Editor::at(int pos)
 {
