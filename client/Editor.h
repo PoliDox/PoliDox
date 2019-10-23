@@ -47,9 +47,15 @@ private slots:
     void fontSizeChanged(int i);
     void fontFamilyChanged(const QFont& font);
 
+    void on_actionLeftAllignmet_triggered();
+    void on_actionAlignCenter_triggered();
+    void on_actionAlignRight_triggered();
+
 private:
     void createActions();
     void createStatusBar();
+
+    void setRichTextToolBar();
 
     bool handlingRemoteOp;
     QTextEdit *m_textEdit;

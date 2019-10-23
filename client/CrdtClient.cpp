@@ -8,7 +8,7 @@
 
 
 #define MAXNUM 100
-//#define DEBUG_OUTPUT
+#define DEBUG_OUTPUT
 
 
 double CrdtClient::getSiteId() const {
@@ -236,6 +236,9 @@ void CrdtClient::localDelete(unsigned int position){
 
     this->_toMatrix(position,&row,&index);
 
+    if(row>_NROWS-1)    //paragraph alignment
+        return;
+
     Char _Dsymbol=this->_symbols[row][index];
     char _CHAR=_Dsymbol.getValue();
 
@@ -252,7 +255,10 @@ void CrdtClient::localDelete(unsigned int position){
     emit onLocalDelete(_Dsymbol);
 
 #ifdef DEBUG_OUTPUT
-    std::cout << "[LOCAL DELETE]@ [" << row << "] [" << index <<"]\t" << _Dsymbol.getValue() << std::endl;
+     if(_CHAR=='\n')
+         std::cout << "[LOCAL DELETE]@ [" << row << "] [" << index <<"]\t\\n"<< std::endl;
+     else
+         std::cout << "[LOCAL DELETE]@ [" << row << "] [" << index <<"]\t" << _Dsymbol.getValue() << std::endl;
 #endif
 
 
