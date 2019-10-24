@@ -45,6 +45,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
 
     QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accounts);
+    qDebug() << "sendMsgToClient:  " << sendMsgToClient << "\n\n";
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
@@ -72,7 +73,7 @@ void ServerController::createCrdt(QList<Char>& orderedInserts){
 
     //QJsonArray arrayJson = QJsonArray::fromStringList(orderedInserts);
     //this->crdt->fromJson(arrayJson);
-    this->crdt->fromJson(orderedInserts);
+    this->crdt->fromDatabase(orderedInserts);
 }
 
 
