@@ -14,7 +14,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
 
         QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
 
-        //std::cout << jsonString.toUtf8().constData() <<std::endl;
+        qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
 
         m_socket->sendTextMessage(jsonString);
     });
