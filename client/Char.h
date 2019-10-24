@@ -11,26 +11,24 @@
 #include <QJsonDocument>
 #include <iostream>
 
-
+//TODO: ATTENZIONE, DEFINIRE COSTRUTTORE DI COPIA E OPERATORE DI ASSEGNAZIONE!!!
 
 class Char {
 
 private:
-    double siteId;
-    int counter;
     char value;
-    std::vector<int> position;
+    std::vector<int> fractionalPosition;
 
 public:
-    Char(double siteId, int counter, char value);
-    ~Char();
-    double getSiteId() const;
-    void setPosition(std::vector<int>& x);
-    std::vector<int> getPosition();
-    char getValue() const;
-    void setFractionalPosition(std::vector<int>& fractionalPosition);
+    Char(char value, std::vector<int>& fractionalPosition);
+    Char(char value);
     std::vector<int> getFractionalPosition();
+    void setFractionalPosition(std::vector<int>& fractionalPosition);
+    char getValue() const;
     bool operator < (const Char& other) const;
+    ~Char();
+
+    int getSiteId(){return 0;}      //ATTENZIONE, METODO DA CANCELLARE!!!
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;
