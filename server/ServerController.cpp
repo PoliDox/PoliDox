@@ -45,7 +45,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
 
     QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accounts);
-    qDebug() << "sendMsgToClient:  " << sendMsgToClient << "\n\n";
+    //qDebug() << "sendMsgToClient:  " << QString(sendMsgToClient).toUtf8().constData();
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
@@ -83,6 +83,8 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
+    qDebug() << "Handling remote operation: " << messageReceivedByClient.toUtf8().constData();
+
     requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
     if (requestDocJSON.isNull()) {
         // TODO: print some debug
@@ -92,6 +94,8 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
+    qDebug() << "value: " << charObj.getValue();
+    qDebug() << "position: " << charObj.getFractionalPosition();
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
 

@@ -9,7 +9,8 @@ QByteArray ClientMessageFactory::createInsertMessage(const Char& p_char)
     QJsonValue jsonChar(p_char.toJson());
     l_obj.insert("char", jsonChar);
 
-    QJsonDocument l_doc(l_obj);
+    QJsonDocument l_doc(l_obj);        
+
     return l_doc.toJson(QJsonDocument::Indented);
 }
 

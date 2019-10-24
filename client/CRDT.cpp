@@ -79,14 +79,18 @@ void CRDT::searchEqualSymbol(Char& symbol,unsigned int& _row,unsigned int& _inde
 
 void CRDT::searchGreaterSymbol(Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
 
+    //qDebug() << "Before getValue";
+    //qDebug() << "value: " << symbol.getValue();
+
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
             _index=0; //newline
             _row++;
 
-            _INDEXhit = find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
+            _INDEXhit = std::find_if(row.begin(), row.end(), [&](Char m_symbol) ->bool {
                 _index++;
-                if(_INDEXhit->getValue()=='\n')
+                if(m_symbol.getValue()=='\n')
                     _LINECOUNTER++;
+
                 if(symbol.getFractionalPosition() < m_symbol.getFractionalPosition())
                     return true;
                 else
