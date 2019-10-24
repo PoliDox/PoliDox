@@ -2,8 +2,14 @@
 
 
 
-Char::Char(double siteId, int counter, char value) : siteId(siteId), counter(counter), value(value){
-    //nothing else to do??
+Char::Char(char value, std::vector<int>& fractionalPosition){
+    this->value = value;
+    this->fractionalPosition = fractionalPosition;
+}
+
+
+Char::Char(char value){
+    this->value = value;
 }
 
 
@@ -12,36 +18,114 @@ Char::~Char(){
 }
 
 
-double Char::getSiteId() const {
-    return siteId;
+void Char::setFractionalPosition(std::vector<int>& newFractPos) {
+    this->fractionalPosition = newFractPos;
 }
 
-void Char::setPosition(std::vector<int>& x)
-{
-    this->position = x;
+
+std::vector<int> Char::getFractionalPosition() {
+    return this->fractionalPosition;
 }
+
+
+char Char::getValue() const {
+    return this->value;
+}
+
+
+bool Char::operator < (const Char& other) const {
+    return this->fractionalPosition < other.fractionalPosition;
+}
+
 
 QJsonObject Char::toJson() const {
+    QJsonObject charJSON;
+    QJsonArray fractPosJSON;
 
-    QJsonObject _JSONobj;
-    QJsonArray _JSONpos;
+    charJSON.insert("value", QString(this->value));
+    for(int elem : this->fractionalPosition)
+        fractPosJSON.push_back(elem);
+    charJSON.insert("position",fractPosJSON);       //TODO: cambiare in fractionalPosition
 
-    _JSONobj.insert("value",QString(this->value));
-    _JSONobj.insert("siteId",this->siteId);
-    _JSONobj.insert("counter",this->counter);
+    return charJSON;
+}
 
-    for(auto it=this->position.begin();it!=this->position.end();it++){
-        _JSONpos.push_back(*it);
+
+Char Char::fromJson2(const QString& stringReturnedFromDb){
+    QJsonObject stringObjJSON;
+    QJsonDocument stringDocJSON;
+
+    stringDocJSON = QJsonDocument::fromJson(stringReturnedFromDb.toUtf8());
+    if (stringDocJSON.isNull()) {
+        // TODO: print some debug
+        throw "Char::fromJson2 error: malformatted Json string";     //TODO: da sistemare, questa riga va cancellata, bisogna lanciare l'eccezione
+    }
+    stringObjJSON = stringDocJSON.object();
+
+    //int counter = stringObjJSON["counter"].toInt();
+    //double siteId = stringObjJSON["siteId"].toDouble();
+    QString value = stringObjJSON["value"].toString();              //TODO: mettersi d'accordo sul campo, o symbol o value
+    QJsonArray fractionalPositionObjJSON = stringObjJSON["position"].toArray(); //TODO: mettersi d'accordo sul campo, position o fractionalPosition
+
+    std::vector<int> fractionalPosition;
+    for(auto elem : fractionalPositionObjJSON)
+        fractionalPosition.push_back(elem.toInt());
+
+    char valueOfChar = value.at(0).toLatin1();
+    Char result(valueOfChar, fractionalPosition)    ;  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
+    return result;
+}
+
+
+// Used in DatabaseManager::getAllInserts where
+// we take the documents of the collection "insert",
+// that are strings formatted in Json inside
+//TODO: QUESTO METODO PUO' RICHIAMARE QUELLO AVENTE COME PARAMETRO IL QJsonObject
+//      MA PRIMA METTERDI D'ACCORDO SUI CAMPI FRA symbol E position
+Char Char::fromJson(const QString& stringReturnedFromDb){
+    QJsonObject stringObjJSON;
+    QJsonDocument stringDocJSON;
+
+    stringDocJSON = QJsonDocument::fromJson(stringReturnedFromDb.toUtf8());
+    if (stringDocJSON.isNull()) {
+        // TODO: print some debug
+        throw "Char::fromJson error: malformatted Json string";     //TODO: da sistemare, questa riga va cancellata, bisogna lanciare l'eccezione
+    }
+    stringObjJSON = stringDocJSON.object();
+
+    QString symbol = stringObjJSON["symbol"].toString();            //TODO: metterdi d'accordo sul campo, o symbol o value
+    QJsonArray fractionalPositionObjJSON = stringObjJSON["fractionalPosition"].toArray(); //TODO: mettersi d'accordo sul campo, position o fractionalPosition
+
+    std::vector<int> fractionalPosition;
+    for(auto elem : fractionalPositionObjJSON)
+        fractionalPosition.push_back(elem.toInt());
+
+    char valueOfChar = symbol.at(0).toLatin1();
+    Char result(valueOfChar, fractionalPosition)    ;  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
+    return result;
+}
+
+
+Char Char::fromJson(const QJsonObject& charJSON){
+    // TODO: What if some value is missing? E.g. There is no "value"
+    QString value = charJSON["value"].toString();
+    //int counter=charJSON["counter"].toInt();
+    //int siteId=charJSON["siteId"].toInt();
+    QJsonArray fractionalPositionObjJSON = charJSON["position"].toArray();  //TODO: mettersi d'accordo sul campo, position o fractionalPosition
+
+    std::vector<int> fractionalPosition;
+    for(auto elem : fractionalPositionObjJSON){
+        fractionalPosition.push_back(elem.toInt());
     }
 
-    _JSONobj.insert("position",_JSONpos);
-
-    return _JSONobj;
+    char valueOfChar = value.at(0).toLatin1();
+    Char result(valueOfChar, fractionalPosition)    ;  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
+    return result;
 }
 
 
 //TODO: dove viene usata questa funzione?
-Char Char::fromJson(const QJsonObject& _JSONobj){
+/*Char Char::fromJson(const QJsonObject& _JSONobj){
     // TODO: What if some value is missing? E.g. There is no "value"
     QString value=_JSONobj["value"].toString();
     int counter=_JSONobj["counter"].toInt();
@@ -57,87 +141,16 @@ Char Char::fromJson(const QJsonObject& _JSONobj){
     }
 
     //std::cout << "]" << std::endl;
-    Char symbol(siteId,counter,value[0].toLatin1());
+    //Char symbol(siteId,counter,value[0].toLatin1());
     symbol.setFractionalPosition(position);
 
     return symbol;
-}
-
-
-Char Char::fromJson2(const QString& stringReturnedFromDb){
-    QJsonObject stringObjJSON;
-    QJsonDocument stringDocJSON;
-
-    stringDocJSON = QJsonDocument::fromJson(stringReturnedFromDb.toUtf8());
-    if (stringDocJSON.isNull()) {
-        // TODO: print some debug
-        return Char(-1,-1,'z');     //TODO: da sistemare, questa riga va cancellata, bisogna lanciare l'eccezione
-    }
-    stringObjJSON = stringDocJSON.object();
-
-    QString value = stringObjJSON["value"].toString();
-    int counter = stringObjJSON["counter"].toInt();
-    double siteId = stringObjJSON["siteId"].toDouble();
-    QJsonArray fractionalPositionObjJSON = stringObjJSON["position"].toArray();
-
-    std::vector<int> fractionalPosition;
-    for(auto elem : fractionalPositionObjJSON)
-        fractionalPosition.push_back(elem.toInt());
-
-    Char result(siteId, counter, value.at(0).toLatin1())    ;  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
-    result.setFractionalPosition(fractionalPosition);
-    return result;
-}
+}*/
 
 
 
-// Used in DatabaseManager::getAllInserts where
-// we take the documents of the collection "insert",
-// that are strings formatted in Json inside
-Char Char::fromJson(const QString& stringReturnedFromDb){
-    QJsonObject stringObjJSON;
-    QJsonDocument stringDocJSON;
-
-    stringDocJSON = QJsonDocument::fromJson(stringReturnedFromDb.toUtf8());
-    if (stringDocJSON.isNull()) {
-        // TODO: print some debug
-        return Char(-1,-1,'z');     //TODO: da sistemare, questa riga va cancellata, bisogna lanciare l'eccezione
-    }
-    stringObjJSON = stringDocJSON.object();
-
-    QString symbol = stringObjJSON["symbol"].toString();
-    QJsonArray fractionalPositionObjJSON = stringObjJSON["fractionalPosition"].toArray();
-
-    std::vector<int> fractionalPosition;
-    for(auto elem : fractionalPositionObjJSON)
-        fractionalPosition.push_back(elem.toInt());
-
-    Char result(-1, -1, symbol.at(0).toLatin1());  //TODO: sistemare siteid e counter? perche sono in char? non dovrebbero esserci
-    result.setFractionalPosition(fractionalPosition);
-    return result;
-}
 
 
-std::vector<int> Char::getPosition() {
-    return this->position;
-}
 
 
-char Char::getValue() const {
-    return this->value;
-}
 
-
-void Char::setFractionalPosition(std::vector<int>& fractionalPosition) {
-        this->position = fractionalPosition;
-}
-
-
-std::vector<int> Char::getFractionalPosition() {
-    return position;
-}
-
-
-bool Char::operator < (const Char& other) const {
-    return this->position < other.position;
-}
