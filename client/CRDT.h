@@ -27,8 +27,8 @@ public:
     int remoteDelete(Char& symbol);
     QJsonArray toJson() const;
     static std::vector<std::vector<Char>> fromJson(const QJsonArray& crdtJsonFormatted);
-    void fromJson(const QList<Char>& crdtJsonFormatted);
-    void setSymbols(std::vector<std::vector<Char>> toSet);
+    void fromDatabase(const QList<Char>& crdtJsonFormatted);
+    void setSymbols(std::vector<std::vector<Char>>& toSet);
     std::vector<std::vector<Char>> getSymbols();
 
 };

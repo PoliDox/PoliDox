@@ -8,7 +8,7 @@ CRDT::CRDT(){
     this->_symbols=std::vector<std::vector<Char>>(1);
 }
 
-void CRDT::setSymbols(std::vector<std::vector<Char>> toSet){
+void CRDT::setSymbols(std::vector<std::vector<Char>>& toSet){
     this->_symbols = toSet;
 }
 
@@ -274,10 +274,11 @@ QJsonArray CRDT::toJson() const {
         for (Char columnOfRowElem : rowElem) {
             //da ricontrollare, vederne l'output
             QJsonObject charFormattedJson = columnOfRowElem.toJson();
-            QJsonDocument json_doc(charFormattedJson);
-            QString json_string = json_doc.toJson();
+            //QJsonDocument json_doc(charFormattedJson);
+            //QString json_string = json_doc.toJson();
 
-            crdtToReturn.push_back( QJsonValue(json_string) );
+            //crdtToReturn.push_back( QJsonValue(json_string) );
+            crdtToReturn.push_back( QJsonValue(charFormattedJson) );
         }
     }
 
@@ -286,28 +287,21 @@ QJsonArray CRDT::toJson() const {
 
 
 std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatted){
-    std::vector<std::vector<Char>> result;
-    result.clear();
-    result.push_back(std::vector<Char>());
+    std::vector<std::vector<Char>> result = std::vector<std::vector<Char>>(1);
 
-    unsigned long rowIndex = 0;
+    unsigned int rowIndex = 0;
     for(QJsonValue elem : crdtJsonFormatted){
-       //QJsonObject charObjJson = elem.toObject();   //CHAROBJJSON E' VUOTO
-       //Char charToAdd = Char::fromJson(charObjJson);
-        Char charToAdd = Char::fromJson2(elem.toString());
+        Char charToAdd = Char::fromJson(elem.toObject());
 
-       result[rowIndex].push_back(charToAdd);
+        result[rowIndex].push_back(charToAdd);
 
-       if(charToAdd.getValue() == '\n'){
-           rowIndex++;
-           //inserts the next row in the matrix
-           result.push_back(std::vector<Char>());
-       }
+        if(charToAdd.getValue() == '\n'){
+            rowIndex++;
+            //inserts the next row in the matrix
+            result.push_back(std::vector<Char>());
+        }
     }
 
-
-    int a=0;
-    int b = a+2;
     return result;
 }
 
@@ -320,7 +314,9 @@ std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatte
 //   Char object) in ascending order.
 //   Furthermore, no one can access the array
 //   this->_symbols while this function is in execution.
-void CRDT::fromJson(const QList<Char>& crdtJsonFormatted){
+void CRDT::fromDatabase(const QList<Char>& crdtJsonFormatted){
+    this->_symbols = std::vector<std::vector<Char>>(1);
+
     unsigned long rowIndex = 0;
     for(Char elem : crdtJsonFormatted){
        this->_symbols[rowIndex].push_back(elem);
