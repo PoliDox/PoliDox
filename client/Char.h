@@ -33,8 +33,7 @@ public:
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;
     static Char fromJson(const QJsonObject& _JSONobj);
-    static Char fromJson(const QString& stringReturnedFromDb);
-    static Char fromJson2(const QString& stringReturnedFromDb);
+    //static Char fromJson2(const QString& stringReturnedFromDb);
 };
 
 

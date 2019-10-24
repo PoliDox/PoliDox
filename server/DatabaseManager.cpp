@@ -181,8 +181,8 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::
     bsoncxx::document::value symbolToInsert =
         elementBuilder << "_id"                << counterInsert
                        << "nameDocument"       << nameDocument.toUtf8().constData()
-                       << "symbol"             << symbol.toUtf8().constData()
-                       << "fractionalPosition" << array_builder
+                       << "value"             << symbol.toUtf8().constData()
+                       << "position" << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToInsertView = symbolToInsert.view();
 
@@ -242,8 +242,20 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
     //(.1)Save them in local before ordering
     for (auto elem : resultIterator) {
         QString insert = QString::fromStdString(bsoncxx::to_json(elem));
-        Char charToInsert = Char::fromJson(insert);
+        QJsonDocument stringDocJSON = QJsonDocument::fromJson(insert.toUtf8());
+        if (stringDocJSON.isNull()) {
+            // TODO: print some debug
+            throw "DatabaseManager::getAllInserts  error";       //TODO: da sistemare
+        }
 
+        QJsonObject insertObjJson;
+        insertObjJson = stringDocJSON.object();
+
+        qDebug() << "insertObjJson:    " << insertObjJson;
+
+        Char charToInsert = Char::fromJson(insertObjJson);
+
+        qDebug() << "char.getvalue : "  << charToInsert.getValue();
         orderedChars.push_back(charToInsert);
     }
 
