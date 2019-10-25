@@ -110,32 +110,41 @@ void Editor::addClient(const Account& user)
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
 
     m_remoteCursors[siteId]->setVisible(true);
+
+    // Draw the remote cursor at position 0
+    int origPos = m_localCursor->position();
+    m_localCursor->clearSelection();
+    m_localCursor->setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
     m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
+    m_localCursor->setPosition(origPos);
+
+    //m_textEdit->raise();
 }
 
 void Editor::remoteInsert(int siteId, int position, char ch)
 {
-    // TODO: At the end of the remote insert the cursor should be where it was before
     /*
+     * At the end of the remote insert the cursor should be where it was before
      * This implies:
      *  1. if the insert happens AFTER my local cursor, it remains unchanged
-     *  2. if it happens BEFORE, it is moved by one position forward
-     *  3. what about the SAME position??
+     *  2. if it happens BEFORE or at the SAME position, it is moved by one position forward
      */
     handlingRemoteOp = true;
     int origPos = m_localCursor->position();
+    if (origPos <= position)
+        origPos++; // See comment
+
     m_localCursor->clearSelection();
-    m_localCursor->setPosition(position);    
+    m_localCursor->setPosition(position);
     m_localCursor->insertText(QString(ch));
     handlingRemoteOp = false;
 
-    //m_localCursor->setPosition(position+1);
     QRect remoteCoord = m_textEdit->cursorRect(*m_localCursor);
     QLabel *remCursor = m_remoteCursors[siteId];
     remCursor->move(remoteCoord.left(), remoteCoord.top());
     remCursor->show();
-    //m_remoteCursors[siteId]->setVisible(true);
+    //m_textEdit->raise();
     m_localCursor->setPosition(origPos);
 }
 
