@@ -108,7 +108,7 @@ void Editor::addClient(const Account& user)
 
     int siteId = user.getSiteId();
     m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
-    // TODO: Uncomment these lines when siteId is supported
+
     m_remoteCursors[siteId]->setVisible(true);
     QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
     m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
@@ -116,22 +116,38 @@ void Editor::addClient(const Account& user)
 
 void Editor::remoteInsert(int siteId, int position, char ch)
 {
+    // TODO: At the end of the remote insert the cursor should be where it was before
+    /*
+     * This implies:
+     *  1. if the insert happens AFTER my local cursor, it remains unchanged
+     *  2. if it happens BEFORE, it is moved by one position forward
+     *  3. what about the SAME position??
+     */
     handlingRemoteOp = true;
     int origPos = m_localCursor->position();
     m_localCursor->clearSelection();
     m_localCursor->setPosition(position);    
     m_localCursor->insertText(QString(ch));
     handlingRemoteOp = false;
-    // TODO: Uncomment these lines when siteId is supported
+
     //m_localCursor->setPosition(position+1);
-    //QRect remoteCoord = m_textEdit->cursorRect(*m_localCursor);
-    //m_remoteCursors[siteId]->move(remoteCoord.left(), remoteCoord.top());
+    QRect remoteCoord = m_textEdit->cursorRect(*m_localCursor);
+    QLabel *remCursor = m_remoteCursors[siteId];
+    remCursor->move(remoteCoord.left(), remoteCoord.top());
+    remCursor->show();
+    //m_remoteCursors[siteId]->setVisible(true);
     m_localCursor->setPosition(origPos);
 }
 
 void Editor::remoteDelete(int siteId, int position)
 {
-    // TODO: implement it (see remoteInsert)
+    // TODO: At the end of the remote delete the cursor should be where it was before
+    /*
+     * This implies:
+     *  1. if the insert happens AFTER or my local cursor, it remains unchanged
+     *  2. if it happens BEFORE, it is moved by one position backward
+     *  3. what about the SAME position??
+     */
     handlingRemoteOp = true;
     m_localCursor->clearSelection();
     m_localCursor->setPosition(position);

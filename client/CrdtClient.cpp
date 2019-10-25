@@ -158,7 +158,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 #endif
 
-    Char symbolToInsert(value);
+    Char symbolToInsert(value, siteId);
 
     rowSize=this->_symbols[row].size();
 

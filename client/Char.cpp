@@ -2,15 +2,13 @@
 
 
 
-Char::Char(char value, std::vector<int>& fractionalPosition){
-    this->value = value;
-    this->fractionalPosition = fractionalPosition;
-}
+Char::Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition)
+    : value(p_value), siteId(p_siteId), fractionalPosition(p_fractionalPosition)
+{}
 
 
-Char::Char(char value){
-    this->value = value;
-}
+Char::Char(char p_value, int p_siteId) : value(p_value), siteId(p_siteId)
+{}
 
 
 Char::~Char(){
@@ -44,6 +42,7 @@ QJsonObject Char::toJson() const {
 
     QString charValue(this->value);
     charJSON.insert("value", charValue);
+    charJSON.insert("siteId", siteId);
     for(int elem : this->fractionalPosition)
         fractPosJSON.push_back(elem);
     charJSON.insert("position",fractPosJSON);       //TODO: cambiare in fractionalPosition
@@ -55,6 +54,7 @@ QJsonObject Char::toJson() const {
 Char Char::fromJson(const QJsonObject& charJSON){
     // TODO: What if some value is missing? E.g. There is no "value"
     char value = charJSON["value"].toString().at(0).toLatin1();
+    int siteId = charJSON["siteId"].toInt();
     QJsonArray fractionalPositionObjJSON = charJSON["position"].toArray();  //TODO: mettersi d'accordo sul campo, position o fractionalPosition
 
     std::vector<int> fractionalPosition;
@@ -62,7 +62,7 @@ Char Char::fromJson(const QJsonObject& charJSON){
         fractionalPosition.push_back(elem.toInt());
     }
 
-    Char result(value, fractionalPosition);
+    Char result(value, siteId, fractionalPosition);
     return result;
 }
 
