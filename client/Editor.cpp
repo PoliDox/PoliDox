@@ -103,65 +103,103 @@ QChar Editor::at(int pos)
 }
 
 void Editor::addClient(const Account& user)
-{
-    m_users.append(user);
-
+{   
+    // Add user to the map of remote users
     int siteId = user.getSiteId();
-    m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
-
-    m_remoteCursors[siteId]->setVisible(true);
+    QLabel *remoteLabel = new QLabel(QString("|"), m_textEdit);
+    User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
+    m_users[siteId] = newUser;
+    //m_users[siteId] = new QLabel(QString("|"), m_textEdit);
+    //m_users[siteId]->setVisible(true);
 
     // Draw the remote cursor at position 0
-    int origPos = m_localCursor->position();
-    m_localCursor->clearSelection();
-    m_localCursor->setPosition(0);
-    QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
-    m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
-    m_localCursor->setPosition(origPos);
-
+    QTextCursor& remoteCursor = m_users[siteId].cursor;
+    remoteCursor.setPosition(0);
+    QRect curCoord = m_textEdit->cursorRect(remoteCursor);
+    remoteLabel->move(curCoord.left(), curCoord.top());
+    remoteLabel->setVisible(true);
     //m_textEdit->raise();
 }
 
-void Editor::remoteInsert(int siteId, int position, char ch)
+void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
 {
-    /*
-     * At the end of the remote insert the cursor should be where it was before
-     * This implies:
-     *  1. if the insert happens AFTER my local cursor, it remains unchanged
-     *  2. if it happens BEFORE or at the SAME position, it is moved by one position forward
-     */
     handlingRemoteOp = true;
-    int origPos = m_localCursor->position();
-    if (origPos <= position)
-        origPos++; // See comment
+    QTextCursor& remCursor = m_users[siteId].cursor;
+    remCursor.setPosition(position);
+    if (op == INSERT_OP)
+        remCursor.insertText(QString(ch));
+    else if (op == DELETE_OP)
+       remCursor.deleteChar();
 
-    m_localCursor->clearSelection();
-    m_localCursor->setPosition(position);
-    m_localCursor->insertText(QString(ch));
+    updateCursors(op, position, siteId);
     handlingRemoteOp = false;
+}
 
-    QRect remoteCoord = m_textEdit->cursorRect(*m_localCursor);
-    QLabel *remCursor = m_remoteCursors[siteId];
-    remCursor->move(remoteCoord.left(), remoteCoord.top());
-    remCursor->show();
-    //m_textEdit->raise();
-    m_localCursor->setPosition(origPos);
+/*
+void Editor::remoteInsert(int siteId, int position, char ch)
+{    
+    handlingRemoteOp = true;
+    QTextCursor& remCursor = m_users[siteId].cursor;
+    remCursor.setPosition(position);
+    remCursor.insertText(QString(ch));
+    //updateCursors(INSERT_OP, position, siteId);
+    handlingRemoteOp = false;    
+    //m_localCursor->setPosition(origPos); TODO: set local cursor visible if necessary
 }
 
 void Editor::remoteDelete(int siteId, int position)
 {
-    // TODO: At the end of the remote delete the cursor should be where it was before
-    /*
-     * This implies:
-     *  1. if the insert happens AFTER or my local cursor, it remains unchanged
-     *  2. if it happens BEFORE, it is moved by one position backward
-     *  3. what about the SAME position??
-     */
     handlingRemoteOp = true;
-    m_localCursor->clearSelection();
-    m_localCursor->setPosition(position);
-    m_localCursor->deleteChar();
+    QTextCursor& remCursor = m_users[siteId].cursor;
+    remCursor.setPosition(position);
+    remCursor.deleteChar();
+    //updateCursors(DELETE_OP, position, siteId);
     handlingRemoteOp = false;
+}
+*/
+
+void Editor::updateCursors(EditOp operation, int position, int siteId)
+{
+    /*
+     * At the end of the insert/delete the cursor should be where it was before
+     * This implies:
+     *  1. if the insert/delete happens AFTER my local cursor, it remains unchanged
+     *  2. if an insert happens BEFORE or at the SAME position, it is moved by one position forward
+     *  3. if a delete happens BEFORE or at the SAME position, it is moved by one position backward
+     */
+    // Update remote cursors
+    for (auto it = m_users.begin(); it != m_users.end(); it++) {
+
+        User& user = it.value();
+        int curPos = user.cursor.position();
+        // Move remote cursor if affected
+        if (it.key() != siteId && curPos <= position) {
+            int newPos = (operation == INSERT_OP)? curPos+1 : curPos-1;
+            user.cursor.setPosition(newPos);
+        }
+
+        // Draw remote cursor
+        // we have to update the cursor of the user who did the operation,
+        // for which holds curPos == position
+        if (it.key() == siteId || curPos <= position) {
+            QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+            user.label->move(remoteCoord.left(), remoteCoord.top());
+            user.label->setVisible(true);
+        }
+
+    }
+
+
+    // Update local cursor
+    // As written in Editor.h, we use -1 to identify the local user
+    if ( siteId != -1 ) {
+        int curPos = m_localCursor->position();
+        // Move remote cursor if affected
+        if (curPos <= position) {
+            int newPos = (operation == INSERT_OP)? curPos+1 : curPos-1;
+            m_localCursor->setPosition(newPos);
+        }
+    }
 }
 
 

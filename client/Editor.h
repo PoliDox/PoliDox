@@ -14,6 +14,20 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class Editor; }
 QT_END_NAMESPACE
 
+struct User
+{
+    Account account;
+    QLabel *label;
+    QTextCursor cursor;
+    // TODO: Add colors here (or maybe we should hard-code them in a vector?)
+};
+
+enum EditOp
+{
+    INSERT_OP,
+    DELETE_OP
+};
+
 class Editor : public QMainWindow
 {
     Q_OBJECT
@@ -24,8 +38,10 @@ public:
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
-    void remoteInsert(int siteId, int position, char ch);
-    void remoteDelete(int siteId, int position);
+    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
+    //void remoteInsert(int siteId, int position, char ch);
+    //void remoteDelete(int siteId, int position);
+    void updateCursors(EditOp operation, int position, int siteId = -1); // siteId -1 identifies the local user
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
@@ -63,8 +79,9 @@ private:
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_localCursor;
-    QVector<Account> m_users;
-    QMap<int, QLabel*> m_remoteCursors;
+    // Maps siteIds to a struct identifying a remote user
+    // N.B. You can use it to iterate over all Accounts!    
+    QMap<int, User> m_users;
     Ui::Editor *ui;
 };
 
