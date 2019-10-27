@@ -39,9 +39,6 @@ public:
     QChar at(int pos);
     void addClient(const Account& user);
     void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
-    //void remoteInsert(int siteId, int position, char ch);
-    //void remoteDelete(int siteId, int position);
-    void updateCursors(EditOp operation, int position, int siteId = -1); // siteId -1 identifies the local user
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
@@ -72,8 +69,8 @@ private slots:
 private:
     void createActions();
     void createStatusBar();
-
     void setRichTextToolBar();
+    void updateCursors();
 
     bool handlingRemoteOp;
     QTextEdit *m_textEdit;
