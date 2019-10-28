@@ -22,6 +22,12 @@ void CrdtClient::setSiteId(double siteID) {
     this->siteId = siteID;
 }
 
+std::vector<int> CrdtClient::getUserPositions(int siteId)
+{
+    // TODO Minnoz
+    // Ajo in fretta che mi serve
+}
+
 
 CrdtClient::CrdtClient(double siteId) {
     //TODO il vettore di simboli inizialmente è vuoto??

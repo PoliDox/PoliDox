@@ -12,6 +12,8 @@ Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image,
             randomNr = randomNr << i*8; // We save the color as a single hex value
             color |= randomNr;            
         }
+    } else {
+        color = p_color;
     }
 }
 
@@ -29,11 +31,11 @@ QByteArray Account::getImage() const {
 }
 
 QColor Account::getColor() const
-{
+{    
     int red, green, blue;
-    blue = color && 0xFF;
-    green = (color >> 8) && 0xFF;
-    red = (color >> 16) && 0xFF;
+    blue = color & 0xFF;
+    green = (color >> 8) & 0xFF;
+    red = (color >> 16) & 0xFF;
     return QColor(red, green, blue);
 }
 
@@ -42,7 +44,7 @@ QJsonObject Account::toJson() const {
     accountJSON.insert("siteId", siteId);
     accountJSON.insert("name", name);
     accountJSON.insert("color", color);
-    qDebug() << "JsonColor: " << hex << color;
+    //qDebug() << "JsonColorServer: " << hex << color;
     // TODO: how to send the picture? QByteArray cannot be transformed into a QJsonValue
     //_JSONobj.insert("image", image);
 
@@ -54,6 +56,7 @@ Account Account::fromJson(const QJsonObject& accountJSON) {
     int l_siteId = accountJSON["siteId"].toInt();
     QString l_name = accountJSON["name"].toString();
     int l_color = accountJSON["color"].toInt();
+    //qDebug() << "JsonColorClient: " << hex << l_color;
     return Account(l_siteId, l_name, "", l_color);
 }
 

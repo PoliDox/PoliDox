@@ -28,7 +28,7 @@ public:
     QJsonArray toJson() const;
     static std::vector<std::vector<Char>> fromJson(const QJsonArray& crdtJsonFormatted);
     void fromDatabase(const QList<Char>& crdtJsonFormatted);
-    void setSymbols(std::vector<std::vector<Char>>& toSet);
+    void setSymbols(std::vector<std::vector<Char>>& toSet);    
     std::vector<std::vector<Char>> getSymbols();
 
 };

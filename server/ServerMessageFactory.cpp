@@ -34,9 +34,10 @@ QByteArray ServerMessageFactory::createLoginReply(bool response, const Account *
     for(QString nameDocument : nameDocuments){
         nameDocumentsArray.push_back(nameDocument);
     }
-    objToReturn.insert("nameDocuments",nameDocumentsArray);
+    objToReturn.insert("nameDocuments",nameDocumentsArray);    
 
-    QJsonDocument docOfObj(objToReturn);
+    QJsonDocument docOfObj(objToReturn);    
+
     return docOfObj.toJson(QJsonDocument::Indented);
 }
 

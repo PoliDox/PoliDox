@@ -26,6 +26,7 @@ public:
     void printDebugChars();
     double getSiteId() const;
     void setSiteId(double siteId);
+    std::vector<int> getUserPositions(int siteId);
 
 signals:
     void onLocalInsert(Char& symbol);
