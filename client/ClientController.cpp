@@ -5,10 +5,11 @@
 
 ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
     m_socket(p_socket)
-{    
+{        
     m_crdt = new CrdtClient(p_siteId);
+    m_editor = new Editor(this);
 
-    connect(&m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
+    connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
@@ -30,7 +31,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
 
     connect(m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
-    m_editor.show();
+    m_editor->show();
 }
 
 
@@ -50,13 +51,19 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
     for(std::vector<Char> elem : this->m_crdt->getSymbols())
         for(Char symbol : elem)
             text += symbol.getValue();
-    m_editor.init(text);
+    m_editor->init(text);
 
     // Initialize accounts
     for (const QJsonValue& ac : p_accounts) {
         Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
-        m_editor.addClient(account);
+        m_editor->addClient(account);
     }
+}
+
+QVector<int> ClientController::getUserChars(int p_siteId)
+{
+    std::vector<int> userChars = m_crdt->getUserPositions(p_siteId);
+    return QVector<int>::fromStdVector(userChars);
 }
 
 
@@ -95,18 +102,18 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
-        m_editor.handleRemoteOperation(INSERT_OP, symbol.getSiteId(), linPos, symbol.getValue());
+        m_editor->handleRemoteOperation(INSERT_OP, symbol.getSiteId(), linPos, symbol.getValue());
 
     } else if (l_header== "delete") {
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteDelete(symbol);
-        m_editor.handleRemoteOperation(DELETE_OP, symbol.getSiteId(), linPos);
+        m_editor->handleRemoteOperation(DELETE_OP, symbol.getSiteId(), linPos);
 
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
-        m_editor.addClient(newUser);
+        m_editor->addClient(newUser);
         qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else {
@@ -127,7 +134,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
     if (charsAdded > 1 && position == 0 &&
-            m_editor.at(0) != QChar::ParagraphSeparator) {
+            m_editor->at(0) != QChar::ParagraphSeparator) {
         // When copying to the beginning everything is deleted and copied anew
         charsAdded--;
         if (!charsRemoved) {
@@ -142,7 +149,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     }
 
     for (int i = 0; i < charsAdded; i++) {
-        QChar qchar = m_editor.at(position+i);
+        QChar qchar = m_editor->at(position+i);
         char _char;
         if (qchar == QChar::ParagraphSeparator) {
             qDebug() << "ParagraphSeparator";

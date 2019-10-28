@@ -18,8 +18,8 @@
 #include <QFontComboBox>
 #include <iostream>
 
-Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
-
+Editor::Editor(ClientController *p_controller, QWidget *parent) :
+    QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
     this->ui->textEdit->setAcceptRichText(true);
@@ -37,6 +37,7 @@ Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), 
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
         if (!handlingRemoteOp) {
+           updateCursors();
            emit textChanged(position, charsRemoved, charsAdded);
         }
     });
@@ -108,9 +109,7 @@ void Editor::addClient(const Account& user)
     int siteId = user.getSiteId();
     QLabel *remoteLabel = new QLabel(QString("|"), m_textEdit);
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
-    m_users[siteId] = newUser;
-    //m_users[siteId] = new QLabel(QString("|"), m_textEdit);
-    //m_users[siteId]->setVisible(true);
+    m_users[siteId] = newUser;    
 
     // Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_users[siteId].cursor;
@@ -153,6 +152,20 @@ void Editor::updateCursors()
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
         user.label->move(remoteCoord.left(), remoteCoord.top());
         user.label->setVisible(true);
+    }
+}
+
+void Editor::highlightUserChars(int p_siteId)
+{
+    QVector<int> userChars = controller->getUserChars(p_siteId);
+    QTextCursor tmpCursor(m_textDoc);
+    QColor color = m_users[p_siteId].account.getColor();
+    QTextCharFormat format;
+    format.setBackground(color);
+    for (int charPos : userChars) {
+        tmpCursor.setPosition(charPos);
+        tmpCursor.select(QTextCursor::WordUnderCursor);
+        tmpCursor.mergeCharFormat(format);
     }
 }
 

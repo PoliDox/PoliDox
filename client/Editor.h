@@ -8,11 +8,14 @@
 #include <QLabel>
 #include "Account.h"
 #include "Styler.h"
+#include "ClientController.h"
 
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Editor; }
 QT_END_NAMESPACE
+
+class ClientController;
 
 struct User
 {
@@ -32,13 +35,13 @@ class Editor : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Editor(QWidget *parent = nullptr);
+    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr);
     ~Editor();
 
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
-    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
+    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);    
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
@@ -71,7 +74,9 @@ private:
     void createStatusBar();
     void setRichTextToolBar();
     void updateCursors();
+    void highlightUserChars(int p_siteId);
 
+    ClientController *controller;
     bool handlingRemoteOp;
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
