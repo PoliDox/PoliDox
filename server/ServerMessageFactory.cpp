@@ -30,8 +30,7 @@ QByteArray ServerMessageFactory::createLoginReply(bool response, const Account *
     objToReturn.insert("response",responseString);
     if(account != nullptr)
         objToReturn.insert("account", account->toJson());
-    else
-        objToReturn.insert("account", "null");
+
     for(QString nameDocument : nameDocuments){
         nameDocumentsArray.push_back(nameDocument);
     }

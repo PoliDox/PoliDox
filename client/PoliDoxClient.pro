@@ -2,7 +2,7 @@ QT += widgets
 
 TEMPLATE        = app
 TARGET          = polidox-client
-QT += gui websockets
+QT += gui websockets core
 
 INSTALLS += target
 
