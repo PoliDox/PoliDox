@@ -85,11 +85,58 @@ void Log_Dialog::on_pushButton_register_clicked()
     sp_retain.setRetainSizeWhenHidden(true);
     ui->groupBox->setSizePolicy(sp_retain);*/
 
+    hideLoginForm();
+
+    createRegistrationForm();
+
+}
+
+void Log_Dialog::manageRegistrationData(){
+
+    QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
+    QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
+
+    QString username=user_linedit->text();
+    QString password=pwd_linedit->text();
+
+    cleanRegistrationForm();
+
+    ui->groupBox->setFixedSize(335,265);
+
+    showLoginForm();
+
+    ui->lineEdit_username->setText(username);
+    ui->lineEdit_password->setText(password);
+
+    //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
+
+    emit signupDataSubmitted(username, password);
+
+
+
+}
+
+void Log_Dialog::showLoginForm(){
+
+    QList<QWidget*> list=this->ui->groupBox->findChildren<QWidget*>();
+
+    for(auto it=list.begin();it!=list.end();it++)
+            (*it)->show();
+}
+
+void Log_Dialog::hideLoginForm(){
+
     QList<QWidget*> list=ui->groupBox->findChildren<QWidget*>();
-    ui->groupBox->setFixedSize(330,400);
 
     for(auto it=list.begin();it!=list.end();it++)
             (*it)->hide();
+
+}
+
+void Log_Dialog::createRegistrationForm(){
+
+    ui->groupBox->setFixedSize(330,400);
+
 
     QLabel* name=new QLabel("Name",ui->groupBox);
     QLabel* surname=new QLabel("Surname",ui->groupBox);
@@ -127,8 +174,10 @@ void Log_Dialog::on_pushButton_register_clicked()
     pwd_form->setPlaceholderText("Insert your password");
 
     QPushButton* submit=new QPushButton("Submit",ui->groupBox);
+    QPushButton* cancel=new QPushButton("Cancel");
 
     submit->setObjectName("submit");
+    cancel->setObjectName("cancel");
 
     QGridLayout* grid_layout = static_cast<QGridLayout*>(ui->groupBox->layout());
 
@@ -149,13 +198,15 @@ void Log_Dialog::on_pushButton_register_clicked()
     grid_layout->addWidget(pwd,6,0,0);
     grid_layout->addWidget(pwd_form,7,0,0);
     grid_layout->addWidget(submit,9,0,0);
+    grid_layout->addWidget(cancel,9,1,0);
 
 
     connect(submit,&QPushButton::clicked,this,&Log_Dialog::manageRegistrationData);
 
-}
+    connect(cancel,&QPushButton::clicked,this,&Log_Dialog::cleanRegistrationForm);
 
-void Log_Dialog::manageRegistrationData(){
+}
+void Log_Dialog::cleanRegistrationForm(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
@@ -168,6 +219,7 @@ void Log_Dialog::manageRegistrationData(){
     QLabel* pwd=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("pwd"));
 
     QPushButton* submit=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("submit"));
+    QPushButton* cancel=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("cancel"));
 
     QString username=user_linedit->text();
     QString password=pwd_linedit->text();
@@ -183,6 +235,7 @@ void Log_Dialog::manageRegistrationData(){
     delete pwd;
 
     delete submit;
+    delete cancel;
 
     ui->groupBox->setFixedSize(335,265);
 
@@ -195,11 +248,9 @@ void Log_Dialog::manageRegistrationData(){
 
     //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
 
-    emit signupDataSubmitted(username, password);
-
-
 
 }
+
 void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
     qDebug() << "SELECTED FILE: "<< item->text();

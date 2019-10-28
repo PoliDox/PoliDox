@@ -16,9 +16,54 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QTextEdit" name="textEdit"/>
+       <widget class="QTextEdit" name="textEdit">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Currently online</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="onlineList">
+          <property name="maximumSize">
+           <size>
+            <width>250</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Contributors</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="contributorsList">
+          <property name="maximumSize">
+           <size>
+            <width>250</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>

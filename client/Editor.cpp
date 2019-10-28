@@ -16,6 +16,7 @@
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QFontComboBox>
+#include <QPushButton>
 #include <iostream>
 
 Editor::Editor(ClientController *p_controller, QWidget *parent) :
@@ -26,12 +27,42 @@ Editor::Editor(ClientController *p_controller, QWidget *parent) :
     m_textEdit = ui->textEdit;
     this->ui->textEdit->setStyleSheet( "background-color:white");
     this->ui->toolBar_2->setStyleSheet( "background-color:transparent");
-    setCentralWidget(m_textEdit);
+    //setCentralWidget(m_textEdit);
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
     setWindowTitle("PoliDox");
+
+    QGridLayout* OnlineLayout=new QGridLayout();
+    QGridLayout* ContributorsLayout=new QGridLayout();
+    ui->onlineList->setLayout(OnlineLayout);
+    ui->contributorsList->setLayout(ContributorsLayout);
+    OnlineLayout->setSpacing(0);
+    ContributorsLayout->setSpacing(0);
+
+    OnlineLayout->addWidget(new QLabel("User1",ui->onlineList),0,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),0,1,0);
+    OnlineLayout->addWidget(new QLabel("User2",ui->onlineList),1,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),1,1,0);
+    OnlineLayout->addWidget(new QLabel("User3",ui->onlineList),2,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),2,1,0);
+    OnlineLayout->addWidget(new QLabel("User4",ui->onlineList),3,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),3,1,0);
+    OnlineLayout->addWidget(new QLabel("User5",ui->onlineList),4,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),4,1,0);
+
+    ContributorsLayout->addWidget(new QLabel("User1",ui->contributorsList),0,0,0);
+    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),0,1,0);
+    ContributorsLayout->addWidget(new QLabel("User2",ui->contributorsList),1,0,0);
+    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),1,1,0);
+    ContributorsLayout->addWidget(new QLabel("User3",ui->contributorsList),2,0,0);
+    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),2,1,0);
+
+
+
+
+
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
