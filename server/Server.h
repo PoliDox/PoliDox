@@ -15,6 +15,8 @@ class Server : public QObject {
 
 private:
     QWebSocketServer *m_pWebSocketServer;
+    //socket2account contains all the sockets that have
+    //an account logged, even those who do not have an open file
     QMap<QWebSocket*, Account*> socket2account;
     QMap<QString, ServerController*> file2serverController;
     DatabaseManager *dbOperations;
@@ -23,8 +25,10 @@ private:
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
-    Account* getAccount(QWebSocket *socketOfAccont);
+    Account* getAccount(QWebSocket *socketOfAccount);
     DatabaseManager* getDb();
+    void removeSocketAccountPair(QWebSocket *socketOfAccount);
+    void removeFileServcontrPair(QString filename);
     virtual ~Server();
 
 /* ======================================================================
