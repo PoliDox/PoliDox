@@ -70,8 +70,16 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         bool loginSuccess = false;
         Account *loggedAccount = nullptr;
         QList<QString> nameDocuments;
-        int result = this->dbOperations->checkPassword(name, password);
 
+        //check if account is already logged
+        bool alreadyLogged = false;
+        for(Account* account : this->socket2account.values())
+            if(account->getName() == name)
+                alreadyLogged = true;
+
+        int result = -1;
+        if(!alreadyLogged)
+            result = this->dbOperations->checkPassword(name, password);
         qDebug() << "Authentication result: " << result;
 
         if(result >= 0){
