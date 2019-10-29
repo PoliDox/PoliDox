@@ -1,4 +1,4 @@
-#ifndef CLIENTCONTROLLER_H
+    #ifndef CLIENTCONTROLLER_H
 #define CLIENTCONTROLLER_H
 
 #include <QObject>
@@ -6,6 +6,8 @@
 #include "CrdtClient.h"
 #include "Editor.h"
 #include "ListFiles.h"
+
+class Editor;
 
 class ClientController : public QObject {
     Q_OBJECT
@@ -15,11 +17,13 @@ public:
     ~ClientController();
 
     void init(const QJsonArray& p_crdt, const QJsonArray& p_accounts);
+    QVector<int> getUserChars(int p_siteId);
 
 private:
-    Editor m_editor;
+    Editor *m_editor;
     CrdtClient *m_crdt; // TODO: use smart-pointer
     QWebSocket *m_socket;
+    ListFiles *m_lf;
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);

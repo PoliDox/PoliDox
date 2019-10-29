@@ -41,6 +41,11 @@ private:
     Editor *editor;
     ListFiles *lf;
     NewFileDialog *nfd;
+
+    void createRegistrationForm();
+    void cleanRegistrationForm();
+    void showLoginForm();
+    void hideLoginForm();
 };
 
 #endif // LOG_DIALOG_H

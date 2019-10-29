@@ -51,4 +51,11 @@ CREATE FILE REPL
 "response" = "ok"/"fail"
 "crdt" = { //empty }
 
+CLOSED EDITOR REQ
+"action" = "closedEditorReq"
+
+CLOSED EDITOR REPL
+"action" = "closedEditorRep"
+"nameDocuments" = { ... }
+
 NEW REMOTE FILE        // ???

@@ -1,6 +1,5 @@
 TARGET = polidox-server
 
-QT -= gui
 QT += websockets
 QT += sql
 

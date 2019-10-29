@@ -88,7 +88,7 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
         }        
 
-        QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
+        QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);        
         signalSender->sendTextMessage(sendMsgToClient);
     }
     else if (header == "registerUser"){

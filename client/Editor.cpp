@@ -16,27 +16,59 @@
 #include <QMessageBox>
 #include <QSpinBox>
 #include <QFontComboBox>
+#include <QPushButton>
 #include <iostream>
 
-Editor::Editor(QWidget *parent) : QMainWindow(parent), handlingRemoteOp(false), ui(new Ui::Editor)
-
+Editor::Editor(ClientController *p_controller, QWidget *parent) :
+    QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
     this->ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
     this->ui->textEdit->setStyleSheet( "background-color:white");
     this->ui->toolBar_2->setStyleSheet( "background-color:transparent");
-    setCentralWidget(m_textEdit);
+    //setCentralWidget(m_textEdit);
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
     setWindowTitle("PoliDox");
 
+    QGridLayout* OnlineLayout=new QGridLayout();
+    QGridLayout* ContributorsLayout=new QGridLayout();
+    ui->onlineList->setLayout(OnlineLayout);
+    ui->contributorsList->setLayout(ContributorsLayout);
+    OnlineLayout->setSpacing(0);
+    ContributorsLayout->setSpacing(0);
+
+    OnlineLayout->addWidget(new QLabel("User1",ui->onlineList),0,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),0,1,0);
+    OnlineLayout->addWidget(new QLabel("User2",ui->onlineList),1,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),1,1,0);
+    OnlineLayout->addWidget(new QLabel("User3",ui->onlineList),2,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),2,1,0);
+    OnlineLayout->addWidget(new QLabel("User4",ui->onlineList),3,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),3,1,0);
+    OnlineLayout->addWidget(new QLabel("User5",ui->onlineList),4,0,0);
+    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),4,1,0);
+
+    ContributorsLayout->addWidget(new QLabel("User1",ui->contributorsList),0,0,0);
+    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),0,1,0);
+    ContributorsLayout->addWidget(new QLabel("User2",ui->contributorsList),1,0,0);
+    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),1,1,0);
+    ContributorsLayout->addWidget(new QLabel("User3",ui->contributorsList),2,0,0);
+    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),2,1,0);
+
+
+
+
+
+
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
         if (!handlingRemoteOp) {
+           updateCursors();
            emit textChanged(position, charsRemoved, charsAdded);
         }
     });
@@ -103,40 +135,69 @@ QChar Editor::at(int pos)
 }
 
 void Editor::addClient(const Account& user)
-{
-    m_users.append(user);
-
+{   
+    // Add user to the map of remote users
     int siteId = user.getSiteId();
-    m_remoteCursors[siteId] = new QLabel(QString("|"), m_textEdit);
-    // TODO: Uncomment these lines when siteId is supported
-    m_remoteCursors[siteId]->setVisible(true);
-    QRect curCoord = m_textEdit->cursorRect(*m_localCursor);
-    m_remoteCursors[siteId]->move(curCoord.left(), curCoord.top());
+    QLabel *remoteLabel = new QLabel(QString("|"), m_textEdit);
+    User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
+    m_users[siteId] = newUser;    
+
+    // Draw the remote cursor at position 0
+    QTextCursor& remoteCursor = m_users[siteId].cursor;
+    remoteCursor.setPosition(0);
+    QRect curCoord = m_textEdit->cursorRect(remoteCursor);
+    remoteLabel->move(curCoord.left(), curCoord.top());
+    remoteLabel->setVisible(true);
+    //m_textEdit->raise();
 }
 
-void Editor::remoteInsert(int siteId, int position, char ch)
+void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
 {
+    /*
+    qDebug() << "Cursors positions: ";
+    for (auto it = m_users.begin(); it != m_users.end(); it++) {
+        int tmp = it.key();
+        User& tmpp = it.value();
+        qDebug() << tmp << ": " << tmpp.cursor.position();
+    }
+    qDebug() << "local: " << m_localCursor->position();
+    */
+
     handlingRemoteOp = true;
-    int origPos = m_localCursor->position();
-    m_localCursor->clearSelection();
-    m_localCursor->setPosition(position);    
-    m_localCursor->insertText(QString(ch));
+    QTextCursor& remCursor = m_users[siteId].cursor;
+    remCursor.setPosition(position);
+    if (op == INSERT_OP)
+        remCursor.insertText(QString(ch));
+    else if (op == DELETE_OP)
+       remCursor.deleteChar();
+
+    updateCursors();
     handlingRemoteOp = false;
-    // TODO: Uncomment these lines when siteId is supported
-    //m_localCursor->setPosition(position+1);
-    //QRect remoteCoord = m_textEdit->cursorRect(*m_localCursor);
-    //m_remoteCursors[siteId]->move(remoteCoord.left(), remoteCoord.top());
-    m_localCursor->setPosition(origPos);
 }
 
-void Editor::remoteDelete(int siteId, int position)
+void Editor::updateCursors()
 {
-    // TODO: implement it (see remoteInsert)
-    handlingRemoteOp = true;
-    m_localCursor->clearSelection();
-    m_localCursor->setPosition(position);
-    m_localCursor->deleteChar();
-    handlingRemoteOp = false;
+    for (auto it = m_users.begin(); it != m_users.end(); it++) {
+
+        User& user = it.value();
+        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+        user.label->move(remoteCoord.left(), remoteCoord.top());
+        user.label->setVisible(true);
+    }
+}
+
+void Editor::highlightUserChars(int p_siteId)
+{
+    QVector<int> userChars = controller->getUserChars(p_siteId);
+    QTextCursor tmpCursor(m_textDoc);
+    QColor color = m_users[p_siteId].account.getColor();
+    QTextCharFormat format;
+    format.setBackground(color);
+    for (int charPos : userChars) {
+        tmpCursor.setPosition(charPos);
+        tmpCursor.select(QTextCursor::WordUnderCursor);
+        tmpCursor.mergeCharFormat(format);
+    }
 }
 
 
@@ -188,7 +249,9 @@ void Editor::on_actionSave_as_triggered()
 
 void Editor::on_actionQuit_triggered()
 {
-    QApplication::quit();
+    emit quit_editor();
+    this->hide();
+    //QApplication::quit();
 }
 
 void Editor::on_actionCopy_triggered()

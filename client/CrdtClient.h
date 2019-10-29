@@ -16,7 +16,7 @@ class CrdtClient : public QObject, public CRDT {
     Q_OBJECT
 
 private:    
-    double siteId;
+    double siteId; // TODO: Perché è un double??
     void printSymbols();
 
 public:
@@ -26,6 +26,7 @@ public:
     void printDebugChars();
     double getSiteId() const;
     void setSiteId(double siteId);
+    std::vector<int> getUserPositions(int siteId);
 
 signals:
     void onLocalInsert(Char& symbol);

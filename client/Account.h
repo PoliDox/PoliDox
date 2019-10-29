@@ -4,6 +4,7 @@
 #include <QString>
 #include <QByteArray>
 #include <QJsonObject>
+#include <QColor>
 
 // WARNING: This file is shared between client and server!
 //          Please consider that before modifying
@@ -11,17 +12,18 @@
 class Account {
 
 private:
-    double siteId;
+    int siteId;
     QString name;
     QByteArray image;
+    int color;
 
 public:
     Account() = default;
-    Account(double p_siteId, const QString& p_name, const QByteArray& p_picture);
-    Account(const QString& p_name, const QByteArray& p_picture);
-    double getSiteId() const;
+    Account(int p_siteId, const QString& p_name, const QByteArray& p_picture, int p_color = -1);
+    int getSiteId() const;
     QString getName() const;
     QByteArray getImage() const;
+    QColor getColor() const;
     QJsonObject toJson() const;
     static Account fromJson(const QJsonObject& accountJSON);
     bool operator < (const Account& other) const;

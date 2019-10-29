@@ -18,17 +18,18 @@ class Char {
 private:
     char value;
     std::vector<int> fractionalPosition;
+    int siteId;  // NON CANCELLARE: serve per spostare i cursori nelle operazioni remote
 
 public:
-    Char(char value, std::vector<int>& fractionalPosition);
-    Char(char value);
+    Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition);
+    Char(char p_value, int p_siteId);
     std::vector<int> getFractionalPosition();
     void setFractionalPosition(std::vector<int>& fractionalPosition);
     char getValue() const;
     bool operator < (const Char& other) const;
     ~Char();
 
-    int getSiteId(){return 0;}      //ATTENZIONE, METODO DA CANCELLARE!!!
+    int getSiteId(){return siteId;}
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;

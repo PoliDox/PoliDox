@@ -22,6 +22,22 @@ void CrdtClient::setSiteId(double siteID) {
     this->siteId = siteID;
 }
 
+std::vector<int> CrdtClient::getUserPositions(int siteId)
+{
+    unsigned int i=0,
+                 j=0;
+
+    std::vector<int> result;
+
+    for(i=0;i<_symbols.size();i++){
+        for(j=0;j<_symbols[i].size();j++)
+            if(_symbols[i][j].getSiteId()==siteId)
+                    result.push_back(_toLinear(i,j));
+    }
+
+    return result;
+}
+
 
 CrdtClient::CrdtClient(double siteId) {
     //TODO il vettore di simboli inizialmente è vuoto??
@@ -158,7 +174,7 @@ void CrdtClient::localInsert(unsigned int position, char value) {
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 #endif
 
-    Char symbolToInsert(value);
+    Char symbolToInsert(value, siteId);
 
     rowSize=this->_symbols[row].size();
 
