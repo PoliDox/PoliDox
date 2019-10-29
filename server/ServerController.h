@@ -30,6 +30,7 @@ public:
 public slots:
     void replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket);
     void handleRemoteOperation(const QString& messageReceivedByClient);
+    void disconnectAccount();
 };
 
 #endif // SERVERCONTROLLER_H

@@ -212,8 +212,8 @@ bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value symbolToDelete =
         elementBuilder << "nameDocument"       << nameDocument.toUtf8().constData()
-                       << "symbol"             << symbol.toUtf8().constData()
-                       << "fractionalPosition" << array_builder
+                       << "value"             << symbol.toUtf8().constData()
+                       << "position" << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToDeleteView = symbolToDelete.view();
 

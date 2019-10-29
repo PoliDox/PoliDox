@@ -32,10 +32,13 @@ void ServerController::addClient(QWebSocket *socketToAdd){
 
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
+    connect(socketToAdd, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
     //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
 
     this->notifyOtherClients(socketToAdd);
 
+    //notify the new socket about all the accounts
+    //actually connected on the document just opened by him
     QList<Account*> accounts;
     for(auto otherSocket : this->socketsOnDocument) {
         if(otherSocket != socketToAdd){
@@ -50,16 +53,13 @@ void ServerController::addClient(QWebSocket *socketToAdd){
 }
 
 
-// Pay attention that while I notify (.1)the other clients
-// about the new_client_connected(== newSocket) I notify also
-// (.2)the new_client_connected(me) about all the other clients already connected
 void ServerController::notifyOtherClients(QWebSocket *newSocket){
     Account *newAccount = this->server->getAccount(newSocket);
-    QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(newAccount);
+    QString msgNewClient = ServerMessageFactory::createNewClientMessage(newAccount);
 
     for(auto otherSocket : this->socketsOnDocument){
         if(otherSocket != newSocket){            
-            otherSocket->sendTextMessage(msgNewClient1);            
+            otherSocket->sendTextMessage(msgNewClient);
         }
     }
 }
@@ -112,6 +112,30 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
 
+}
+
+
+// if I arrive on this slot, is from a socket that in the
+// moment he quits he has an open file
+void ServerController::disconnectAccount(){
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+
+    Account *accountToDisconnect = this->server->getAccount(signalSender);
+
+    this->server->removeSocketAccountPair(signalSender);
+
+    bool destroyServContr = false;
+    this->socketsOnDocument.removeOne(signalSender);
+    if(this->socketsOnDocument.size() == 0){
+        destroyServContr = true;
+        this->server->removeFileServcontrPair(this->nameDocumentAssociated);
+    }
+
+    //il distruttore lo chiama già la remove oppure no??
+    signalSender->deleteLater();
+    delete (accountToDisconnect);       //TODO: controlllare il distruttore
+    if(destroyServContr)
+        delete (this);                  //TODO: controlllare il distruttore
 }
 
 
