@@ -15,7 +15,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QStrin
 
         QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
 
-        qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
+        //qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
 
         m_socket->sendTextMessage(jsonString);
     });
@@ -58,6 +58,8 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
         for(Char symbol : elem)
             text += symbol.getValue();
     m_editor->init(text);
+
+    std::cout << "ACCOUNT LIST SIZE: " << p_accounts.size() << std::endl;
 
     // Initialize accounts
     for (const QJsonValue& ac : p_accounts) {
@@ -120,7 +122,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
         m_editor->addClient(newUser);
-        qDebug() << "New client with siteId" << newUser.getSiteId();
+        //qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else if (l_header == "closeEditorRep") {
         m_lf = new ListFiles();
@@ -141,7 +143,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
     // Probably we should delete everything first and then insert..
 
-    qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
+    //qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
     if (charsAdded > 1 && position == 0 &&
             m_editor->at(0) != QChar::ParagraphSeparator) {

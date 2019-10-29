@@ -40,6 +40,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     ui->onlineList->setLayout(OnlineLayout);
     ui->contributorsList->setLayout(ContributorsLayout);
 
+    ui->label_3->setText(fileName);
+
     QPixmap online("./online.png");
     QIcon onlineIcon(online);
     ui->label->setPixmap(onlineIcon.pixmap(QSize(10,10)));
@@ -48,19 +50,21 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
-    OnlineLayout->setSpacing(1);
+    OnlineLayout->setSpacing(0);
     ContributorsLayout->setSpacing(0);
 
-    OnlineLayout->addWidget(new QLabel("User1",ui->onlineList),0,0);
+
+    OnlineLayout->addWidget(new QLabel("You",ui->onlineList),0,0);
     OnlineLayout->addWidget(new QCheckBox(ui->onlineList),0,1);
-    OnlineLayout->addWidget(new QLabel("User2",ui->onlineList),1,0);
-    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),1,1);
-    OnlineLayout->addWidget(new QLabel("User3",ui->onlineList),2,0);
-    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),2,1);
-    OnlineLayout->addWidget(new QLabel("User4",ui->onlineList),3,0);
-    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),3,1);
-    OnlineLayout->addWidget(new QLabel("User5",ui->onlineList),4,0);
-    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),4,1);
+
+    int i=1;
+    std::cout << "USER MAP SIZE: "<< m_users.size() << std::endl;
+    for(auto e : m_users.keys())
+    {
+      OnlineLayout->addWidget(new QLabel(m_users.find(e)->account.getName(),ui->onlineList),i,0);
+      OnlineLayout->addWidget(new QCheckBox(ui->onlineList),i,1);
+      i++;
+    }
 
     QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     OnlineLayout->addItem(Ospacer,5,0);
@@ -74,9 +78,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
 
     QSpacerItem *Cspacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ContributorsLayout->addItem(Cspacer,5,0);
-
-
-
 
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
