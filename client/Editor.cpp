@@ -69,6 +69,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     OnlineLayout->addItem(Ospacer,5,0);
 
+    //TODO contributors list
+
     ContributorsLayout->addWidget(new QLabel("User1",ui->contributorsList),0,0);
     ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),0,1);
     ContributorsLayout->addWidget(new QLabel("User2",ui->contributorsList),1,0);
