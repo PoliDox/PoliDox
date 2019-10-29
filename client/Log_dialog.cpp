@@ -176,6 +176,7 @@ void Log_Dialog::createRegistrationForm(){
     QPushButton* submit=new QPushButton("Submit",ui->groupBox);
     QPushButton* cancel=new QPushButton("Cancel");
 
+
     submit->setObjectName("submit");
     cancel->setObjectName("cancel");
 
