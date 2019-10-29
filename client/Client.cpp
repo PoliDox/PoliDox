@@ -87,7 +87,7 @@ void Client::onMessageReceived(const QString &p_msg)
             qDebug() << "Couldn't open file";
             return;
         }
-        std::cout << "JSON ARRIVATO:" << p_msg.toUtf8().constData() << "\n\n\n";
+        //std::cout << "JSON ARRIVATO:" << p_msg.toUtf8().constData() << "\n\n\n";
         QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
 

@@ -155,6 +155,7 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
         fileServContr->addClient(signalSender);
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
+        disconnect(signalSender, &QWebSocket::disconnected, this, &Server::disconnectAccount);
 
     }
     else if (header == "createFileReq"){
@@ -179,20 +180,19 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 }
 
 
-//TODO: - capire bene TUTTE le cose che ci sono da fare
-//        quando un acconut di disconnette
+// if I arrive on this slot, is from a socket that in the
+// moment he quits he does not have a open file
 void Server::disconnectAccount(){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+    Account *accountToDisconnect = this->socket2account[signalSender];
 
-    Account *accountToDisconnet = this->socket2account[signalSender];
-    delete (accountToDisconnet);
+    if(accountToDisconnect != nullptr)
+        this->socket2account.remove(signalSender);
 
-    //TODO: la delete dell'oggetto socket presente(come chiave)
-    //      nella mappa va fatta oppure no ???
-
-    this->socket2account.remove(signalSender);
-
-    //poi ????
+    //il distruttore lo chiama già la remove oppure no??
+    signalSender->deleteLater();
+    if(accountToDisconnect != nullptr)
+        delete (accountToDisconnect);       //TODO: controlllare il distruttore
 }
 
 
@@ -204,7 +204,17 @@ void Server::onNewConnection() {
     this->socket2account[newSocket] = nullptr;
 
     connect(newSocket, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
-    connect(newSocket, &QWebSocket::disconnected, this, &Server::disconnectAccount);    //TODO: da rivedere
+    connect(newSocket, &QWebSocket::disconnected, this, &Server::disconnectAccount);
+}
+
+
+void Server::removeSocketAccountPair(QWebSocket *socketOfAccount){
+    this->socket2account.remove(socketOfAccount);
+}
+
+
+void Server::removeFileServcontrPair(QString filename){
+   this->file2serverController.remove(filename);
 }
 
 
