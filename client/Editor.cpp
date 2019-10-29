@@ -20,7 +20,7 @@
 #include <QCheckBox>
 #include <iostream>
 
-Editor::Editor(ClientController *p_controller, QWidget *parent) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName) :
     QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
@@ -264,7 +264,9 @@ void Editor::on_actionSave_as_triggered()
 
 void Editor::on_actionQuit_triggered()
 {
-    QApplication::quit();
+    emit quit_editor();
+    this->hide();
+    //QApplication::quit();
 }
 
 void Editor::on_actionCopy_triggered()

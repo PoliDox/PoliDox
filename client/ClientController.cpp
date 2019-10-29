@@ -3,11 +3,11 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName) :
     m_socket(p_socket)
 {        
     m_crdt = new CrdtClient(p_siteId);
-    m_editor = new Editor(this);
+    m_editor = new Editor(this, nullptr, fileName);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
@@ -25,6 +25,12 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
         QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
+
+        m_socket->sendTextMessage(jsonString);
+    });
+
+    connect(m_editor, &Editor::quit_editor, this, [&](){
+       QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
 
         m_socket->sendTextMessage(jsonString);
     });
@@ -116,6 +122,10 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         m_editor->addClient(newUser);
         qDebug() << "New client with siteId" << newUser.getSiteId();
 
+    } else if (l_header == "closeEditorRep") {
+        m_lf = new ListFiles();
+        //TODO: implementare la ricezione dei nomi file e farne la show nel listFiles
+        m_lf->show();
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }
@@ -161,3 +171,4 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     }
 
 }
+

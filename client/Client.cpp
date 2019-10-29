@@ -24,11 +24,13 @@ Client::Client()
     connect(&loginWindow, &Log_Dialog::fileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createOpenFileMessage(p_filename);
         m_socket.sendTextMessage(message);
+        c_fileName = p_filename;
     });
 
     connect(&loginWindow, &Log_Dialog::newFileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createNewFileMessage(p_filename);
         m_socket.sendTextMessage(message);
+        c_fileName = p_filename;
     });
 
     loginWindow.exec();
@@ -91,7 +93,7 @@ void Client::onMessageReceived(const QString &p_msg)
         QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
 
-        m_document = new ClientController(&m_socket, m_user.getSiteId());
+        m_document = new ClientController(&m_socket, m_user.getSiteId(), c_fileName);
         m_document->init(JSONcrdt, JSONaccounts);
 
         loginWindow.hide();
