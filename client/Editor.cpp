@@ -53,18 +53,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     OnlineLayout->setSpacing(0);
     ContributorsLayout->setSpacing(0);
 
-
     OnlineLayout->addWidget(new QLabel("You",ui->onlineList),0,0);
     OnlineLayout->addWidget(new QCheckBox(ui->onlineList),0,1);
-
-    int i=1;
-    std::cout << "USER MAP SIZE: "<< m_users.size() << std::endl;
-    for(auto e : m_users.keys())
-    {
-      OnlineLayout->addWidget(new QLabel(m_users.find(e)->account.getName(),ui->onlineList),i,0);
-      OnlineLayout->addWidget(new QCheckBox(ui->onlineList),i,1);
-      i++;
-    }
 
     QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     OnlineLayout->addItem(Ospacer,5,0);
@@ -106,6 +96,15 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
         ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
     });
 
+    connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
+
+}
+
+void Editor::addOnlineUser(QString username){
+
+    QGridLayout* OnlineLayout=static_cast<QGridLayout*>(ui->onlineList->layout());
+    OnlineLayout->addWidget(new QLabel(username,ui->onlineList),m_users.size(),0);
+    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),m_users.size(),1);
 
 }
 

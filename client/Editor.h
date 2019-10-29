@@ -70,6 +70,8 @@ private slots:
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered();
 
+    void addOnlineUser(QString username);
+
 private:
     void createActions();
     void createStatusBar();

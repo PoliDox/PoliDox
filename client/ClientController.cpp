@@ -59,13 +59,14 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
             text += symbol.getValue();
     m_editor->init(text);
 
-    std::cout << "ACCOUNT LIST SIZE: " << p_accounts.size() << std::endl;
-
     // Initialize accounts
     for (const QJsonValue& ac : p_accounts) {
         Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
         m_editor->addClient(account);
+        emit newUserOnline(account.getName());
     }
+
+
 }
 
 QVector<int> ClientController::getUserChars(int p_siteId)
@@ -122,6 +123,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
         m_editor->addClient(newUser);
+        emit newUserOnline(newUser.getName());
         //qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else if (l_header == "closeEditorRep") {
