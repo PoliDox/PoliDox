@@ -17,6 +17,7 @@ private:
     Account m_user;
     QList<QString> m_files;
     Log_Dialog loginWindow;
+    QString c_fileName;
 
 public:
     Client();

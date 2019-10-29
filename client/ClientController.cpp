@@ -3,11 +3,11 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName) :
     m_socket(p_socket)
 {        
     m_crdt = new CrdtClient(p_siteId);
-    m_editor = new Editor(this);
+    m_editor = new Editor(this, nullptr, fileName);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
@@ -171,3 +171,4 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     }
 
 }
+

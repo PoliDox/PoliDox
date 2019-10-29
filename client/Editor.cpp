@@ -19,7 +19,7 @@
 #include <QPushButton>
 #include <iostream>
 
-Editor::Editor(ClientController *p_controller, QWidget *parent) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName) :
     QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);

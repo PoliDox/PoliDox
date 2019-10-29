@@ -35,7 +35,7 @@ class Editor : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr);
+    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, QString fileName = "");
     ~Editor();
 
     void init(const QString &p_text);
@@ -77,6 +77,7 @@ private:
     void updateCursors();
     void highlightUserChars(int p_siteId);
 
+    QString fileName;
     ClientController *controller;
     bool handlingRemoteOp;
     QTextEdit *m_textEdit;
