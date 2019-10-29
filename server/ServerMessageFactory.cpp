@@ -34,9 +34,39 @@ QByteArray ServerMessageFactory::createLoginReply(bool response, const Account *
     for(QString nameDocument : nameDocuments){
         nameDocumentsArray.push_back(nameDocument);
     }
-    objToReturn.insert("nameDocuments",nameDocumentsArray);    
+    objToReturn.insert("nameDocuments",nameDocumentsArray);
 
     QJsonDocument docOfObj(objToReturn);    
+
+    return docOfObj.toJson(QJsonDocument::Indented);
+}
+
+
+QByteArray ServerMessageFactory::createClosedEditorReply(QList<QString>& nameDocuments){
+    QJsonObject objToReturn;
+    QJsonArray nameDocumentsArray;
+
+    objToReturn.insert("action","closedEditorRepl");
+
+    for(QString nameDocument : nameDocuments){
+        nameDocumentsArray.push_back(nameDocument);
+    }
+    objToReturn.insert("nameDocuments",nameDocumentsArray);
+
+    QJsonDocument docOfObj(objToReturn);
+
+    return docOfObj.toJson(QJsonDocument::Indented);
+}
+
+
+QByteArray ServerMessageFactory::createClosedEditorRemote(const Account *accountQuitted){
+    QJsonObject objToReturn;
+
+    objToReturn.insert("action","closedEditorRemote");
+    if(accountQuitted != nullptr)
+        objToReturn.insert("account", accountQuitted->toJson());
+
+    QJsonDocument docOfObj(objToReturn);
 
     return docOfObj.toJson(QJsonDocument::Indented);
 }

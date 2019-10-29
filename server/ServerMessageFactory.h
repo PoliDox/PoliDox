@@ -18,6 +18,8 @@ public:
     static QByteArray createLoginReply(bool response, const Account *account, QList<QString>& nameDocuments);
     static QByteArray createRegistrationUserReply(bool response, double siteIdOfRegisteredUser);
     static QByteArray createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts);
+    static QByteArray createClosedEditorReply(QList<QString>& nameDocuments);
+    static QByteArray createClosedEditorRemote(const Account *accountQuitted);
 };
 
 

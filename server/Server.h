@@ -27,8 +27,8 @@ public:
     explicit Server(quint16 port, QObject *parent = nullptr);
     Account* getAccount(QWebSocket *socketOfAccount);
     DatabaseManager* getDb();
-    void removeSocketAccountPair(QWebSocket *socketOfAccount);
-    void removeFileServcontrPair(QString filename);
+    void removeSocket2AccountPair(QWebSocket *socketOfAccount);
+    void removeFile2ServcontrPair(QString filename);
     virtual ~Server();
 
 /* ======================================================================

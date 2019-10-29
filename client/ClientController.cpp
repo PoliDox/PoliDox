@@ -107,13 +107,25 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     if (l_header == "insert") {
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
+        for(auto elem : this->m_crdt->getSymbols())
+            for(auto elem2 : elem)
+                qDebug() << "prima " << elem2.getFractionalPosition() << "   ";
         int linPos = m_crdt->remoteInsert(symbol);
+        for(auto elem : this->m_crdt->getSymbols())
+            for(auto elem2 : elem)
+                qDebug() << "dopo " << elem2.getFractionalPosition() << "   ";
         m_editor->handleRemoteOperation(INSERT_OP, symbol.getSiteId(), linPos, symbol.getValue());
 
     } else if (l_header== "delete") {
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
+        for(auto elem : this->m_crdt->getSymbols())
+            for(auto elem2 : elem)
+                qDebug() << "prima " << elem2.getFractionalPosition() << "   ";
         int linPos = m_crdt->remoteDelete(symbol);
+        for(auto elem : this->m_crdt->getSymbols())
+            for(auto elem2 : elem)
+                qDebug() << "dopo " << elem2.getFractionalPosition() << "   ";
         m_editor->handleRemoteOperation(DELETE_OP, symbol.getSiteId(), linPos);
 
     } else if (l_header == "newClient") {

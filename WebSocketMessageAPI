@@ -1,10 +1,10 @@
 INSERT
 "action" = "insert"
-char = { ... }
+"char" = { ... }
 
 DELETE
 "action" = "delete"
-char = { ... }
+"char" = { ... }
 
 NEW CLIENT CONNECTED ON DOCUMENT
 "action" = "newClient"
@@ -40,7 +40,8 @@ OPEN FILE REPL
 "action" = "openFileRepl"
 "response" = "ok"/"fail"
 "crdt" = { ... }        // here comes the crdt formatted in json array 
-"accounts" = { // array of client already present }
+"accounts" = { // array of clients with this file currently open }
+//TODO: add another field for sending all the clients who have the right to access to that file
 
 CREATE FILE REQ
 "action" = "createFileReq"
@@ -54,8 +55,14 @@ CREATE FILE REPL
 CLOSED EDITOR REQ
 "action" = "closedEditorReq"
 
-CLOSED EDITOR REPL
-"action" = "closedEditorRep"
+CLOSED EDITOR REPL         	//this is send only to the client that has just closed the file 
+"action" = "closedEditorRepl"
 "nameDocuments" = { ... }
+
+CLOSED EDITOR REMOTE		//to notify other clients connected on that document that a client has just quitted the document 
+"action" = "closedEditorRemote"
+"account" = { ... }         //the account who has just quitted the document
+
+
 
 NEW REMOTE FILE        // ???
