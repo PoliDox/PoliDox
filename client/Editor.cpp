@@ -17,9 +17,10 @@
 #include <QSpinBox>
 #include <QFontComboBox>
 #include <QPushButton>
+#include <QCheckBox>
 #include <iostream>
 
-Editor::Editor(ClientController *p_controller, QWidget *parent) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName) :
     QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
@@ -38,30 +39,45 @@ Editor::Editor(ClientController *p_controller, QWidget *parent) :
     QGridLayout* ContributorsLayout=new QGridLayout();
     ui->onlineList->setLayout(OnlineLayout);
     ui->contributorsList->setLayout(ContributorsLayout);
+
+    ui->label_3->setText(fileName);
+
+    QPixmap online("./online.png");
+    QIcon onlineIcon(online);
+    ui->label->setPixmap(onlineIcon.pixmap(QSize(10,10)));
+
+    QPixmap offline("./offline.png");
+    QIcon offlineIcon(offline);
+    ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
+
     OnlineLayout->setSpacing(0);
     ContributorsLayout->setSpacing(0);
 
-    OnlineLayout->addWidget(new QLabel("User1",ui->onlineList),0,0,0);
-    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),0,1,0);
-    OnlineLayout->addWidget(new QLabel("User2",ui->onlineList),1,0,0);
-    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),1,1,0);
-    OnlineLayout->addWidget(new QLabel("User3",ui->onlineList),2,0,0);
-    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),2,1,0);
-    OnlineLayout->addWidget(new QLabel("User4",ui->onlineList),3,0,0);
-    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),3,1,0);
-    OnlineLayout->addWidget(new QLabel("User5",ui->onlineList),4,0,0);
-    OnlineLayout->addWidget(new QPushButton("highlight",ui->onlineList),4,1,0);
 
-    ContributorsLayout->addWidget(new QLabel("User1",ui->contributorsList),0,0,0);
-    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),0,1,0);
-    ContributorsLayout->addWidget(new QLabel("User2",ui->contributorsList),1,0,0);
-    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),1,1,0);
-    ContributorsLayout->addWidget(new QLabel("User3",ui->contributorsList),2,0,0);
-    ContributorsLayout->addWidget(new QPushButton("highlight",ui->contributorsList),2,1,0);
+    OnlineLayout->addWidget(new QLabel("You",ui->onlineList),0,0);
+    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),0,1);
 
+    int i=1;
+    std::cout << "USER MAP SIZE: "<< m_users.size() << std::endl;
+    for(auto e : m_users.keys())
+    {
+      OnlineLayout->addWidget(new QLabel(m_users.find(e)->account.getName(),ui->onlineList),i,0);
+      OnlineLayout->addWidget(new QCheckBox(ui->onlineList),i,1);
+      i++;
+    }
 
+    QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    OnlineLayout->addItem(Ospacer,5,0);
 
+    ContributorsLayout->addWidget(new QLabel("User1",ui->contributorsList),0,0);
+    ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),0,1);
+    ContributorsLayout->addWidget(new QLabel("User2",ui->contributorsList),1,0);
+    ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),1,1);
+    ContributorsLayout->addWidget(new QLabel("User3",ui->contributorsList),2,0);
+    ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),2,1);
 
+    QSpacerItem *Cspacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    ContributorsLayout->addItem(Cspacer,5,0);
 
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {

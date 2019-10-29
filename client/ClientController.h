@@ -13,7 +13,7 @@ class ClientController : public QObject {
     Q_OBJECT
 
 public:
-    ClientController(QWebSocket *p_socket, double p_siteId);
+    ClientController(QWebSocket *p_socket, double p_siteId, QString fileName);
     ~ClientController();
 
     void init(const QJsonArray& p_crdt, const QJsonArray& p_accounts);
