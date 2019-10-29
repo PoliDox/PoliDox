@@ -71,10 +71,10 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         Account *loggedAccount = nullptr;
         QList<QString> nameDocuments;
 
-        //check if account is already logged
+        //check if account is already logged. If true, login is rejected
         bool alreadyLogged = false;
         for(Account* account : this->socket2account.values())
-            if(account->getName() == name)
+            if(account != nullptr && account->getName() == name)
                 alreadyLogged = true;
 
         int result = -1;
@@ -82,7 +82,7 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
             result = this->dbOperations->checkPassword(name, password);
         qDebug() << "Authentication result: " << result;
 
-        if(result >= 0){
+        if(alreadyLogged == false && result >= 0){
             loginSuccess = true;
             //in case of success, result will contain siteId and [image(TODO!!)]
             loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
