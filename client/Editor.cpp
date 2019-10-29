@@ -249,7 +249,9 @@ void Editor::on_actionSave_as_triggered()
 
 void Editor::on_actionQuit_triggered()
 {
-    QApplication::quit();
+    emit quit_editor();
+    this->hide();
+    //QApplication::quit();
 }
 
 void Editor::on_actionCopy_triggered()

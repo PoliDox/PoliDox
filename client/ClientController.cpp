@@ -29,6 +29,12 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
         m_socket->sendTextMessage(jsonString);
     });
 
+    connect(m_editor, &Editor::quit_editor, this, [&](){
+       QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
+
+        m_socket->sendTextMessage(jsonString);
+    });
+
     connect(m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
 
     m_editor->show();
@@ -116,6 +122,10 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         m_editor->addClient(newUser);
         qDebug() << "New client with siteId" << newUser.getSiteId();
 
+    } else if (l_header == "closeEditorRep") {
+        m_lf = new ListFiles();
+        //TODO: implementare la ricezione dei nomi file e farne la show nel listFiles
+        m_lf->show();
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }

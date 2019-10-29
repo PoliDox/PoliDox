@@ -45,6 +45,7 @@ public:
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
+    void quit_editor();
 
 private slots:
     void on_actionNew_triggered();

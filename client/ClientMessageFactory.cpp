@@ -67,3 +67,11 @@ QByteArray ClientMessageFactory::createNewFileMessage(const QString &p_filename)
     QJsonDocument l_doc(l_obj);
     return l_doc.toJson(QJsonDocument::Indented);
 }
+
+QByteArray ClientMessageFactory::createCloseEditorMessage(){
+    QJsonObject l_obj;
+    l_obj.insert("action", "closedEditorReq");
+
+    QJsonDocument l_doc(l_obj);
+    return l_doc.toJson(QJsonDocument::Indented);
+}
