@@ -85,8 +85,12 @@ void Editor::initUserList(){
     OnlineLayout->setSpacing(0);
     ContributorsLayout->setSpacing(0);
 
+    QCheckBox* checkbok=new QCheckBox(ui->onlineList);
+
     OnlineLayout->addWidget(new QLabel("You",ui->onlineList),0,0);
-    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),0,1);
+    OnlineLayout->addWidget(checkbok,0,1);
+
+    connect(checkbok,&QCheckBox::clicked,this,&Editor::highLightUser);
 
     QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     OnlineLayout->addItem(Ospacer,5,0);
@@ -94,6 +98,24 @@ void Editor::initUserList(){
     QSpacerItem *Cspacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ContributorsLayout->addItem(Cspacer,5,0);
 
+
+}
+
+void Editor::highLightUser(){
+
+    /* //TODO implementare una funzione che dato il vettore di linear
+     *        position relative al siteId calcoli tutti i
+     *        range di caratteri e chiami la funzione per evidenziare
+     *        su ogni range.
+     * */
+
+    QTextCharFormat fmt;
+    fmt.setBackground(QColor(Qt::yellow).lighter(160));
+    QTextCursor cursor(m_textEdit->document());
+    cursor.setPosition(2, QTextCursor::MoveAnchor);
+    cursor.setPosition(10, QTextCursor::KeepAnchor);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
 
 }
 
@@ -113,7 +135,7 @@ void Editor::addOfflineUser(Account account){
     QLabel* username=new QLabel(account.getName(),ui->offlineList);
     username->setStyleSheet("color:"+account.getColor().name());
     QGridLayout* OfflineLayout=static_cast<QGridLayout*>(ui->offlineList->layout());
-    OfflineLayout->addWidget(username,m_users.size(),0);
+    OfflineLayout->addWidget(username,m_users.size(),0); //TODO change m_users with offline users!
     OfflineLayout->addWidget(new QCheckBox(ui->offlineList),m_users.size(),1);
 
     QLabel* _dUser=ui->onlineList->findChild<QLabel*>(account.getName());
@@ -156,6 +178,7 @@ void Editor::init(const QString &p_text)
     m_textEdit->setPlainText(p_text);
     m_textEdit->show();
     handlingRemoteOp = false;
+
 }
 
 

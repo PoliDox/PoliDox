@@ -47,6 +47,7 @@ signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
     void quit_editor();
 
+
 private slots:
     void on_actionNew_triggered();
     void on_actionOpen_triggered();
@@ -72,6 +73,8 @@ private slots:
 
     void addOnlineUser(Account account);
     void addOfflineUser(Account account);
+
+    void highLightUser();
 
 private:
     void createActions();
