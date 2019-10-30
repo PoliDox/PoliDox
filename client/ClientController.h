@@ -30,7 +30,7 @@ public slots:
     void onTextChanged(int position, int charsRemoved, int charsAdded);
 
 signals:
-    void newUserOnline(QString username);
+    void newUserOnline(Account account);
 
 };
 

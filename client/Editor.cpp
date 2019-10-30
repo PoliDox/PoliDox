@@ -24,23 +24,55 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
-    this->ui->textEdit->setAcceptRichText(true);
+    ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
-    this->ui->textEdit->setStyleSheet( "background-color:white");
-    this->ui->toolBar_2->setStyleSheet( "background-color:transparent");
-    //setCentralWidget(m_textEdit);
+    ui->textEdit->setStyleSheet( "background-color:white");
+    ui->toolBar_2->setStyleSheet( "background-color:transparent");
+    //setCentralWidget(m_textEdit); //no more central widget because of user's list
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
+
     setWindowTitle("PoliDox");
+    ui->currentFile->setText(fileName);
+
+    initUserList();
+
+    connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
+        // If text changes because of a remote modification we mustn't emit the signal again,
+        // otherwise we fall in an endless loop
+        if (!handlingRemoteOp) {
+           updateCursors();
+           emit textChanged(position, charsRemoved, charsAdded);
+        }
+    });
+
+
+    initRichTextToolBar();
+
+
+    int TLines = ui->textEdit->document()->blockCount();
+    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
+
+    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
+        int line = ui->textEdit->textCursor().blockNumber()+1;
+        int pos = ui->textEdit->textCursor().columnNumber()+1;
+        int TLines = ui->textEdit->document()->blockCount();
+
+        ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
+    });
+
+    connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
+
+}
+
+void Editor::initUserList(){
 
     QGridLayout* OnlineLayout=new QGridLayout();
     QGridLayout* ContributorsLayout=new QGridLayout();
     ui->onlineList->setLayout(OnlineLayout);
-    ui->contributorsList->setLayout(ContributorsLayout);
-
-    ui->label_3->setText(fileName);
+    ui->offlineList->setLayout(ContributorsLayout);
 
     QPixmap online("./online.png");
     QIcon onlineIcon(online);
@@ -59,56 +91,37 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     OnlineLayout->addItem(Ospacer,5,0);
 
-    //TODO contributors list
-
-    ContributorsLayout->addWidget(new QLabel("User1",ui->contributorsList),0,0);
-    ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),0,1);
-    ContributorsLayout->addWidget(new QLabel("User2",ui->contributorsList),1,0);
-    ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),1,1);
-    ContributorsLayout->addWidget(new QLabel("User3",ui->contributorsList),2,0);
-    ContributorsLayout->addWidget(new QCheckBox(ui->contributorsList),2,1);
-
     QSpacerItem *Cspacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ContributorsLayout->addItem(Cspacer,5,0);
 
 
-    connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
-        // If text changes because of a remote modification we mustn't emit the signal again,
-        // otherwise we fall in an endless loop
-        if (!handlingRemoteOp) {
-           updateCursors();
-           emit textChanged(position, charsRemoved, charsAdded);
-        }
-    });
-
-
-    setRichTextToolBar();
-
-
-    int TLines = ui->textEdit->document()->blockCount();
-    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
-
-    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
-        int line = ui->textEdit->textCursor().blockNumber()+1;
-        int pos = ui->textEdit->textCursor().columnNumber()+1;
-        int TLines = ui->textEdit->document()->blockCount();
-
-        ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
-    });
-
-    connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
-
 }
 
-void Editor::addOnlineUser(QString username){
+void Editor::addOnlineUser(Account account){
 
+    QLabel* username=new QLabel(account.getName(),ui->onlineList);
+    username->setObjectName(account.getName());
+    username->setStyleSheet("color:"+account.getColor().name());
     QGridLayout* OnlineLayout=static_cast<QGridLayout*>(ui->onlineList->layout());
-    OnlineLayout->addWidget(new QLabel(username,ui->onlineList),m_users.size(),0);
+    OnlineLayout->addWidget(username,m_users.size(),0);
     OnlineLayout->addWidget(new QCheckBox(ui->onlineList),m_users.size(),1);
 
 }
 
-void Editor::setRichTextToolBar(){
+void Editor::addOfflineUser(Account account){
+
+    QLabel* username=new QLabel(account.getName(),ui->offlineList);
+    username->setStyleSheet("color:"+account.getColor().name());
+    QGridLayout* OfflineLayout=static_cast<QGridLayout*>(ui->offlineList->layout());
+    OfflineLayout->addWidget(username,m_users.size(),0);
+    OfflineLayout->addWidget(new QCheckBox(ui->offlineList),m_users.size(),1);
+
+    QLabel* _dUser=ui->onlineList->findChild<QLabel*>(account.getName());
+    delete _dUser;
+
+}
+
+void Editor::initRichTextToolBar(){
 
 
     QFontComboBox* font=new QFontComboBox(this->ui->textRichToolBar);

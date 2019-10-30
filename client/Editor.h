@@ -70,12 +70,14 @@ private slots:
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered();
 
-    void addOnlineUser(QString username);
+    void addOnlineUser(Account account);
+    void addOfflineUser(Account account);
 
 private:
     void createActions();
     void createStatusBar();
-    void setRichTextToolBar();
+    void initUserList();
+    void initRichTextToolBar();
     void updateCursors();
     void highlightUserChars(int p_siteId);
 

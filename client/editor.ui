@@ -26,7 +26,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="currentFile">
           <property name="text">
            <string>FILENAME</string>
           </property>
@@ -74,7 +74,7 @@
          <widget class="QListWidget" name="onlineList">
           <property name="maximumSize">
            <size>
-            <width>250</width>
+            <width>150</width>
             <height>16777215</height>
            </size>
           </property>
@@ -105,10 +105,10 @@
          </layout>
         </item>
         <item>
-         <widget class="QListWidget" name="contributorsList">
+         <widget class="QListWidget" name="offlineList">
           <property name="maximumSize">
            <size>
-            <width>250</width>
+            <width>150</width>
             <height>16777215</height>
            </size>
           </property>
