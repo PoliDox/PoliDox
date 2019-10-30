@@ -83,10 +83,10 @@ DatabaseManager::DatabaseManager() {
 //TODO: - sistemare il blocco catch
 //      - inserire l'immagine
 // - Returns siteId if the registration success, -1 otherwise
-double DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
+int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
     mongocxx::collection userCollection = (*this->db)["user"];
 
-    double siteId = this->getCounterOfCollection("user");
+    int siteId = (int)this->getCounterOfCollection("user");
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
@@ -121,7 +121,7 @@ double DatabaseManager::registerUser(QString& name, QString& password, QByteArra
 
 //TODO: - oltre al siteId, ritornare anche l'immagine
 //it returns the id of the account, -1 otherwise
-double DatabaseManager::checkPassword(QString& name, QString& password){
+int DatabaseManager::checkPassword(QString& name, QString& password){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
@@ -137,7 +137,7 @@ double DatabaseManager::checkPassword(QString& name, QString& password){
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element element = a["siteId"];
-        return element.get_double().value;
+        return (int)element.get_double().value;
     }
     else{
         return -1;
