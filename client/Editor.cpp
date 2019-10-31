@@ -107,39 +107,63 @@ void Editor::highLightUser(QListWidgetItem * item){
      *        su ogni range.
      * */
 
-    /*QTextCharFormat fmt;
-    fmt.setBackground(QColor(Qt::yellow).lighter(160));
-    QTextCursor cursor(m_textEdit->document());
-    cursor.setPosition(2, QTextCursor::MoveAnchor);
-    cursor.setPosition(3, QTextCursor::KeepAnchor);
-    cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);*/
 
-    /*QVector<int> userChars = controller->getUserChars(siteID);
+    QVector<int> userChars = controller->getUserChars(0); //perchè sitedID tutti a 0 ??
     std::cout << "USER CHARS ARE " << userChars.size() <<std::endl;
     QMap<int,int>* map=new QMap<int,int>();
 
     int start=0,
         lenght=0;
 
-    for(int i=1;i<userChars.size();i++){
+    if(userChars.size()>0){
 
-        if(lenght==0)
-            start=userChars[i-1];
+        for(int i=1;i<userChars.size();i++){
 
-        if(userChars[i]-userChars[i-1]>1){
-            lenght=0;
-            map->insert(start,lenght);
+            if(lenght==0)
+                start=userChars[i-1];
 
-        }else{
+            if(userChars[i]-userChars[i-1]>1){
+
+                lenght=0;
+                map->insert(start,lenght);
+
+            }else{
+
             lenght++;
+
+            }
         }
     }
 
-    std::cout<<map->value(0) <<std::endl;
+    map->insert(start,lenght);
 
-    highlightUserChars(0);*/
+    std::cout <<"SIZE "<< map->size()<<std::endl;
+    for(auto elem: *map){
 
+        std::cout <<elem <<std::endl;
+    }
+
+    disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
+
+    QColor color;
+    if(item->checkState() == Qt::Checked)
+        color=QColor(m_users[siteID].account.getColor().lighter(160));
+    else
+        color=QColor("transparent");
+
+    for(auto elem:(*map)){
+
+        QTextCharFormat fmt;
+        fmt.setBackground(color);
+        QTextCursor cursor(m_textEdit->document());
+        cursor.setPosition(map->key(elem), QTextCursor::MoveAnchor);
+        cursor.setPosition(map->key(elem)+elem, QTextCursor::KeepAnchor);
+        cursor.mergeCharFormat(fmt);
+        m_textEdit->mergeCurrentCharFormat(fmt);
+    }
+
+
+    connect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
 }
 

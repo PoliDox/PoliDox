@@ -1,5 +1,5 @@
 #include "Char.h"
-
+#include <iostream>
 
 
 Char::Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition)
