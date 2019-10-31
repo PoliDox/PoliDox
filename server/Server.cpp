@@ -87,6 +87,7 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
             //in case of success, result will contain siteId and [image(TODO!!)]
             loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
             this->socket2account[signalSender] = loggedAccount;
+            qDebug() << this->getAccount(signalSender)->getName();
 
             nameDocuments = this->dbOperations->getAllDocuments();
 

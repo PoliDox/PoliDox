@@ -63,9 +63,9 @@ QByteArray ServerMessageFactory::createClosedEditorRemote(const Account *account
     QJsonObject objToReturn;
 
     objToReturn.insert("action","closedEditorRemote");
-    if(accountQuitted != nullptr)
+    if(accountQuitted != nullptr){
         objToReturn.insert("account", accountQuitted->toJson());
-
+    }
     QJsonDocument docOfObj(objToReturn);
 
     return docOfObj.toJson(QJsonDocument::Indented);

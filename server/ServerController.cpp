@@ -157,8 +157,6 @@ void ServerController::disconnectAccount(){
 
     Account *accountToDisconnect = this->server->getAccount(signalSender);
 
-    this->server->removeSocket2AccountPair(signalSender);
-
     bool destroyServContr = false;
     this->socketsOnDocument.removeOne(signalSender);
     if(this->socketsOnDocument.size() == 0){
@@ -174,6 +172,7 @@ void ServerController::disconnectAccount(){
         }
     }
 
+    this->server->removeSocket2AccountPair(signalSender);
     //il distruttore lo chiama già la remove oppure no??
     signalSender->deleteLater();
     delete (accountToDisconnect);       //TODO: controlllare il distruttore
