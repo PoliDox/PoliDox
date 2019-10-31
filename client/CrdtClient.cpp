@@ -28,11 +28,16 @@ std::vector<int> CrdtClient::getUserPositions(int siteId)
                  j=0;
 
     std::vector<int> result;
-
+    std::cout << "GET CHAR OF SITEID, WE ARE INSIDE GETUSERPOS: "<<siteId <<std::endl;
     for(i=0;i<_symbols.size();i++){
-        for(j=0;j<_symbols[i].size();j++)
-            if(_symbols[i][j].getSiteId()==siteId)
+        for(j=0;j<_symbols[i].size();j++){
+            std::cout << "siteID inside matrix: ";
+            std::cout <<_symbols[i][j].getSiteId()<<std::endl;
+            if(_symbols[i][j].getSiteId()==siteId){
                     result.push_back(_toLinear(i,j));
+                    std::cout <<"found"<<std::endl;
+            }
+        }
     }
 
     return result;

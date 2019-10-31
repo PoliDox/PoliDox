@@ -69,11 +69,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
 
 void Editor::initUserList(){
 
-    QGridLayout* OnlineLayout=new QGridLayout();
-    QGridLayout* ContributorsLayout=new QGridLayout();
-    ui->onlineList->setLayout(OnlineLayout);
-    ui->offlineList->setLayout(ContributorsLayout);
-
     QPixmap online("./online.png");
     QIcon onlineIcon(online);
     ui->label->setPixmap(onlineIcon.pixmap(QSize(10,10)));
@@ -82,26 +77,29 @@ void Editor::initUserList(){
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
-    OnlineLayout->setSpacing(0);
-    ContributorsLayout->setSpacing(0);
+    QListWidgetItem* item= new QListWidgetItem("You",ui->onlineList);
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setCheckState(Qt::Unchecked);
 
-    QCheckBox* checkbok=new QCheckBox(ui->onlineList);
+    ui->onlineList->addItem(item);
 
-    OnlineLayout->addWidget(new QLabel("You",ui->onlineList),0,0);
-    OnlineLayout->addWidget(checkbok,0,1);
-
-    connect(checkbok,&QCheckBox::clicked,this,&Editor::highLightUser);
-
-    QSpacerItem *Ospacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    OnlineLayout->addItem(Ospacer,5,0);
-
-    QSpacerItem *Cspacer = new QSpacerItem(0, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    ContributorsLayout->addItem(Cspacer,5,0);
-
+    connect(ui->onlineList,&QListWidget::itemChanged,this,&Editor::highLightUser);
 
 }
 
-void Editor::highLightUser(){
+void Editor::highLightUser(QListWidgetItem * item){
+
+    int siteID=-1;
+
+    QList<User> valuesList = m_users.values(); // get a list of all the values
+
+    foreach(User value, valuesList){
+            if(value.account.getName() == item->text().toUtf8().constData())
+                siteID=value.account.getSiteId();
+        }
+
+    std::cout << "SITEID trovato: " <<siteID<<std::endl;
 
     /* //TODO implementare una funzione che dato il vettore di linear
      *        position relative al siteId calcoli tutti i
@@ -109,37 +107,56 @@ void Editor::highLightUser(){
      *        su ogni range.
      * */
 
-    QTextCharFormat fmt;
+    /*QTextCharFormat fmt;
     fmt.setBackground(QColor(Qt::yellow).lighter(160));
     QTextCursor cursor(m_textEdit->document());
     cursor.setPosition(2, QTextCursor::MoveAnchor);
-    cursor.setPosition(10, QTextCursor::KeepAnchor);
+    cursor.setPosition(3, QTextCursor::KeepAnchor);
     cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);*/
+
+    /*QVector<int> userChars = controller->getUserChars(siteID);
+    std::cout << "USER CHARS ARE " << userChars.size() <<std::endl;
+    QMap<int,int>* map=new QMap<int,int>();
+
+    int start=0,
+        lenght=0;
+
+    for(int i=1;i<userChars.size();i++){
+
+        if(lenght==0)
+            start=userChars[i-1];
+
+        if(userChars[i]-userChars[i-1]>1){
+            lenght=0;
+            map->insert(start,lenght);
+
+        }else{
+            lenght++;
+        }
+    }
+
+    std::cout<<map->value(0) <<std::endl;
+
+    highlightUserChars(0);*/
+
 
 }
 
 void Editor::addOnlineUser(Account account){
 
-    QLabel* username=new QLabel(account.getName(),ui->onlineList);
-    username->setObjectName(account.getName());
-    username->setStyleSheet("color:"+account.getColor().name());
-    QGridLayout* OnlineLayout=static_cast<QGridLayout*>(ui->onlineList->layout());
-    OnlineLayout->addWidget(username,m_users.size(),0);
-    OnlineLayout->addWidget(new QCheckBox(ui->onlineList),m_users.size(),1);
+    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setBackgroundColor(account.getColor().lighter(170));
+    item->setCheckState(Qt::Unchecked);
+    ui->onlineList->addItem(item);
+
 
 }
 
 void Editor::addOfflineUser(Account account){
 
-    QLabel* username=new QLabel(account.getName(),ui->offlineList);
-    username->setStyleSheet("color:"+account.getColor().name());
-    QGridLayout* OfflineLayout=static_cast<QGridLayout*>(ui->offlineList->layout());
-    OfflineLayout->addWidget(username,m_users.size(),0); //TODO change m_users with offline users!
-    OfflineLayout->addWidget(new QCheckBox(ui->offlineList),m_users.size(),1);
-
-    QLabel* _dUser=ui->onlineList->findChild<QLabel*>(account.getName());
-    delete _dUser;
 
 }
 
@@ -241,15 +258,17 @@ void Editor::updateCursors()
 
 void Editor::highlightUserChars(int p_siteId)
 {
+
     QVector<int> userChars = controller->getUserChars(p_siteId);
     QTextCursor tmpCursor(m_textDoc);
     QColor color = m_users[p_siteId].account.getColor();
     QTextCharFormat format;
-    format.setBackground(color);
+    format.setBackground(color.lighter(160));
     for (int charPos : userChars) {
         tmpCursor.setPosition(charPos);
         tmpCursor.select(QTextCursor::WordUnderCursor);
         tmpCursor.mergeCharFormat(format);
+        // MaBorghe perchè se una parola è lunga 20lettere la evidenzi 20 volte ? =(
     }
 }
 

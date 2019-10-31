@@ -6,6 +6,7 @@
 #include <QTextDocument>
 #include <QMap>
 #include <QLabel>
+#include <QListWidgetItem>
 #include "Account.h"
 #include "Styler.h"
 #include "ClientController.h"
@@ -74,7 +75,7 @@ private slots:
     void addOnlineUser(Account account);
     void addOfflineUser(Account account);
 
-    void highLightUser();
+    void highLightUser(QListWidgetItem * item);
 
 private:
     void createActions();
