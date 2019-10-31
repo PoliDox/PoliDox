@@ -101,15 +101,16 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     Char charObj = Char::fromJson(charJson);
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
+    int siteId = charObj.getSiteId();
 
     QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
-        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, fractPos);
+        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
     }
     else if(header == "delete"){
         this->crdt->remoteDelete(charObj);
-        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, fractPos);
+        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
     }
     else if(header == "closedEditorReq"){
         QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());

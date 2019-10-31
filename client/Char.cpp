@@ -31,6 +31,11 @@ char Char::getValue() const {
 }
 
 
+int Char::getSiteId(){
+    return siteId;
+}
+
+
 bool Char::operator < (const Char& other) const {
     return this->fractionalPosition < other.fractionalPosition;
 }
@@ -54,7 +59,7 @@ QJsonObject Char::toJson() const {
 Char Char::fromJson(const QJsonObject& charJSON){
     // TODO: What if some value is missing? E.g. There is no "value"
     char value = charJSON["value"].toString().at(0).toLatin1();
-    int siteId = charJSON["siteId"].toInt();
+    int siteId = (int)charJSON["siteId"].toDouble();
     QJsonArray fractionalPositionObjJSON = charJSON["position"].toArray();  //TODO: mettersi d'accordo sul campo, position o fractionalPosition
 
     std::vector<int> fractionalPosition;
