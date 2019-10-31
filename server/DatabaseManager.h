@@ -40,8 +40,8 @@ public:
     int registerUser(QString& name, QString& password, QByteArray& image);
     int checkPassword(QString& name, QString& password);
     bool insertNewDocument(QString& documentName);
-    bool insertSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition);
-    bool deleteSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition);
+    bool insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
+    bool deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
     QList<Char> getAllInserts(QString& nameDocument);
     QList<QString> getAllDocuments();
     mongocxx::database getDb();

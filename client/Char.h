@@ -28,8 +28,7 @@ public:
     char getValue() const;
     bool operator < (const Char& other) const;
     ~Char();
-
-    int getSiteId(){return siteId;}
+    int getSiteId();
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;

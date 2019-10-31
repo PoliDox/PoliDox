@@ -167,10 +167,11 @@ bool DatabaseManager::insertNewDocument(QString& documentName){
 
 //TODO: - sistemare il valore di ritorno
 //      - implementare il vincolo di integrità su nameDocument
-bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition) {
+bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     double counterInsert = this->getCounterOfCollection("insert");
+    double siteIdDouble = (double)siteIdOfSymbol;
 
     auto array_builder = bsoncxx::builder::basic::array{};
     for (int element : fractionalPosition) {
@@ -181,8 +182,9 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::
     bsoncxx::document::value symbolToInsert =
         elementBuilder << "_id"                << counterInsert
                        << "nameDocument"       << nameDocument.toUtf8().constData()
-                       << "value"             << symbol.toUtf8().constData()
-                       << "position" << array_builder
+                       << "value"              << symbol.toUtf8().constData()
+                       << "siteId"             << siteIdDouble
+                       << "position"           << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToInsertView = symbolToInsert.view();
 
@@ -201,8 +203,10 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::
 //        eventuale eccezione alzata dalla delete_one
 //A symbol is uniquely identified by his fractional position and belonging document,
 //so "symbol parameter" is useful, we pass it only for sake of completeness
-bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition){
+bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition){
     mongocxx::collection insertCollection = (*this->db)["insert"];
+
+    double siteIdDouble = (double)siteIdOfSymbol;
 
     auto array_builder = bsoncxx::builder::basic::array{};
     for (int element : fractionalPosition) {
@@ -212,8 +216,9 @@ bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value symbolToDelete =
         elementBuilder << "nameDocument"       << nameDocument.toUtf8().constData()
-                       << "value"             << symbol.toUtf8().constData()
-                       << "position" << array_builder
+                       << "value"              << symbol.toUtf8().constData()
+                       << "siteId"             << siteIdDouble
+                       << "position"           << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToDeleteView = symbolToDelete.view();
 
@@ -248,8 +253,7 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
             throw "DatabaseManager::getAllInserts  error";       //TODO: da sistemare
         }
 
-        QJsonObject insertObjJson;
-        insertObjJson = stringDocJSON.object();
+        QJsonObject insertObjJson = stringDocJSON.object();
 
         qDebug() << "insertObjJson:    " << insertObjJson;
 
