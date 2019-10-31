@@ -108,7 +108,7 @@ void Editor::highLightUser(QListWidgetItem * item){
      * */
 
 
-    QVector<int> userChars = controller->getUserChars(0); //perchè sitedID tutti a 0 ??
+    QVector<int> userChars = controller->getUserChars(siteID); //perchè sitedID tutti a 0 ??
     std::cout << "USER CHARS ARE " << userChars.size() <<std::endl;
     QMap<int,int>* map=new QMap<int,int>();
 
@@ -117,19 +117,23 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     if(userChars.size()>0){
 
-        for(int i=1;i<userChars.size();i++){
+        for(int i=1;i<=userChars.size();i++){
 
             if(lenght==0)
                 start=userChars[i-1];
 
+            lenght++;
+
+            if(i==userChars.size()){
+                 map->insert(start,lenght);
+                 break;
+            }
+
+
             if(userChars[i]-userChars[i-1]>1){
 
-                lenght=0;
                 map->insert(start,lenght);
-
-            }else{
-
-            lenght++;
+                lenght=0;
 
             }
         }
@@ -139,8 +143,7 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     std::cout <<"SIZE "<< map->size()<<std::endl;
     for(auto elem: *map){
-
-        std::cout <<elem <<std::endl;
+        std::cout <<"KEY "<<map->key(elem)<<" ELEM: "<<elem <<std::endl;
     }
 
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
