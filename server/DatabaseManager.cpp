@@ -23,12 +23,12 @@ void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
 }
 
 
-void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, double initialValue){
+void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, int initialValue){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value elemToInsert =
-        elementBuilder << "_id"      << nameDocument.toUtf8().constData()
+        elementBuilder << "_id"                 << nameDocument.toUtf8().constData()
                        << "sequentialCounter"   << initialValue
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view elemToInsertView = elemToInsert.view();
@@ -43,7 +43,7 @@ void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, dou
 }
 
 
-double DatabaseManager::getCounterOfCollection(QString nameCollection){
+int DatabaseManager::getCounterOfCollection(QString nameCollection){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
@@ -56,12 +56,12 @@ double DatabaseManager::getCounterOfCollection(QString nameCollection){
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element element = a["sequentialCounter"];
-        return element.get_double().value;
+        return element.get_int32().value;
     }
     else{
         //it's the first time; so insert new element in counter collection
         //with fields: "_id":nameCollection , "sequentialCounter":firstValue
-        double initialValue = 0;
+        int initialValue = 0;
         insertNewElemInCounterCollection(nameCollection, initialValue);
         return initialValue;
     }
@@ -86,7 +86,7 @@ DatabaseManager::DatabaseManager() {
 int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
     mongocxx::collection userCollection = (*this->db)["user"];
 
-    int siteId = (int)this->getCounterOfCollection("user");
+    int siteId = this->getCounterOfCollection("user");
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
@@ -115,7 +115,7 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
     }
 
     this->incrementCounterOfCollection("user");
-    return siteId;
+    return (int)siteId;
 }
 
 
@@ -137,7 +137,8 @@ int DatabaseManager::checkPassword(QString& name, QString& password){
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element element = a["siteId"];
-        return (int)element.get_double().value;
+        int siteIdToReturn = element.get_int32().value;
+        return siteIdToReturn;
     }
     else{
         return -1;
@@ -170,8 +171,7 @@ bool DatabaseManager::insertNewDocument(QString& documentName){
 bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
-    double counterInsert = this->getCounterOfCollection("insert");
-    double siteIdDouble = (double)siteIdOfSymbol;
+    int counterInsert = this->getCounterOfCollection("insert");
 
     auto array_builder = bsoncxx::builder::basic::array{};
     for (int element : fractionalPosition) {
@@ -183,7 +183,7 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
         elementBuilder << "_id"                << counterInsert
                        << "nameDocument"       << nameDocument.toUtf8().constData()
                        << "value"              << symbol.toUtf8().constData()
-                       << "siteId"             << siteIdDouble
+                       << "siteId"             << siteIdOfSymbol
                        << "position"           << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToInsertView = symbolToInsert.view();
@@ -206,8 +206,6 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
 bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition){
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
-    double siteIdDouble = (double)siteIdOfSymbol;
-
     auto array_builder = bsoncxx::builder::basic::array{};
     for (int element : fractionalPosition) {
         array_builder.append(element);
@@ -217,7 +215,7 @@ bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int s
     bsoncxx::document::value symbolToDelete =
         elementBuilder << "nameDocument"       << nameDocument.toUtf8().constData()
                        << "value"              << symbol.toUtf8().constData()
-                       << "siteId"             << siteIdDouble
+                       << "siteId"             << siteIdOfSymbol
                        << "position"           << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToDeleteView = symbolToDelete.view();

@@ -32,8 +32,8 @@ private:
     mongocxx::uri *uri;
 
     void incrementCounterOfCollection(QString nameCollection);
-    double getCounterOfCollection(QString nameCollection);
-    void insertNewElemInCounterCollection(QString nameDocument, double initialValue);
+    int getCounterOfCollection(QString nameCollection);
+    void insertNewElemInCounterCollection(QString nameDocument, int initialValue);
 
 public:
     DatabaseManager();
