@@ -42,7 +42,9 @@ public:
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
-    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);    
+    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
+    QTextDocument* getDocument();
+    QTextEdit* getQTextEdit();
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);

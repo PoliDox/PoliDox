@@ -147,6 +147,15 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
 
     //qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
+    /************************************************************************************************/
+    //This is needed to avoid that the character inserted copy the style of the previous character
+    QTextCharFormat fmt;
+    fmt.setBackground(QColor("transparent"));
+    QTextCursor cursor(m_editor->getDocument());
+    cursor.mergeCharFormat(fmt);
+    m_editor->getQTextEdit()->mergeCurrentCharFormat(fmt);
+    /************************************************************************************************/
+
     if (charsAdded > 1 && position == 0 &&
             m_editor->at(0) != QChar::ParagraphSeparator) {
         // When copying to the beginning everything is deleted and copied anew

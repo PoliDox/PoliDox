@@ -92,6 +92,8 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     int siteID=-1;
 
+
+
     QList<User> valuesList = m_users.values(); // get a list of all the values
 
     foreach(User value, valuesList){
@@ -110,7 +112,7 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     QVector<int> userChars = controller->getUserChars(siteID); //perchè sitedID tutti a 0 ??
     std::cout << "USER CHARS ARE " << userChars.size() <<std::endl;
-    QMap<int,int>* map=new QMap<int,int>();
+    QMap<int,int> map;
 
     int start=0,
         lenght=0;
@@ -125,25 +127,25 @@ void Editor::highLightUser(QListWidgetItem * item){
             lenght++;
 
             if(i==userChars.size()){
-                 map->insert(start,lenght);
+                 map.insert(start,lenght);
                  break;
             }
 
 
             if(userChars[i]-userChars[i-1]>1){
 
-                map->insert(start,lenght);
+                map.insert(start,lenght);
                 lenght=0;
 
             }
         }
     }
 
-    map->insert(start,lenght);
+    map.insert(start,lenght);
 
-    std::cout <<"SIZE "<< map->size()<<std::endl;
-    for(auto elem: *map){
-        std::cout <<"KEY "<<map->key(elem)<<" ELEM: "<<elem <<std::endl;
+    std::cout <<"SIZE "<< map.size()<<std::endl;
+    for(auto elem: map){
+        std::cout <<"KEY "<<map.key(elem)<<" ELEM: "<<elem <<std::endl;
     }
 
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
@@ -154,19 +156,20 @@ void Editor::highLightUser(QListWidgetItem * item){
     else
         color=QColor("transparent");
 
-    for(auto elem:(*map)){
+    for(auto elem:map){
 
         QTextCharFormat fmt;
         fmt.setBackground(color);
         QTextCursor cursor(m_textEdit->document());
-        cursor.setPosition(map->key(elem), QTextCursor::MoveAnchor);
-        cursor.setPosition(map->key(elem)+elem, QTextCursor::KeepAnchor);
+        cursor.setPosition(map.key(elem), QTextCursor::MoveAnchor);
+        cursor.setPosition(map.key(elem)+elem, QTextCursor::KeepAnchor);
         cursor.mergeCharFormat(fmt);
         m_textEdit->mergeCurrentCharFormat(fmt);
     }
 
 
     connect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
+
 
 }
 
@@ -236,6 +239,7 @@ void Editor::addClient(const Account& user)
     // Add user to the map of remote users
     int siteId = user.getSiteId();
     QLabel *remoteLabel = new QLabel(QString("|"), m_textEdit);
+    remoteLabel->setStyleSheet("color:"+user.getColor().name());
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_users[siteId] = newUser;    
 
@@ -385,7 +389,7 @@ void Editor::on_actionBold_triggered()
 {
 
     QTextCharFormat fmt;
-    fmt.setFontWeight(this->ui->textRichToolBar->actions().at(1)->isChecked() ? QFont::Bold : QFont::Normal);
+    fmt.setFontWeight(this->ui->textRichToolBar->actions().at(0)->isChecked() ? QFont::Bold : QFont::Normal);
 
     QTextCursor cursor = m_textEdit->textCursor();
 
@@ -399,7 +403,7 @@ void Editor::on_actionItalic_triggered()
 {
 
     QTextCharFormat fmt;
-    fmt.setFontItalic(this->ui->textRichToolBar->actions().at(2)->isChecked());
+    fmt.setFontItalic(this->ui->textRichToolBar->actions().at(1)->isChecked());
 
     QTextCursor cursor = m_textEdit->textCursor();
 
@@ -412,7 +416,7 @@ void Editor::on_actionUnderlined_triggered()
 {
 
     QTextCharFormat fmt;
-    fmt.setFontUnderline(this->ui->textRichToolBar->actions().at(3)->isChecked());
+    fmt.setFontUnderline(this->ui->textRichToolBar->actions().at(2)->isChecked());
 
     QTextCursor cursor = m_textEdit->textCursor();
 
@@ -440,8 +444,8 @@ void Editor::fontFamilyChanged(const QFont& font){
 
 void Editor::on_actionLeftAllignmet_triggered()
 {
-    QAction* center=this->ui->textRichToolBar->actions().at(6);
-    QAction* right=this->ui->textRichToolBar->actions().at(7);
+    QAction* center=this->ui->textRichToolBar->actions().at(5);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);
 
     if(center->isChecked())
         center->setChecked(false);
@@ -453,8 +457,8 @@ void Editor::on_actionLeftAllignmet_triggered()
 
 void Editor::on_actionAlignCenter_triggered()
 {
-    QAction* left=this->ui->textRichToolBar->actions().at(5);
-    QAction* right=this->ui->textRichToolBar->actions().at(7);
+    QAction* left=this->ui->textRichToolBar->actions().at(4);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);
 
     if(left->isChecked())
         left->setChecked(false);
@@ -467,8 +471,8 @@ void Editor::on_actionAlignCenter_triggered()
 
 void Editor::on_actionAlignRight_triggered()
 {
-    QAction* left=this->ui->textRichToolBar->actions().at(5);
-    QAction* center=this->ui->textRichToolBar->actions().at(6);
+    QAction* left=this->ui->textRichToolBar->actions().at(4);
+    QAction* center=this->ui->textRichToolBar->actions().at(5);
 
     if(left->isChecked())
         left->setChecked(false);
@@ -480,9 +484,9 @@ void Editor::on_actionAlignRight_triggered()
 
 void Editor::on_actionJustify_triggered()
 {
-    QAction* left=this->ui->textRichToolBar->actions().at(5);
-    QAction* center=this->ui->textRichToolBar->actions().at(6);
-    QAction* right=this->ui->textRichToolBar->actions().at(7);
+    QAction* left=this->ui->textRichToolBar->actions().at(4);
+    QAction* center=this->ui->textRichToolBar->actions().at(5);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);
 
     if(left->isChecked())
         left->setChecked(false);
@@ -493,4 +497,12 @@ void Editor::on_actionJustify_triggered()
 
     m_textEdit->setAlignment(Qt::AlignJustify);
 
+}
+
+QTextDocument* Editor::getDocument(){
+    return m_textDoc;
+}
+
+QTextEdit* Editor::getQTextEdit(){
+    return m_textEdit;
 }
