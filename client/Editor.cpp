@@ -95,8 +95,6 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     int siteID=-1;
 
-
-
     QList<User> valuesList = m_users.values(); // get a list of all the values
 
     foreach(User value, valuesList){
@@ -104,17 +102,7 @@ void Editor::highLightUser(QListWidgetItem * item){
                 siteID=value.account.getSiteId();
         }
 
-    std::cout << "SITEID trovato: " <<siteID<<std::endl;
-
-    /* //TODO implementare una funzione che dato il vettore di linear
-     *        position relative al siteId calcoli tutti i
-     *        range di caratteri e chiami la funzione per evidenziare
-     *        su ogni range.
-     * */
-
-
-    QVector<int> userChars = controller->getUserChars(siteID); //perchè sitedID tutti a 0 ??
-    std::cout << "USER CHARS ARE " << userChars.size() <<std::endl;
+    QVector<int> userChars = controller->getUserChars(siteID);
     QMap<int,int> map;
 
     int start=0,
@@ -144,18 +132,14 @@ void Editor::highLightUser(QListWidgetItem * item){
         }
     }
 
-    map.insert(start,lenght);
-
-    std::cout <<"SIZE "<< map.size()<<std::endl;
-    for(auto elem: map){
-        std::cout <<"KEY "<<map.key(elem)<<" ELEM: "<<elem <<std::endl;
-    }
-
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
     QColor color;
-    if(item->checkState() == Qt::Checked)
-        color=QColor(m_users[siteID].account.getColor().lighter(160));
+
+    if(item->checkState() == Qt::Checked){
+        color=QColor(m_users[siteID].account.getColor());
+        color.setAlpha(80);
+    }
     else
         color=QColor("transparent");
 
@@ -179,30 +163,46 @@ void Editor::highLightUser(QListWidgetItem * item){
 void Editor::addOnlineUser(Account account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
+
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-    item->setBackgroundColor(account.getColor().lighter(170));
+
+    QColor color(account.getColor());
+    color.setAlpha(80);
+    item->setBackgroundColor(color);
+
     item->setCheckState(Qt::Unchecked);
+
     ui->onlineList->addItem(item);
 
 }
 
 void Editor::addOfflineUser(Account account){
 
-    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
-    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-    item->setBackgroundColor(account.getColor().lighter(170));
-    item->setCheckState(Qt::Unchecked);
-    ui->offlineList->addItem(item);
-
-
+    QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
     foreach(QListWidgetItem * item, items)
     {
-        delete item;
+        _dItem=item;
     }
+
+    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    QColor color(account.getColor());
+    color.setAlpha(80);
+    item->setBackgroundColor(color);
+
+    if(_dItem->checkState() == Qt::Checked)
+        item->setCheckState(Qt::Checked);
+    else
+        item->setCheckState(Qt::Unchecked);
+
+    delete _dItem;
+    ui->offlineList->addItem(item);
+
+
 
 }
 
