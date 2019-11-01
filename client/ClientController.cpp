@@ -133,7 +133,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "closedEditorRemote") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
-        m_editor->addOfflineUser(offlineUser);
+        emit userOffline(offlineUser);
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }

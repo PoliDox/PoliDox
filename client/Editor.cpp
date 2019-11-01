@@ -64,6 +64,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     });
 
     connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
+    connect(controller,&ClientController::userOffline,this,&Editor::addOfflineUser);
+
 
 }
 
@@ -85,6 +87,7 @@ void Editor::initUserList(){
     ui->onlineList->addItem(item);
 
     connect(ui->onlineList,&QListWidget::itemChanged,this,&Editor::highLightUser);
+    connect(ui->offlineList,&QListWidget::itemChanged,this,&Editor::highLightUser);
 
 }
 
@@ -193,12 +196,13 @@ void Editor::addOfflineUser(Account account){
     item->setCheckState(Qt::Unchecked);
     ui->offlineList->addItem(item);
 
-    //todo: fare la cancellazione account dalla lista degli online
-    /*auto items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchContains);
-    foreach(QListWidgetItem * item_, items)
+
+    QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
+
+    foreach(QListWidgetItem * item, items)
     {
-        delete ui->onlineList->takeItem(ui->onlineList->row(item_));
-    }*/
+        delete item;
+    }
 
 }
 

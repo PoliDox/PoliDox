@@ -31,6 +31,7 @@ public slots:
 
 signals:
     void newUserOnline(Account account);
+    void userOffline(Account account);
 
 };
 
