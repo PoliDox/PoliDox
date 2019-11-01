@@ -26,9 +26,10 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
+    //TODO spostare in QTdesign
     ui->textEdit->setStyleSheet( "background-color:white");
     ui->toolBar_2->setStyleSheet( "background-color:transparent");
-    //setCentralWidget(m_textEdit); //no more central widget because of user's list
+    //setCentralWidget(m_textEdit); //no more central widget because of user's lists
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
@@ -97,10 +98,18 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     QList<User> valuesList = m_users.values(); // get a list of all the values
 
-    foreach(User value, valuesList){
-            if(value.account.getName() == item->text().toUtf8().constData())
-                siteID=value.account.getSiteId();
-        }
+    auto userHIT=std::find_if(valuesList.begin(),valuesList.end(),[item](User user){
+
+            if(user.account.getName()==item->text().toUtf8().constData())
+                return true;
+            else
+                return false;
+    });
+
+    if(userHIT!=valuesList.end())
+        siteID=userHIT->account.getSiteId();
+    else
+        std::cout << "PANIC! USER ONLINE NOT FOUND" << std::endl;
 
     QVector<int> userChars = controller->getUserChars(siteID);
     QMap<int,int> map;
@@ -134,6 +143,13 @@ void Editor::highLightUser(QListWidgetItem * item){
 
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
+    for(auto elem:userChars)
+        std::cout <<elem<<" ";
+
+    for (auto it = map.begin(); it != map.end(); ++it)
+        std::cout << it.key() << "-"<<it.value()<<std::endl;
+
+
     QColor color;
 
     if(item->checkState() == Qt::Checked){
@@ -143,13 +159,13 @@ void Editor::highLightUser(QListWidgetItem * item){
     else
         color=QColor("transparent");
 
-    for(auto elem:map){
+    for (auto it = map.begin(); it != map.end(); ++it){
 
         QTextCharFormat fmt;
         fmt.setBackground(color);
         QTextCursor cursor(m_textEdit->document());
-        cursor.setPosition(map.key(elem), QTextCursor::MoveAnchor);
-        cursor.setPosition(map.key(elem)+elem, QTextCursor::KeepAnchor);
+        cursor.setPosition(it.key(), QTextCursor::MoveAnchor);
+        cursor.setPosition(it.key()+it.value(), QTextCursor::KeepAnchor);
         cursor.mergeCharFormat(fmt);
         m_textEdit->mergeCurrentCharFormat(fmt);
     }
@@ -182,14 +198,18 @@ void Editor::addOfflineUser(Account account){
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
-    foreach(QListWidgetItem * item, items)
-    {
-        _dItem=item;
-    }
+    if(items.size()==0)
+        std::cout << "PANIC! USER NOT FOUND"<< std::endl;
+    else if(items.size()>1)
+        std::cout << "PANIC! MORE USER WITH SAME SITEID"<< std::endl;
+    else if(items.size()==1)
+         _dItem=items.at(0); //there should be always one item in this list
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
+
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+
     QColor color(account.getColor());
     color.setAlpha(80);
     item->setBackgroundColor(color);
@@ -201,8 +221,6 @@ void Editor::addOfflineUser(Account account){
 
     delete _dItem;
     ui->offlineList->addItem(item);
-
-
 
 }
 
@@ -256,6 +274,7 @@ void Editor::addClient(const Account& user)
     int siteId = user.getSiteId();
     QLabel *remoteLabel = new QLabel(QString("|"), m_textEdit);
     remoteLabel->setStyleSheet("color:"+user.getColor().name());
+    remoteLabel->lower();
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_users[siteId] = newUser;    
 
