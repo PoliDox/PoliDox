@@ -26,10 +26,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
-    //TODO spostare in QTdesign
-    ui->textEdit->setStyleSheet( "background-color:white");
-    ui->toolBar_2->setStyleSheet( "background-color:transparent");
-    //setCentralWidget(m_textEdit); //no more central widget because of user's lists
+
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
@@ -231,7 +228,7 @@ void Editor::initRichTextToolBar(){
     QSpinBox* spinBox=new QSpinBox(this->ui->textRichToolBar);
 
     m_textEdit->setFont(font->currentFont());
-    m_textEdit->setFontPointSize(15);
+    m_textEdit->setFontPointSize(20);
     spinBox->setValue(m_textEdit->fontPointSize());
 
     this->ui->textRichToolBar->addWidget(font);
@@ -272,8 +269,8 @@ void Editor::addClient(const Account& user)
 {   
     // Add user to the map of remote users
     int siteId = user.getSiteId();
-    QLabel *remoteLabel = new QLabel(QString("|"), m_textEdit);
-    remoteLabel->setStyleSheet("color:"+user.getColor().name());
+    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
+    remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;font-family:American Typewriter;font-weight:bold");
     remoteLabel->lower();
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_users[siteId] = newUser;    
@@ -282,7 +279,7 @@ void Editor::addClient(const Account& user)
     QTextCursor& remoteCursor = m_users[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
-    remoteLabel->move(curCoord.left(), curCoord.top());
+    remoteLabel->move(curCoord.left()-2, curCoord.top()-7);
     remoteLabel->setVisible(true);
     //m_textEdit->raise();
 }
@@ -317,7 +314,7 @@ void Editor::updateCursors()
 
         User& user = it.value();
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
-        user.label->move(remoteCoord.left(), remoteCoord.top());
+        user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
         user.label->setVisible(true);
     }
 }
