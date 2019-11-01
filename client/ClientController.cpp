@@ -130,6 +130,10 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         m_lf = new ListFiles();
         //TODO: implementare la ricezione dei nomi file e farne la show nel listFiles
         m_lf->show();
+    } else if (l_header == "closedEditorRemote") {
+        QJsonObject accountObj = _JSONobj["account"].toObject();
+        Account offlineUser = Account::fromJson(accountObj);
+        m_editor->addOfflineUser(offlineUser);
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }

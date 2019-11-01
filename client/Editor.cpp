@@ -179,11 +179,23 @@ void Editor::addOnlineUser(Account account){
     item->setCheckState(Qt::Unchecked);
     ui->onlineList->addItem(item);
 
-
 }
 
 void Editor::addOfflineUser(Account account){
 
+    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setBackgroundColor(account.getColor().lighter(170));
+    item->setCheckState(Qt::Unchecked);
+    ui->offlineList->addItem(item);
+
+    //todo: fare la cancellazione account dalla lista degli online
+    /*auto items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchContains);
+    foreach(QListWidgetItem * item_, items)
+    {
+        delete ui->onlineList->takeItem(ui->onlineList->row(item_));
+    }*/
 
 }
 

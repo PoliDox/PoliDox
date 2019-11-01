@@ -43,6 +43,7 @@ public:
     QChar at(int pos);
     void addClient(const Account& user);
     void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);    
+    void addOfflineUser(Account account);
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
@@ -73,7 +74,6 @@ private slots:
     void on_actionJustify_triggered();
 
     void addOnlineUser(Account account);
-    void addOfflineUser(Account account);
 
     void highLightUser(QListWidgetItem * item);
 
