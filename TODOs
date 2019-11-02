@@ -1,4 +1,5 @@
 URGENTI
+modificare il costruttore di Editor in modo da inviargli due QList<Account> al boot. Una di queste liste deve contenere Gli account attualmente online sul documento, l' altra quelli offline. Bisogna inviare al client la lista degli utenti, online e offline, in modo da inizializzare correttamente queste liste al boot dell' editor
 bottone nella registration form per tornare al login form se ho cliccato sign up per sbaglio
 
 NON URGENTI
