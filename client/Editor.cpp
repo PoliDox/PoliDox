@@ -37,6 +37,24 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
 
     initUserList();
 
+    /*TODO: passare al costruttore dell' editor la lista degli utenti online e offline
+     *      in modo da poterne fare lo startup iniziale
+     *
+     *      questo e' uno stub iniziale di prova.
+     */
+    QList<Account> contributorsOnlineStub;
+    QList<Account> contributorsOfflineStub;
+    QByteArray p_image_stub;
+    Account accSt_1(123, QString("Sandros_Online_stub"), p_image_stub, 80);
+    Account accSt_2(123, QString("Marelli_Online_stub"), p_image_stub, 80);
+    Account accSt_3(123, QString("Sandros_Offline_stub"), p_image_stub, 80);
+    Account accSt_4(123, QString("Marelli_Offline_stub"), p_image_stub, 80);
+    contributorsOnlineStub.append(accSt_1);
+    contributorsOnlineStub.append(accSt_2);
+    contributorsOfflineStub.append(accSt_3);
+    contributorsOfflineStub.append(accSt_4);
+    bootContributorsLists(contributorsOnlineStub, contributorsOfflineStub);
+
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
@@ -64,7 +82,40 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
     connect(controller,&ClientController::userOffline,this,&Editor::addOfflineUser);
 
+}
 
+void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
+    //fille offline list
+    for(Account acc : contributorsOffline){
+        QListWidgetItem* item= new QListWidgetItem(acc.getName());
+
+        item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+
+        QColor color(acc.getColor());
+        color.setAlpha(80);
+        item->setBackgroundColor(color);
+
+        item->setCheckState(Qt::Unchecked);
+
+        ui->offlineList->addItem(item);
+    }
+
+    //fill online list
+    for(Account acc : contributorsOnline){
+        QListWidgetItem* item= new QListWidgetItem(acc.getName());
+
+        item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+
+        QColor color(acc.getColor());
+        color.setAlpha(80);
+        item->setBackgroundColor(color);
+
+        item->setCheckState(Qt::Unchecked);
+
+        ui->onlineList->addItem(item);
+    }
 }
 
 void Editor::initUserList(){
@@ -509,7 +560,7 @@ QTextEdit* Editor::getQTextEdit(){
 }
 */
 
-/* Handler di gestione dell'apertura di un nnuovo file */
+/* Handler di gestione dell'apertura di un nuovo file */
 void Editor::on_actionOpen_triggered()
 {
     /* TODO: implementare l'apertura di un file già esistente qui */

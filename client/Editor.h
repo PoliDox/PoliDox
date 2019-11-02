@@ -86,6 +86,7 @@ private:
     void initRichTextToolBar();
     void updateCursors();
     void highlightUserChars(int p_siteId);
+    void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
 
     QString fileName;
     ClientController *controller;
