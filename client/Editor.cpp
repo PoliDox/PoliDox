@@ -128,7 +128,6 @@ void Editor::highLightUser(QListWidgetItem * item){
                  break;
             }
 
-
             if(userChars[i]-userChars[i-1]>1){
 
                 map.insert(start,lenght);
@@ -139,13 +138,6 @@ void Editor::highLightUser(QListWidgetItem * item){
     }
 
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
-
-    for(auto elem:userChars)
-        std::cout <<elem<<" ";
-
-    for (auto it = map.begin(); it != map.end(); ++it)
-        std::cout << it.key() << "-"<<it.value()<<std::endl;
-
 
     QColor color;
 
@@ -198,7 +190,7 @@ void Editor::addOfflineUser(Account account){
     if(items.size()==0)
         std::cout << "PANIC! USER NOT FOUND"<< std::endl;
     else if(items.size()>1)
-        std::cout << "PANIC! MORE USER WITH SAME SITEID"<< std::endl;
+        std::cout << "PANIC! MORE USER WITH SAME USERNAME"<< std::endl;
     else if(items.size()==1)
          _dItem=items.at(0); //there should be always one item in this list
 
@@ -256,7 +248,6 @@ void Editor::init(const QString &p_text)
     m_textEdit->setPlainText(p_text);
     m_textEdit->show();
     handlingRemoteOp = false;
-
 }
 
 
@@ -319,50 +310,11 @@ void Editor::updateCursors()
     }
 }
 
-void Editor::highlightUserChars(int p_siteId)
-{
-
-    QVector<int> userChars = controller->getUserChars(p_siteId);
-    QTextCursor tmpCursor(m_textDoc);
-    QColor color = m_users[p_siteId].account.getColor();
-    QTextCharFormat format;
-    format.setBackground(color.lighter(160));
-    for (int charPos : userChars) {
-        tmpCursor.setPosition(charPos);
-        tmpCursor.select(QTextCursor::WordUnderCursor);
-        tmpCursor.mergeCharFormat(format);
-        // MaBorghe perchè se una parola è lunga 20lettere la evidenzi 20 volte ? =(
-    }
-}
-
 
 /* Handler di gestione per la creazione di un nuovo file */
 void Editor::on_actionNew_triggered()
 {
     /* TODO: implementare la creazione di un nuovo file qui */
-}
-
-/* Handler di gestione dell'apertura di un nnuovo file */
-void Editor::on_actionOpen_triggered()
-{
-    /* TODO: implementare l'apertura di un file già esistente qui */
-
-    //PROCEDURA PER L'APERTURA DI UN FILE IN LOCALE, NON E' IL NOSTRO CASO. NOI LO VOGLIAMO PRENDERE DAL SERVER.
-    //L'ho scritta perché le funzioni possono tornarci utili. Lasciamola commentata al momento
-    /*
-    QString fileName = QFileDialog::getOpenFileName(this, "Open the file");
-    QFile file(fileName);
-    curFile = fileName;
-    if(!file.open(QIODevice::ReadOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot open file : " + file.errorString());
-        return;
-    }
-    setWindowTitle(fileName);
-    QTextStream in(&file);
-    QString text = in.readAll();
-    m_textEdit->setText(text);
-    file.close();
-    */
 }
 
 /* Handler di gestione per il salvataggio ed esportazione del file */
@@ -537,4 +489,45 @@ QTextDocument* Editor::getDocument(){
 
 QTextEdit* Editor::getQTextEdit(){
     return m_textEdit;
+}
+
+
+/* void Editor::highlightUserChars(int p_siteId)
+{
+
+    QVector<int> userChars = controller->getUserChars(p_siteId);
+    QTextCursor tmpCursor(m_textDoc);
+    QColor color = m_users[p_siteId].account.getColor();
+    QTextCharFormat format;
+    format.setBackground(color.lighter(160));
+    for (int charPos : userChars) {
+        tmpCursor.setPosition(charPos);
+        tmpCursor.select(QTextCursor::WordUnderCursor);
+        tmpCursor.mergeCharFormat(format);
+        // MaBorghe perchè se una parola è lunga 20lettere la evidenzi 20 volte ? =(
+    }
+}
+*/
+
+/* Handler di gestione dell'apertura di un nnuovo file */
+void Editor::on_actionOpen_triggered()
+{
+    /* TODO: implementare l'apertura di un file già esistente qui */
+
+    //PROCEDURA PER L'APERTURA DI UN FILE IN LOCALE, NON E' IL NOSTRO CASO. NOI LO VOGLIAMO PRENDERE DAL SERVER.
+    //L'ho scritta perché le funzioni possono tornarci utili. Lasciamola commentata al momento
+    /*
+    QString fileName = QFileDialog::getOpenFileName(this, "Open the file");
+    QFile file(fileName);
+    curFile = fileName;
+    if(!file.open(QIODevice::ReadOnly | QFile::Text)){
+        QMessageBox::warning(this, "Warning", "Cannot open file : " + file.errorString());
+        return;
+    }
+    setWindowTitle(fileName);
+    QTextStream in(&file);
+    QString text = in.readAll();
+    m_textEdit->setText(text);
+    file.close();
+    */
 }

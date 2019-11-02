@@ -149,13 +149,15 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
     // Probably we should delete everything first and then insert..
 
-    //qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
+    qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
     /************************************************************************************************/
     //This is needed to avoid that the character inserted copy the style of the previous character
     QTextCharFormat fmt;
     fmt.setBackground(QColor("transparent"));
     QTextCursor cursor(m_editor->getDocument());
+    cursor.setPosition(position, QTextCursor::MoveAnchor);
+    cursor.setPosition(position+1, QTextCursor::KeepAnchor);
     cursor.mergeCharFormat(fmt);
     m_editor->getQTextEdit()->mergeCurrentCharFormat(fmt);
     /************************************************************************************************/
