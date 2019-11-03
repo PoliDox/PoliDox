@@ -43,8 +43,8 @@ public:
     QChar at(int pos);
     void addClient(const Account& user);
     void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
-    QTextDocument* getDocument();
-    QTextEdit* getQTextEdit();
+    void resetBackgroundColor(int pos);
+    void setCharacterStyle(int pos,int i,Char& symbol);
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
@@ -98,6 +98,10 @@ private:
     // N.B. You can use it to iterate over all Accounts!    
     QMap<int, User> m_users;
     Ui::Editor *ui;
+
+protected:
+    //bool eventFilter(QObject *target, QEvent *event) override;
+
 };
 
 #endif // EDITOR_H

@@ -71,6 +71,20 @@ Char Char::fromJson(const QJsonObject& charJSON){
     return result;
 }
 
+void Char::setStyle(QString family, int size, int bold, int italic, int underline,Qt::Alignment al){
+
+    st.font_family=family;
+    st.font_size=size;
+    st.is_bold=bold;
+    st.is_italic=italic;
+    st.is_underline=underline;
+    st.alignment=al;
+}
+
+style Char::getStyle(){
+
+    return st;
+}
 
 //TODO: delete this???
 /*

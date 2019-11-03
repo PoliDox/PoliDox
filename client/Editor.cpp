@@ -44,15 +44,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
      */
     QList<Account> contributorsOnlineStub;
     QList<Account> contributorsOfflineStub;
-    QByteArray p_image_stub;
-    Account accSt_1(123, QString("Sandros_Online_stub"), p_image_stub, 80);
-    Account accSt_2(123, QString("Marelli_Online_stub"), p_image_stub, 80);
-    Account accSt_3(123, QString("Sandros_Offline_stub"), p_image_stub, 80);
-    Account accSt_4(123, QString("Marelli_Offline_stub"), p_image_stub, 80);
-    contributorsOnlineStub.append(accSt_1);
-    contributorsOnlineStub.append(accSt_2);
-    contributorsOfflineStub.append(accSt_3);
-    contributorsOfflineStub.append(accSt_4);
+
     bootContributorsLists(contributorsOnlineStub, contributorsOfflineStub);
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
@@ -82,7 +74,25 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
     connect(controller,&ClientController::userOffline,this,&Editor::addOfflineUser);
 
+
 }
+
+/*bool Editor::eventFilter(QObject *target, QEvent *event){
+
+    if(event->type()==QEvent::MouseButtonPress){
+        QMouseEvent* mouse_event=static_cast<QMouseEvent*>(event);
+        if(mouse_event->button()==Qt::LeftButton)
+            std::cout << "Mouse left event captured!" << std::endl;
+        else
+            std::cout << "Mouse right event captured!" << std::endl;
+
+        return true;
+    }
+
+    QMainWindow::eventFilter(target,event);
+
+}*/
+
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
     //fille offline list
@@ -218,16 +228,36 @@ void Editor::highLightUser(QListWidgetItem * item){
 
 void Editor::addOnlineUser(Account account){
 
+    QListWidgetItem* _dItem;
+    QList<QListWidgetItem*> items = ui->offlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
+
+    if(items.size()==0)
+        std::cout << "NEW USER FOR THIS FILE"<< std::endl;
+    else if(items.size()>1)
+        std::cout << "PANIC! MORE USER WITH SAME USERNAME"<< std::endl;
+    else if(items.size()==1)
+         _dItem=items.at(0); //there should be always one item in this list
+
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setCheckState(Qt::Unchecked);
 
     QColor color(account.getColor());
     color.setAlpha(80);
     item->setBackgroundColor(color);
 
-    item->setCheckState(Qt::Unchecked);
+    if(items.size()>0){
+
+        if(_dItem->checkState() == Qt::Checked)
+            item->setCheckState(Qt::Checked);
+        else
+            item->setCheckState(Qt::Unchecked);
+
+        delete _dItem;
+    }
+
 
     ui->onlineList->addItem(item);
 
@@ -340,6 +370,7 @@ void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
 
     handlingRemoteOp = true;
     QTextCursor& remCursor = m_users[siteId].cursor;
+    /* SETTAGGIO STILE */
     remCursor.setPosition(position);
     if (op == INSERT_OP)
         remCursor.insertText(QString(ch));
@@ -361,7 +392,32 @@ void Editor::updateCursors()
     }
 }
 
+void Editor::resetBackgroundColor(int pos){
+    QTextCharFormat fmt;
+    fmt.setBackground(QColor("transparent"));
+    QTextCursor cursor(m_textDoc);
+    cursor.setPosition(pos, QTextCursor::MoveAnchor);
+    cursor.setPosition(pos+1, QTextCursor::KeepAnchor);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+}
 
+void Editor::setCharacterStyle(int pos,int i, Char &symbol){
+
+    bool bold;
+
+    QTextCursor cursor(m_textDoc);
+    cursor.setPosition(pos+i+1); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
+
+    QTextCharFormat fmt=cursor.charFormat();
+
+    if(fmt.fontWeight()==50)
+        bold=false;
+    else
+        bold=true;
+
+    symbol.setStyle(fmt.fontFamily(),fmt.fontPointSize(),bold,fmt.fontItalic(),fmt.fontUnderline(),m_textEdit->alignment());
+}
 /* Handler di gestione per la creazione di un nuovo file */
 void Editor::on_actionNew_triggered()
 {
@@ -534,13 +590,6 @@ void Editor::on_actionJustify_triggered()
 
 }
 
-QTextDocument* Editor::getDocument(){
-    return m_textDoc;
-}
-
-QTextEdit* Editor::getQTextEdit(){
-    return m_textEdit;
-}
 
 
 /* void Editor::highlightUserChars(int p_siteId)
