@@ -60,10 +60,7 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
     for (const QJsonValue& ac : p_accounts) {
         Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
         m_editor->addClient(account);
-        emit newUserOnline(account);
     }
-
-
 }
 
 QVector<int> ClientController::getUserChars(int p_siteId)
