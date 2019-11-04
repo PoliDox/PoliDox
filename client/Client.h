@@ -22,7 +22,8 @@ public:
     Client();
 
 public slots:
-    void onMessageReceived(const QString& p_msg);    
+    void onMessageReceived(const QString& p_msg);
+    void onDocClosed();
 };
 
 #endif // CLIENT_H

@@ -140,10 +140,6 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 
 void ClientController::onTextChanged(int position, int charsRemoved, int charsAdded)
 {
-    // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
-    // Probably we should delete everything first and then insert..
-
-    qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
     /************************************************************************************************/
     //This is needed to avoid that the character inserted copies the background of the previous character
