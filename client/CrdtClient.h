@@ -21,7 +21,7 @@ private:
 
 public:
     CrdtClient(double siteId);
-    void localInsert(unsigned int position, char value);
+    void localInsert(unsigned int position, Char symbolToInsert);
     void localDelete(unsigned int index);
     void printDebugChars();
     double getSiteId() const;

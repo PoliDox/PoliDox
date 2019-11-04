@@ -146,15 +146,11 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
     /************************************************************************************************/
-    //This is needed to avoid that the character inserted copy the style of the previous character
-    QTextCharFormat fmt;
-    fmt.setBackground(QColor("transparent"));
-    QTextCursor cursor(m_editor->getDocument());
-    cursor.setPosition(position, QTextCursor::MoveAnchor);
-    cursor.setPosition(position+1, QTextCursor::KeepAnchor);
-    cursor.mergeCharFormat(fmt);
-    m_editor->getQTextEdit()->mergeCurrentCharFormat(fmt);
+    //This is needed to avoid that the character inserted copies the background of the previous character
+    m_editor->resetBackgroundColor(position);
     /************************************************************************************************/
+
+    //TODO check if the previous character of position is bold/italic/underlined. If not, disable QToolbar icon.
 
     if (charsAdded > 1 && position == 0 &&
             m_editor->at(0) != QChar::ParagraphSeparator) {
@@ -180,7 +176,12 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         } else {
             _char =  qchar.toLatin1();
         }
-        m_crdt->localInsert(position+i, _char);
+
+        /* Set the character style before forwarding it to local insert */
+        Char symbol(_char,m_crdt->getSiteId());
+
+        m_editor->setCharacterStyle(position,i,symbol);
+        m_crdt->localInsert(position+i, symbol);
     }
 
 }

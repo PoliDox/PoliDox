@@ -10,7 +10,7 @@
 
 
 #define MAXNUM 100
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 
 
 double CrdtClient::getSiteId() const {
@@ -150,7 +150,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 /* position Ã¨ il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
-void CrdtClient::localInsert(unsigned int position, char value) {
+void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
 
     unsigned int row=0,
                  index=0,
@@ -175,7 +175,8 @@ void CrdtClient::localInsert(unsigned int position, char value) {
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 #endif
 
-    Char symbolToInsert(value, siteId);
+    // symbolToInsert(value, siteId);
+    char value=symbolToInsert.getValue();
 
     rowSize=this->_symbols[row].size();
 
