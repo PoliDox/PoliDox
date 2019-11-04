@@ -41,7 +41,7 @@ OPEN FILE REPL
 "response" = "ok"/"fail"
 "crdt" = { ... }        // here comes the crdt formatted in json array 
 "accounts" = { // array of clients with this file currently open }
-"accountsOffline" = { array of offline clients in this file }
+"accountsOffline" = { //array of offline clients in this file }		//TODO
 
 CREATE FILE REQ
 "action" = "createFileReq"

@@ -87,7 +87,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
 
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
-    //fille offline list
+    //fill offline list
     for(Account acc : contributorsOffline){
         QListWidgetItem* item= new QListWidgetItem(acc.getName());
 
