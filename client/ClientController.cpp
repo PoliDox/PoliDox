@@ -29,13 +29,9 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QStrin
         m_socket->sendTextMessage(jsonString);
     });
 
-    connect(m_editor, &Editor::quit_editor, this, [&](){
-       QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
-
-        m_socket->sendTextMessage(jsonString);
-    });
-
     connect(m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
+
+    connect(m_editor, &Editor::quit_editor, this, &ClientController::docClosed);
 
     m_editor->show();
 }
@@ -44,6 +40,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QStrin
 ClientController::~ClientController()
 {
     delete m_crdt;
+    delete m_editor;
 }
 
 
@@ -126,14 +123,11 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         emit newUserOnline(newUser);
         //qDebug() << "New client with siteId" << newUser.getSiteId();
 
-    } else if (l_header == "closeEditorRep") {
-        m_lf = new ListFiles();
-        //TODO: implementare la ricezione dei nomi file e farne la show nel listFiles
-        m_lf->show();
     } else if (l_header == "closedEditorRemote") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
         emit userOffline(offlineUser);
+
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }

@@ -22,8 +22,7 @@ public:
 private:
     Editor *m_editor;
     CrdtClient *m_crdt; // TODO: use smart-pointer
-    QWebSocket *m_socket;
-    ListFiles *m_lf;
+    QWebSocket *m_socket;    
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);
@@ -32,6 +31,7 @@ public slots:
 signals:
     void newUserOnline(Account account);
     void userOffline(Account account);
+    void docClosed();
 
 };
 

@@ -389,7 +389,6 @@ void Editor::on_actionQuit_triggered()
 {
     emit quit_editor();
     this->hide();
-    //QApplication::quit();
 }
 
 void Editor::on_actionCopy_triggered()

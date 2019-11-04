@@ -33,6 +33,20 @@ Client::Client()
         c_fileName = p_filename;
     });
 
+    connect(m_document, &ClientController::docClosed, this, [&](){
+        delete m_document; // TODO: is it safe?? What about pending messages arriving (e.g. remote operations)?
+
+        connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
+        QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
+        m_socket.sendTextMessage(jsonString);
+
+
+        // TODO Dav:
+        // Qua farei già la show del Log_dialog e quando poi arriva la closedEditorRepl
+        // riempiamo la lista di file (vedi giù), ma se non dovesse arrivare la reply almeno abbiamo
+        // il dialog mostrato, sennò si impallerebbe tutto
+    });
+
     loginWindow.exec();
 
 
@@ -69,11 +83,11 @@ void Client::onMessageReceived(const QString &p_msg)
         qDebug() << "Color " << r << ", " << g << ", " << b;
 
         QJsonArray _JSONfiles=_JSONobj["nameDocuments"].toArray();
-
+        QList<QString> l_files;
         for(QJsonArray::iterator it=_JSONfiles.begin();it!=_JSONfiles.end();it++){
-            m_files.push_back(it->toString());
+            l_files.push_back(it->toString());
         }
-        loginWindow.displayFiles(m_files);
+        loginWindow.displayFiles(l_files);
 
     } else if (l_header == "registerUserRepl") {
         QString replCode = _JSONobj["response"].toString();
@@ -98,6 +112,14 @@ void Client::onMessageReceived(const QString &p_msg)
 
         loginWindow.hide();
         disconnect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
+
+    } else if (l_header == "closedEditorRepl") {
+        QJsonArray _JSONfiles=_JSONobj["nameDocuments"].toArray();
+        QList<QString> l_files;
+        for(QJsonArray::iterator it=_JSONfiles.begin();it!=_JSONfiles.end();it++){
+            l_files.push_back(it->toString());
+        }
+        loginWindow.displayFiles(l_files);
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
