@@ -116,11 +116,15 @@ void Client::onMessageReceived(const QString &p_msg)
 
 void Client::onDocClosed()
 {
-    delete m_document; // TODO: is it safe?? What about pending messages arriving (e.g. remote operations)?
+    qDebug() << "onDocClosed";
+
+    m_document->deleteLater(); // TODO: is it safe?? What about pending messages arriving (e.g. remote operations)?
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
     QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
     m_socket.sendTextMessage(jsonString);
+
+    loginWindow.show();
 
     // TODO Dav:
     // Qua farei già la show del Log_dialog e quando poi arriva la closedEditorRepl
