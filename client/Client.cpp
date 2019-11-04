@@ -123,9 +123,4 @@ void Client::onDocClosed()
     m_socket.sendTextMessage(jsonString);
 
     loginWindow.show();
-
-    // TODO Dav:
-    // Qua farei già la show del Log_dialog e quando poi arriva la closedEditorRepl
-    // riempiamo la lista di file (vedi giù), ma se non dovesse arrivare la reply almeno abbiamo
-    // il dialog mostrato, sennò si impallerebbe tutto
 }

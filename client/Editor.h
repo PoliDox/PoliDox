@@ -36,8 +36,8 @@ class Editor : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, QString fileName = "");
-    ~Editor();
+    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, QString fileName = "", QList<Account> contributorsOnline = {}, QList<Account> contributorsOffline = {});
+    ~Editor() override;
 
     void init(const QString &p_text);
     QChar at(int pos);
