@@ -20,7 +20,7 @@ typedef struct Style{
     int is_bold;
     int is_italic;
     int is_underline;
-    Qt::Alignment alignment;
+    int alignment;
 
 }style;
 
@@ -47,7 +47,7 @@ public:
     static Char fromJson(const QJsonObject& _JSONobj);
     //static Char fromJson2(const QString& stringReturnedFromDb);
 
-    void setStyle(QString family, int size, int bold, int italic, int underline,Qt::Alignment al);
+    void setStyle(QString family, int size, int bold, int italic, int underline,int al);
     style getStyle();
 };
 

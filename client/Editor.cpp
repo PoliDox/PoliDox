@@ -402,12 +402,12 @@ void Editor::resetBackgroundColor(int pos){
     m_textEdit->mergeCurrentCharFormat(fmt);
 }
 
-void Editor::setCharacterStyle(int pos,int i, Char &symbol){
+void Editor::setCharacterStyle(int index, Char &symbol){
 
     bool bold;
 
     QTextCursor cursor(m_textDoc);
-    cursor.setPosition(pos+i+1); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
+    cursor.setPosition(index); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
 
     QTextCharFormat fmt=cursor.charFormat();
 

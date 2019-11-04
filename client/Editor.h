@@ -44,7 +44,7 @@ public:
     void addClient(const Account& user);
     void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
     void resetBackgroundColor(int pos);
-    void setCharacterStyle(int pos,int i,Char& symbol);
+    void setCharacterStyle(int index,Char& symbol);
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
