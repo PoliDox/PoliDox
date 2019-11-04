@@ -178,8 +178,6 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         Char symbol(_char,m_crdt->getSiteId());
 
         m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert
-        style st=symbol.getStyle();
-        std::cout << "ALIGNMENT: "<<st.alignment<<std::endl;
         m_crdt->localInsert(position+i, symbol);
     }
 
