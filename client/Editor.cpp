@@ -447,9 +447,13 @@ void Editor::resetActionToggle(int pos,bool selection){
     else if(fmt.fontUnderline())
         underlineAction->setChecked(true);
 
-
-
 }
+
+void Editor::closeEvent(QCloseEvent *event)
+{
+    on_actionQuit_triggered();
+}
+
 /* Handler di gestione per la creazione di un nuovo file */
 void Editor::on_actionNew_triggered()
 {
