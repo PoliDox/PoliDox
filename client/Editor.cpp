@@ -20,7 +20,7 @@
 #include <QCheckBox>
 #include <iostream>
 
-Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
@@ -36,16 +36,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     ui->currentFile->setText(fileName);
 
     initUserList();
-
-    /*TODO: passare al costruttore dell' editor la lista degli utenti online e offline
-     *      in modo da poterne fare lo startup iniziale
-     *
-     *      questo e' uno stub iniziale di prova.
-     */
-    QList<Account> contributorsOnlineStub;
-    QList<Account> contributorsOfflineStub;
-
-    bootContributorsLists(contributorsOnlineStub, contributorsOfflineStub);
+    bootContributorsLists(contributorsOnline, contributorsOffline);
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,

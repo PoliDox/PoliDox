@@ -3,11 +3,11 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName) :
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
     m_socket(p_socket)
 {        
     m_crdt = new CrdtClient(p_siteId);
-    m_editor = new Editor(this, nullptr, fileName);
+    m_editor = new Editor(this, nullptr, fileName, contributorsOnline, contributorsOffline);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
