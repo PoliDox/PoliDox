@@ -11,9 +11,7 @@ Char::Char(char p_value, int p_siteId) : value(p_value), siteId(p_siteId)
 {}
 
 
-Char::~Char(){
-    //TODO
-}
+Char::~Char(){ }
 
 
 void Char::setFractionalPosition(std::vector<int>& newFractPos) {

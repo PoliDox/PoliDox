@@ -150,6 +150,8 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     m_editor->resetBackgroundColor(position);
     /************************************************************************************************/
 
+    qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;
+
     //TODO check if the previous character of position is bold/italic/underlined. If not, disable QToolbar icon.
 
     if (charsAdded > 1 && position == 0 &&
