@@ -13,7 +13,7 @@
 
 //TODO: ATTENZIONE, DEFINIRE COSTRUTTORE DI COPIA E OPERATORE DI ASSEGNAZIONE!!!
 
-typedef struct Style{
+typedef struct Style {
 
     QString font_family;
     int font_size;
@@ -22,7 +22,7 @@ typedef struct Style{
     int is_underline;
     Qt::Alignment alignment;
 
-}style;
+} tStyle;
 
 class Char {
 
@@ -30,7 +30,7 @@ private:
     char value;
     std::vector<int> fractionalPosition;
     int siteId;  // NON CANCELLARE: serve per spostare i cursori nelle operazioni remote
-    style st;
+    tStyle style;
 
 public:
     Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition);
@@ -47,8 +47,8 @@ public:
     static Char fromJson(const QJsonObject& _JSONobj);
     //static Char fromJson2(const QString& stringReturnedFromDb);
 
-    void setStyle(QString family, int size, int bold, int italic, int underline,Qt::Alignment al);
-    style getStyle();
+    void setStyle(QString family, int size, int bold, int italic, int underline,Qt::Alignment al);    
+    tStyle getStyle();
 };
 
 
