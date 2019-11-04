@@ -420,6 +420,12 @@ void Editor::setCharacterStyle(int pos,int i, Char &symbol){
 
     symbol.setStyle(fmt.fontFamily(),fmt.fontPointSize(),bold,fmt.fontItalic(),fmt.fontUnderline(),m_textEdit->alignment());
 }
+
+void Editor::closeEvent(QCloseEvent *event)
+{
+    on_actionQuit_triggered();
+}
+
 /* Handler di gestione per la creazione di un nuovo file */
 void Editor::on_actionNew_triggered()
 {

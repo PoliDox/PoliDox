@@ -45,6 +45,7 @@ public:
     void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
     void resetBackgroundColor(int pos);
     void setCharacterStyle(int pos,int i,Char& symbol);
+    void closeEvent(QCloseEvent *event) override;
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);

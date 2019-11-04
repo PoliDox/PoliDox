@@ -7,3 +7,4 @@ Non-Ascii characters
 Namespaces
 Smartpointers
 Disconnections
+Parametrizzare il numero di porta del server (da command line?)
