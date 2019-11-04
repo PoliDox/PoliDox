@@ -90,7 +90,7 @@ private:
 
     QString fileName;
     ClientController *controller;
-    bool handlingRemoteOp;
+    bool handlingOperation;
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_localCursor;

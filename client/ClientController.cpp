@@ -29,13 +29,9 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QStrin
         m_socket->sendTextMessage(jsonString);
     });
 
-    connect(m_editor, &Editor::quit_editor, this, [&](){
-       QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
-
-        m_socket->sendTextMessage(jsonString);
-    });
-
     connect(m_socket, &QWebSocket::textMessageReceived, this, &ClientController::onTextMessageReceived);
+
+    connect(m_editor, &Editor::quit_editor, this, &ClientController::docClosed);
 
     m_editor->show();
 }
@@ -44,6 +40,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QStrin
 ClientController::~ClientController()
 {
     delete m_crdt;
+    delete m_editor;
 }
 
 
@@ -126,14 +123,11 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         emit newUserOnline(newUser);
         //qDebug() << "New client with siteId" << newUser.getSiteId();
 
-    } else if (l_header == "closeEditorRep") {
-        m_lf = new ListFiles();
-        //TODO: implementare la ricezione dei nomi file e farne la show nel listFiles
-        m_lf->show();
     } else if (l_header == "closedEditorRemote") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
         emit userOffline(offlineUser);
+
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }
@@ -146,15 +140,13 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 
 void ClientController::onTextChanged(int position, int charsRemoved, int charsAdded)
 {
-    // TODO: Test what happens when we replace some text with other text (Select some text and Ctrl-V)
-    // Probably we should delete everything first and then insert..
-
-    qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
 
     /************************************************************************************************/
     //This is needed to avoid that the character inserted copies the background of the previous character
     m_editor->resetBackgroundColor(position);
     /************************************************************************************************/
+
+    qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;
 
     //TODO check if the previous character of position is bold/italic/underlined. If not, disable QToolbar icon.
 

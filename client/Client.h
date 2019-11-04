@@ -14,8 +14,7 @@ class Client : public QObject
 private:
     ClientController *m_document;
     QWebSocket m_socket;
-    Account m_user;
-    QList<QString> m_files;
+    Account m_user;    
     Log_Dialog loginWindow;
     QString c_fileName;
 
@@ -24,6 +23,7 @@ public:
 
 public slots:
     void onMessageReceived(const QString& p_msg);
+    void onDocClosed();
 };
 
 #endif // CLIENT_H

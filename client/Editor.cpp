@@ -21,7 +21,7 @@
 #include <iostream>
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName) :
-    QMainWindow(parent), controller(p_controller), handlingRemoteOp(false), ui(new Ui::Editor)
+    QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -50,7 +50,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
-        if (!handlingRemoteOp) {
+        if (!handlingOperation) {
+           //qDebug() << "QTextDocument::contentsChange";
            updateCursors();
            emit textChanged(position, charsRemoved, charsAdded);
         }
@@ -198,6 +199,7 @@ void Editor::highLightUser(QListWidgetItem * item){
         }
     }
 
+    // TODO: could be dangerous, use handlingOperation instead?
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
     QColor color;
@@ -220,7 +222,7 @@ void Editor::highLightUser(QListWidgetItem * item){
         m_textEdit->mergeCurrentCharFormat(fmt);
     }
 
-
+    // TODO: could be dangerous, use handlingOperation instead?
     connect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
 
@@ -325,10 +327,10 @@ Editor::~Editor()
 
 void Editor::init(const QString &p_text)
 {
-    handlingRemoteOp = true;
+    handlingOperation = true;
     m_textEdit->setPlainText(p_text);
     m_textEdit->show();
-    handlingRemoteOp = false;
+    handlingOperation = false;
 }
 
 
@@ -368,7 +370,7 @@ void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
     qDebug() << "local: " << m_localCursor->position();
     */
 
-    handlingRemoteOp = true;
+    handlingOperation = true;
     QTextCursor& remCursor = m_users[siteId].cursor;
     /* SETTAGGIO STILE */
     remCursor.setPosition(position);
@@ -378,7 +380,7 @@ void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
        remCursor.deleteChar();
 
     updateCursors();
-    handlingRemoteOp = false;
+    handlingOperation = false;
 }
 
 void Editor::updateCursors()
@@ -443,9 +445,8 @@ void Editor::on_actionSave_as_triggered()
 
 void Editor::on_actionQuit_triggered()
 {
-    emit quit_editor();
     this->hide();
-    //QApplication::quit();
+    emit quit_editor();    
 }
 
 void Editor::on_actionCopy_triggered()
