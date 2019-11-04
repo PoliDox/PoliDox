@@ -50,7 +50,7 @@ Server::~Server() {
 //- Note that "genericRequestString" is a String type but interally
 //  it's formatted in JSON
 void Server::handleNotLoggedRequests(const QString& genericRequestString){
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());  
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -67,40 +67,46 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
 
-        qDebug() << "loginReq received: " << name << " / " << password;
-
         bool loginSuccess = false;
         Account *loggedAccount = nullptr;
         QList<QString> nameDocuments;
-        double result = this->dbOperations->checkPassword(name, password);
 
+        //check if account is already logged. If true, login is rejected
+        bool alreadyLogged = false;
+        for(Account* account : this->socket2account.values())
+            if(account != nullptr && account->getName() == name)
+                alreadyLogged = true;
+
+        int result = -1;
+        if(!alreadyLogged)
+            result = this->dbOperations->checkPassword(name, password);
         qDebug() << "Authentication result: " << result;
 
-        if(result >= 0){
+        if(alreadyLogged == false && result >= 0){
             loginSuccess = true;
             //in case of success, result will contain siteId and [image(TODO!!)]
             loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
             this->socket2account[signalSender] = loggedAccount;
+            qDebug() << this->getAccount(signalSender)->getName();
 
             nameDocuments = this->dbOperations->getAllDocuments();
 
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-        }        
+        }
 
-        QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);        
+        QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);
     }
     else if (header == "registerUser"){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
-        qDebug() << "Registering user " << name << " with password " << password;
 
         QByteArray image ;// = requestObjJSON["image"].toString();  //TODO: da sistemare, come convertire l'immagine ???
                                                                     //      vedere anche Account::toJSON()
 
         bool registrationSuccess = false;
-        double siteId = this->dbOperations->registerUser(name, password, image);
+        int siteId = this->dbOperations->registerUser(name, password, image);
         if(siteId >= 0)
             registrationSuccess = true;
 
@@ -155,7 +161,7 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
         fileServContr->addClient(signalSender);
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-
+        disconnect(signalSender, &QWebSocket::disconnected, this, &Server::disconnectAccount);
     }
     else if (header == "createFileReq"){
         //create and open the file
@@ -179,20 +185,19 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 }
 
 
-//TODO: - capire bene TUTTE le cose che ci sono da fare
-//        quando un acconut di disconnette
+// if I arrive on this slot, is from a socket that in the
+// moment he quits he does not have a open file
 void Server::disconnectAccount(){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+    Account *accountToDisconnect = this->socket2account[signalSender];
 
-    Account *accountToDisconnet = this->socket2account[signalSender];
-    delete (accountToDisconnet);
+    if(accountToDisconnect != nullptr)
+        this->socket2account.remove(signalSender);
 
-    //TODO: la delete dell'oggetto socket presente(come chiave)
-    //      nella mappa va fatta oppure no ???
-
-    this->socket2account.remove(signalSender);
-
-    //poi ????
+    //il distruttore lo chiama già la remove oppure no??
+    signalSender->deleteLater();
+    if(accountToDisconnect != nullptr)
+        delete (accountToDisconnect);       //TODO: controlllare il distruttore
 }
 
 
@@ -204,7 +209,17 @@ void Server::onNewConnection() {
     this->socket2account[newSocket] = nullptr;
 
     connect(newSocket, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
-    connect(newSocket, &QWebSocket::disconnected, this, &Server::disconnectAccount);    //TODO: da rivedere
+    connect(newSocket, &QWebSocket::disconnected, this, &Server::disconnectAccount);
+}
+
+
+void Server::removeSocket2AccountPair(QWebSocket *socketOfAccount){
+    this->socket2account.remove(socketOfAccount);
+}
+
+
+void Server::removeFile2ServcontrPair(QString filename){
+   this->file2serverController.remove(filename);
 }
 
 

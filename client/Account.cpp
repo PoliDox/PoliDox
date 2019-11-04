@@ -57,6 +57,7 @@ Account Account::fromJson(const QJsonObject& accountJSON) {
     QString l_name = accountJSON["name"].toString();
     int l_color = accountJSON["color"].toInt();
     //qDebug() << "JsonColorClient: " << hex << l_color;
+    qDebug() << "ACCOUNT " << accountJSON ;
     return Account(l_siteId, l_name, "", l_color);
 }
 

@@ -3,11 +3,11 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName) :
     m_socket(p_socket)
 {        
     m_crdt = new CrdtClient(p_siteId);
-    m_editor = new Editor(this);
+    m_editor = new Editor(this, nullptr, fileName);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
@@ -15,7 +15,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
 
         QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
 
-        qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
+        //qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
 
         m_socket->sendTextMessage(jsonString);
     });
@@ -25,6 +25,12 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId) :
         QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
+
+        m_socket->sendTextMessage(jsonString);
+    });
+
+    connect(m_editor, &Editor::quit_editor, this, [&](){
+       QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
 
         m_socket->sendTextMessage(jsonString);
     });
@@ -57,7 +63,10 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
     for (const QJsonValue& ac : p_accounts) {
         Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
         m_editor->addClient(account);
+        emit newUserOnline(account);
     }
+
+
 }
 
 QVector<int> ClientController::getUserChars(int p_siteId)
@@ -114,8 +123,17 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
         m_editor->addClient(newUser);
-        qDebug() << "New client with siteId" << newUser.getSiteId();
+        emit newUserOnline(newUser);
+        //qDebug() << "New client with siteId" << newUser.getSiteId();
 
+    } else if (l_header == "closeEditorRep") {
+        m_lf = new ListFiles();
+        //TODO: implementare la ricezione dei nomi file e farne la show nel listFiles
+        m_lf->show();
+    } else if (l_header == "closedEditorRemote") {
+        QJsonObject accountObj = _JSONobj["account"].toObject();
+        Account offlineUser = Account::fromJson(accountObj);
+        emit userOffline(offlineUser);
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }
@@ -132,6 +150,17 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     // Probably we should delete everything first and then insert..
 
     qDebug() << charsAdded << " chars added and " << charsRemoved << " chars removed at position " << position;
+
+    /************************************************************************************************/
+    //This is needed to avoid that the character inserted copy the style of the previous character
+    QTextCharFormat fmt;
+    fmt.setBackground(QColor("transparent"));
+    QTextCursor cursor(m_editor->getDocument());
+    cursor.setPosition(position, QTextCursor::MoveAnchor);
+    cursor.setPosition(position+1, QTextCursor::KeepAnchor);
+    cursor.mergeCharFormat(fmt);
+    m_editor->getQTextEdit()->mergeCurrentCharFormat(fmt);
+    /************************************************************************************************/
 
     if (charsAdded > 1 && position == 0 &&
             m_editor->at(0) != QChar::ParagraphSeparator) {
@@ -161,3 +190,4 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     }
 
 }
+

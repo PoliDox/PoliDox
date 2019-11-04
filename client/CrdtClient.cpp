@@ -24,8 +24,19 @@ void CrdtClient::setSiteId(double siteID) {
 
 std::vector<int> CrdtClient::getUserPositions(int siteId)
 {
-    // TODO Minnoz
-    // Ajo in fretta che mi serve
+    unsigned int i=0,
+                 j=0;
+
+    std::vector<int> result;
+    for(i=0;i<_symbols.size();i++){
+        for(j=0;j<_symbols[i].size();j++){
+            if(_symbols[i][j].getSiteId()==siteId){
+                    result.push_back(_toLinear(i,j));
+            }
+        }
+    }
+
+    return result;
 }
 
 

@@ -23,12 +23,12 @@ void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
 }
 
 
-void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, double initialValue){
+void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, int initialValue){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value elemToInsert =
-        elementBuilder << "_id"      << nameDocument.toUtf8().constData()
+        elementBuilder << "_id"                 << nameDocument.toUtf8().constData()
                        << "sequentialCounter"   << initialValue
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view elemToInsertView = elemToInsert.view();
@@ -43,7 +43,7 @@ void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, dou
 }
 
 
-double DatabaseManager::getCounterOfCollection(QString nameCollection){
+int DatabaseManager::getCounterOfCollection(QString nameCollection){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
@@ -56,12 +56,12 @@ double DatabaseManager::getCounterOfCollection(QString nameCollection){
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element element = a["sequentialCounter"];
-        return element.get_double().value;
+        return element.get_int32().value;
     }
     else{
         //it's the first time; so insert new element in counter collection
         //with fields: "_id":nameCollection , "sequentialCounter":firstValue
-        double initialValue = 0;
+        int initialValue = 0;
         insertNewElemInCounterCollection(nameCollection, initialValue);
         return initialValue;
     }
@@ -83,10 +83,10 @@ DatabaseManager::DatabaseManager() {
 //TODO: - sistemare il blocco catch
 //      - inserire l'immagine
 // - Returns siteId if the registration success, -1 otherwise
-double DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
+int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
     mongocxx::collection userCollection = (*this->db)["user"];
 
-    double siteId = this->getCounterOfCollection("user");
+    int siteId = this->getCounterOfCollection("user");
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
@@ -115,13 +115,13 @@ double DatabaseManager::registerUser(QString& name, QString& password, QByteArra
     }
 
     this->incrementCounterOfCollection("user");
-    return siteId;
+    return (int)siteId;
 }
 
 
 //TODO: - oltre al siteId, ritornare anche l'immagine
 //it returns the id of the account, -1 otherwise
-double DatabaseManager::checkPassword(QString& name, QString& password){
+int DatabaseManager::checkPassword(QString& name, QString& password){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
@@ -137,7 +137,8 @@ double DatabaseManager::checkPassword(QString& name, QString& password){
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element element = a["siteId"];
-        return element.get_double().value;
+        int siteIdToReturn = element.get_int32().value;
+        return siteIdToReturn;
     }
     else{
         return -1;
@@ -167,10 +168,10 @@ bool DatabaseManager::insertNewDocument(QString& documentName){
 
 //TODO: - sistemare il valore di ritorno
 //      - implementare il vincolo di integrità su nameDocument
-bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition) {
+bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
-    double counterInsert = this->getCounterOfCollection("insert");
+    int counterInsert = this->getCounterOfCollection("insert");
 
     auto array_builder = bsoncxx::builder::basic::array{};
     for (int element : fractionalPosition) {
@@ -181,8 +182,9 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::
     bsoncxx::document::value symbolToInsert =
         elementBuilder << "_id"                << counterInsert
                        << "nameDocument"       << nameDocument.toUtf8().constData()
-                       << "value"             << symbol.toUtf8().constData()
-                       << "position" << array_builder
+                       << "value"              << symbol.toUtf8().constData()
+                       << "siteId"             << siteIdOfSymbol
+                       << "position"           << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToInsertView = symbolToInsert.view();
 
@@ -201,7 +203,7 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, std::
 //        eventuale eccezione alzata dalla delete_one
 //A symbol is uniquely identified by his fractional position and belonging document,
 //so "symbol parameter" is useful, we pass it only for sake of completeness
-bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::vector<int>& fractionalPosition){
+bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition){
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     auto array_builder = bsoncxx::builder::basic::array{};
@@ -212,8 +214,9 @@ bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, std::
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value symbolToDelete =
         elementBuilder << "nameDocument"       << nameDocument.toUtf8().constData()
-                       << "symbol"             << symbol.toUtf8().constData()
-                       << "fractionalPosition" << array_builder
+                       << "value"              << symbol.toUtf8().constData()
+                       << "siteId"             << siteIdOfSymbol
+                       << "position"           << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToDeleteView = symbolToDelete.view();
 
@@ -248,8 +251,7 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
             throw "DatabaseManager::getAllInserts  error";       //TODO: da sistemare
         }
 
-        QJsonObject insertObjJson;
-        insertObjJson = stringDocJSON.object();
+        QJsonObject insertObjJson = stringDocJSON.object();
 
         qDebug() << "insertObjJson:    " << insertObjJson;
 

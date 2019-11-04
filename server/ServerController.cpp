@@ -20,9 +20,21 @@ void ServerController::replicateMessageOnOtherSockets(const QString& messageRece
     // The socket of the client which did the local operation
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
-    for(auto socket : this->socketsOnDocument){
-        if(socket != signalSender)
-            socket->sendTextMessage(messageReceivedOnSocket);
+    QJsonObject requestObjJSON;
+    QJsonDocument requestDocJSON;
+    requestDocJSON = QJsonDocument::fromJson(messageReceivedOnSocket.toUtf8());
+    if (requestDocJSON.isNull()) {
+        // TODO: print some debug
+        return;
+    }
+    requestObjJSON = requestDocJSON.object();
+    QString header = requestObjJSON["action"].toString();
+
+    if(header == "insert" || header == "delete"){
+        for(auto socket : this->socketsOnDocument){
+            if(socket != signalSender)
+                socket->sendTextMessage(messageReceivedOnSocket);
+        }
     }
 }
 
@@ -32,10 +44,12 @@ void ServerController::addClient(QWebSocket *socketToAdd){
 
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
-    //TODO: ricordarsi, al momento opportuno(quando???) di fare la disconnect di questa connect
+    connect(socketToAdd, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
 
     this->notifyOtherClients(socketToAdd);
 
+    //notify the new socket about all the accounts
+    //actually connected on the document just opened by him
     QList<Account*> accounts;
     for(auto otherSocket : this->socketsOnDocument) {
         if(otherSocket != socketToAdd){
@@ -45,21 +59,17 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
 
     QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accounts);
-    //qDebug() << "sendMsgToClient:  " << QString(sendMsgToClient).toUtf8().constData();
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
 
-// Pay attention that while I notify (.1)the other clients
-// about the new_client_connected(== newSocket) I notify also
-// (.2)the new_client_connected(me) about all the other clients already connected
 void ServerController::notifyOtherClients(QWebSocket *newSocket){
     Account *newAccount = this->server->getAccount(newSocket);
-    QString msgNewClient1 = ServerMessageFactory::createNewClientMessage(newAccount);
+    QString msgNewClient = ServerMessageFactory::createNewClientMessage(newAccount);
 
     for(auto otherSocket : this->socketsOnDocument){
         if(otherSocket != newSocket){            
-            otherSocket->sendTextMessage(msgNewClient1);            
+            otherSocket->sendTextMessage(msgNewClient);
         }
     }
 }
@@ -80,38 +90,94 @@ void ServerController::createCrdt(QList<Char>& orderedInserts){
 // The ServerController has to update the his crdt on the
 // base of the operation(insert/delete)
 void ServerController::handleRemoteOperation(const QString& messageReceivedByClient){
-    QJsonObject requestObjJSON;
-    QJsonDocument requestDocJSON;
-
-    qDebug() << "Handling remote operation: " << messageReceivedByClient.toUtf8().constData();
-
-    requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
+    QJsonDocument requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
     if (requestDocJSON.isNull()) {
         // TODO: print some debug
         return;
     }
-    requestObjJSON = requestDocJSON.object();
+    QJsonObject requestObjJSON = requestDocJSON.object();
 
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
-    qDebug() << "value: " << charObj.getValue();
-    qDebug() << "position: " << charObj.getFractionalPosition();
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
+    int siteId = charObj.getSiteId();
 
     QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
-        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, fractPos);
+        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
     }
     else if(header == "delete"){
         this->crdt->remoteDelete(charObj);
-        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, fractPos);
+        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
+    }
+    else if(header == "closedEditorReq"){
+        QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+
+        bool destroyServContr = false;
+        this->socketsOnDocument.removeOne(signalSender);
+        if(this->socketsOnDocument.size() == 0){
+            destroyServContr = true;
+            this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
+        }
+
+        disconnect(signalSender, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
+        disconnect(signalSender, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
+        disconnect(signalSender, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
+        connect(signalSender, &QWebSocket::textMessageReceived, this->server, &Server::handleLoggedRequests);
+        connect(signalSender, &QWebSocket::disconnected, this->server, &Server::disconnectAccount);
+
+        QList<QString> nameDocuments = this->server->getDb()->getAllDocuments();
+        QByteArray sendMsgToClientQuitted = ServerMessageFactory::createClosedEditorReply(nameDocuments);
+        signalSender->sendTextMessage(sendMsgToClientQuitted);
+
+        Account *accountQuitted = this->server->getAccount(signalSender);
+        QByteArray msgForNotifyOtherSockets = ServerMessageFactory::createClosedEditorRemote(accountQuitted);
+        for(auto otherSocket : this->socketsOnDocument){
+            if(otherSocket != signalSender){
+                otherSocket->sendTextMessage(msgForNotifyOtherSockets);
+            }
+        }
+
+        if(destroyServContr)
+            delete (this);
     }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
 
+}
+
+
+// if I arrive on this slot, is from a socket that in the
+// moment he quits he has an open file
+void ServerController::disconnectAccount(){
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+
+    Account *accountToDisconnect = this->server->getAccount(signalSender);
+
+    bool destroyServContr = false;
+    this->socketsOnDocument.removeOne(signalSender);
+    if(this->socketsOnDocument.size() == 0){
+        destroyServContr = true;
+        this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
+    }
+
+    Account *accountQuitted = this->server->getAccount(signalSender);
+    QByteArray msgForNotifyOtherSockets = ServerMessageFactory::createClosedEditorRemote(accountQuitted);
+    for(auto otherSocket : this->socketsOnDocument){
+        if(otherSocket != signalSender){
+            otherSocket->sendTextMessage(msgForNotifyOtherSockets);
+        }
+    }
+
+    this->server->removeSocket2AccountPair(signalSender);
+    //il distruttore lo chiama già la remove oppure no??
+    signalSender->deleteLater();
+    delete (accountToDisconnect);       //TODO: controlllare il distruttore
+    if(destroyServContr)
+        delete (this);                  //TODO: controlllare il distruttore
 }
 
 

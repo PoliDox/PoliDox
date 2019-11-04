@@ -6,6 +6,7 @@
 #include <QTextDocument>
 #include <QMap>
 #include <QLabel>
+#include <QListWidgetItem>
 #include "Account.h"
 #include "Styler.h"
 #include "ClientController.h"
@@ -35,16 +36,20 @@ class Editor : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr);
+    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, QString fileName = "");
     ~Editor();
 
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
-    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);    
+    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
+    QTextDocument* getDocument();
+    QTextEdit* getQTextEdit();
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
+    void quit_editor();
+
 
 private slots:
     void on_actionNew_triggered();
@@ -69,13 +74,21 @@ private slots:
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered();
 
+    void addOnlineUser(Account account);
+    void addOfflineUser(Account account);
+
+    void highLightUser(QListWidgetItem * item);
+
 private:
     void createActions();
     void createStatusBar();
-    void setRichTextToolBar();
+    void initUserList();
+    void initRichTextToolBar();
     void updateCursors();
     void highlightUserChars(int p_siteId);
+    void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
 
+    QString fileName;
     ClientController *controller;
     bool handlingRemoteOp;
     QTextEdit *m_textEdit;
