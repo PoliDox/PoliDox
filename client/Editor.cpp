@@ -420,6 +420,36 @@ void Editor::setCharacterStyle(int index, Char &symbol){
 
     symbol.setStyle(fmt.fontFamily(),fmt.fontPointSize(),bold,fmt.fontItalic(),fmt.fontUnderline(),m_textEdit->alignment());
 }
+
+void Editor::resetActionToggle(int pos,bool selection){
+
+    QTextCursor cursor(m_textDoc);
+    cursor.setPosition(pos); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
+
+    QTextCharFormat fmt=cursor.charFormat();
+
+    QAction* boldAction=this->ui->textRichToolBar->actions().at(0);
+    QAction* italicAction=this->ui->textRichToolBar->actions().at(1);
+    QAction* underlineAction=this->ui->textRichToolBar->actions().at(2);
+
+    if(fmt.fontWeight()==50 && boldAction->isChecked() && !selection)
+        boldAction->setChecked(false);
+    else if(fmt.fontWeight()==75)
+        boldAction->setChecked(true);
+
+    if(!fmt.fontItalic() && italicAction->isChecked() && !selection)
+        italicAction->setChecked(false);
+    else if(fmt.fontItalic())
+            italicAction->setChecked(true);
+
+    if(!fmt.fontUnderline() && underlineAction->isChecked() && !selection)
+        underlineAction->setChecked(false);
+    else if(fmt.fontUnderline())
+        underlineAction->setChecked(true);
+
+
+
+}
 /* Handler di gestione per la creazione di un nuovo file */
 void Editor::on_actionNew_triggered()
 {

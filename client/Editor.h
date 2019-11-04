@@ -45,6 +45,7 @@ public:
     void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
     void resetBackgroundColor(int pos);
     void setCharacterStyle(int index,Char& symbol);
+    void resetActionToggle(int pos,bool selection);
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
