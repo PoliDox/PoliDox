@@ -82,6 +82,9 @@ private slots:
 
     void highLightUser(QListWidgetItem * item);
 
+
+    void on_URI_clicked();
+
 private:
     void createActions();
     void createStatusBar();

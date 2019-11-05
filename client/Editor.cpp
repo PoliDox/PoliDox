@@ -635,3 +635,10 @@ void Editor::on_actionOpen_triggered()
     file.close();
     */
 }
+
+
+
+void Editor::on_URI_clicked()
+{
+    this->uriD->show();
+}
