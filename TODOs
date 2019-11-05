@@ -1,6 +1,9 @@
 URGENTI
 bottone nella registration form per tornare al login form se ho cliccato sign up per sbaglio
 aggiungere una lista di account offline al messaggio openFileRepl. guarda WebSocketMessageAPI
+Aggiungere delle label ai pulsanti con i nomi delle azioni quando si tiene il cursore sopra il pulsante
+Ritornare in openFileRepl il nome così da poterlo mostrare se si apre tramite URI
+
 
 NON URGENTI
 Non-Ascii characters

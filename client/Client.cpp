@@ -24,7 +24,14 @@ Client::Client()
     connect(&loginWindow, &Log_Dialog::fileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createOpenFileMessage(p_filename);
         m_socket.sendTextMessage(message);
+        // TODO: delete this, c_fileName should be filled at openFileRepl
         c_fileName = p_filename;
+    });
+
+    connect(&loginWindow, &Log_Dialog::uriSelected, this, [&](const QString& p_uri) {
+        QByteArray message = ClientMessageFactory::createOpenFileMessage(QString(), p_uri);
+        qDebug() << QString(message).toUtf8().constData();
+        m_socket.sendTextMessage(message);
     });
 
     connect(&loginWindow, &Log_Dialog::newFileSelected, this, [&](const QString& p_filename) {

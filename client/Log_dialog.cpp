@@ -1,5 +1,6 @@
 #include "Log_dialog.h"
 #include "ui_log_dialog.h"
+#include "ClientMessageFactory.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QListWidget>
@@ -26,9 +27,14 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
 
     lf = new ListFiles();
     nfd = new NewFileDialog(this);
+    uriDialog = new InsertUriDialog(this);
 
     connect(nfd, &NewFileDialog::getFileName, this, [&](QString newfilename){
         emit newFileSelected(newfilename);
+    });
+
+    connect(uriDialog, &InsertUriDialog::getUriName, this, [&](QString uri) {
+       emit uriSelected(uri);
     });
 
 }
@@ -256,12 +262,12 @@ void Log_Dialog::cleanRegistrationForm(){
 
 void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
-    qDebug() << "SELECTED FILE: "<< item->text();
+    //qDebug() << "SELECTED FILE: "<< item->text();
 
     if(item->text().compare("Create new file") == 0){
         nfd->show();
     }else if(item->text().compare("Insert URI")==0){
-        //TODO uri
+        uriDialog->show();
     }
     else{
         this->hide();

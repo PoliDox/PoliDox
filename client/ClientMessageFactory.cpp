@@ -48,11 +48,12 @@ QByteArray ClientMessageFactory::createLoginMessage(const QString &p_user, const
     return l_doc.toJson(QJsonDocument::Indented);
 }
 
-QByteArray ClientMessageFactory::createOpenFileMessage(const QString &p_filename)
+QByteArray ClientMessageFactory::createOpenFileMessage(const QString &p_filename, const QString& p_uri)
 {
     QJsonObject l_obj;
     l_obj.insert("action", "openFileReq");
     l_obj.insert("nameDocument", p_filename);
+    l_obj.insert("uri", p_uri);
 
     QJsonDocument l_doc(l_obj);
     return l_doc.toJson(QJsonDocument::Indented);

@@ -20,7 +20,8 @@ HEADERS += \
     Client.h \
     NewFileDialog.h \
     Styler.h \
-    UriDialog.h
+    UriDialog.h \
+    InsertUriDialog.h
 
 SOURCES += \
     CRDT.cpp \
@@ -36,7 +37,8 @@ SOURCES += \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp \
-    Client.cpp
+    Client.cpp \
+    InsertUriDialog.cpp
 
 DISTFILES += \
     images/filenew.png \
@@ -48,7 +50,8 @@ FORMS += \
     listfiles.ui \
     log_dialog.ui \
     newfiledialog.ui \
-    uridialog.ui
+    uridialog.ui \
+    inserturidialog.ui
 
 RESOURCES += \
     Resources.qrc

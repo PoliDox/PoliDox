@@ -131,6 +131,8 @@ ServerController* Server::initializeServerController(QString& nameDocument, QLis
 void Server::handleLoggedRequests(const QString& genericRequestString){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
+    //qDebug() << genericRequestString.toUtf8().constData();
+
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
 
@@ -141,12 +143,19 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     }
     requestObjJSON = requestDocJSON.object();
 
-    // No switch case for strings in C++ :((
     ServerController *fileServContr = nullptr;
     QString nameDocument = requestObjJSON["nameDocument"].toString();
+    QString uri = requestObjJSON["uri"].toString();
+
     QString header = requestObjJSON["action"].toString();
+    if (nameDocument == "") {
+        nameDocument = this->dbOperations->getDocument(uri);
+    }
+    qDebug() << "name document: " << nameDocument;
+
     if (header == "openFileReq") {
-        if( !(this->file2serverController.contains(nameDocument)) ){
+        // TODO: controlla che il file esista nel DB e manda un errore se non è così!
+        if( !(this->file2serverController.contains(nameDocument)) ){            
             QList<Char> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
             fileServContr = this->initializeServerController(nameDocument, orderedInserts);
 

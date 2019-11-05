@@ -35,6 +35,7 @@ REGISTER USER REPL
 OPEN FILE REQ
 "action" = "openFileReq"
 "nameDocument" = ...
+"uri" = ...
 
 OPEN FILE REPL
 "action" = "openFileRepl"
