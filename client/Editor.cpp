@@ -349,10 +349,10 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position)
     remCursor.setPosition(position);
     if (op == INSERT_OP){
 
-        remCursor.insertText(QString(symbol.getValue()));
-
         QTextCharFormat fmt;
         tStyle style=symbol.getStyle();
+
+        fmt.setFontPointSize(style.font_size);
 
         if(style.is_bold)
             fmt.setFontWeight(75);
@@ -374,6 +374,8 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position)
 
         remCursor.mergeCharFormat(fmt);
         m_textEdit->mergeCurrentCharFormat(fmt);
+
+        remCursor.insertText(QString(symbol.getValue()));
 
 
     }
