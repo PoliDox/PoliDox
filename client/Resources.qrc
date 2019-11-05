@@ -24,5 +24,6 @@
         <file>images/textbold.png</file>
         <file>images/zoomin.png</file>
         <file>images/zoomout.png</file>
+        <file>images/uri.png</file>
     </qresource>
 </RCC>

@@ -64,6 +64,7 @@ private slots:
     void on_actionCut_triggered();
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();
+    void on_actionURI_triggered();
 
     void on_actionBold_triggered();
     void on_actionItalic_triggered();
@@ -81,9 +82,6 @@ private slots:
     void addOfflineUser(Account account);
 
     void highLightUser(QListWidgetItem * item);
-
-
-    void on_URI_clicked();
 
 private:
     void createActions();
