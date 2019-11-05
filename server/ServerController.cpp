@@ -68,7 +68,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
     // now allAccountsOfDocument contains online offline accounts
 
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accountsOnline, allAccountsOfDocument);
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, nameDocument, this->crdt, accountsOnline, allAccountsOfDocument);
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
