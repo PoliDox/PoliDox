@@ -49,7 +49,7 @@ QJsonObject Char::toJson() const {
     for(int elem : this->fractionalPosition) {
         fractPosJSON.push_back(elem);
     }
-    charJSON.insert("position",fractPosJSON);       //TODO: cambiare in fractionalPosition
+    charJSON.insert("position",fractPosJSON);
 
     // TODO: What about a tStyle::toJson function?
     QJsonObject styleJSON;

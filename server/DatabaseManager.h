@@ -44,7 +44,8 @@ public:
     QString getUri(QString& documentName);
     QString getDocument(QString& uriOfDocument);
     bool insertNewPermission(QString& nameDocument, int siteId);
-    bool insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
+    bool insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
+                      QString& family, int size, int bold, int italic, int underline, int alignment);
     bool deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
     QList<Char> getAllInserts(QString& nameDocument);
     QList<QString> getAllDocuments(int siteId);

@@ -237,7 +237,9 @@ QString DatabaseManager::getDocument(QString& uriOfDocument){
 
 //TODO: - sistemare il valore di ritorno
 //      - implementare il vincolo di integrità su nameDocument
-bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition) {
+//      - anziché passargli tutti questi attributi, passargli un char e chiamare poi qui dentro il toJson
+bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
+                                   QString& family, int size, int bold, int italic, int underline, int alignment) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     int counterInsert = this->getCounterOfCollection("insert");
@@ -254,6 +256,14 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
                        << "value"              << symbol.toUtf8().constData()
                        << "siteId"             << siteIdOfSymbol
                        << "position"           << array_builder
+                       << "style"              << bsoncxx::builder::stream::open_document
+                            << "fontFamily" << family.toUtf8().constData()
+                            << "fontSize"   << size
+                            << "bold"       << bold
+                            << "italic"     << italic
+                            << "underline"  << underline
+                            << "alignment"  << (int)0       // TODO: ALIGNMENT
+                            << bsoncxx::builder::stream::close_document
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToInsertView = symbolToInsert.view();
 
@@ -267,6 +277,7 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
     this->incrementCounterOfCollection("insert");
     return true;
 }
+
 
 //TODO: - sistemare il valore di ritorno, gestire
 //        eventuale eccezione alzata dalla delete_one
@@ -321,12 +332,8 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
         }
 
         QJsonObject insertObjJson = stringDocJSON.object();
-
-        qDebug() << "insertObjJson:    " << insertObjJson;
-
         Char charToInsert = Char::fromJson(insertObjJson);
 
-        qDebug() << "char.getvalue : "  << charToInsert.getValue();
         orderedChars.push_back(charToInsert);
     }
 

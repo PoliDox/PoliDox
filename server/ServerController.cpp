@@ -109,6 +109,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
     QJsonObject charJson = requestObjJSON["char"].toObject();
     Char charObj = Char::fromJson(charJson);
+    tStyle charStyle = charObj.getStyle();
     QString charValue(charObj.getValue());
     std::vector<int> fractPos(charObj.getFractionalPosition());
     int siteId = charObj.getSiteId();
@@ -116,7 +117,9 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
         this->crdt->remoteInsert(charObj);
-        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
+        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
+                                            charStyle.font_family, charStyle.font_size, charStyle.is_bold,
+                                            charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
     }
     else if(header == "delete"){
         this->crdt->remoteDelete(charObj);
