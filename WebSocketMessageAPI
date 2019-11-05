@@ -74,13 +74,13 @@ GET URI REPLY
 
 REQUEST OF ADD PERMISSION ON DOCUMENT VIA URI
 "action" = "permissionReq"
-"nameDocument" = ...
 "uri" = ...
 "siteId" = ...     //the siteId of the account who is asking for permission 
 
 REPLY OF ADD PERMISSION ON DOCUMENT VIA URI 
 "action" = "permissionRepl"	
-response = "ok"/"fail"			//for example, fail if uri inserted is not correct for that nameDocument
+response = "ok"/"fail"			//for example, fail if inserted uri does not correspond to any nameDocument
+"nameDocument" = ...			//only if ok, empty otherwise
 
 
 

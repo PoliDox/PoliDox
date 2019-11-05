@@ -20,6 +20,7 @@ private:
 public:
     Account() = default;
     Account(int p_siteId, const QString& p_name, const QByteArray& p_picture, int p_color = -1);
+    Account(const Account& other);
     int getSiteId() const;
     QString getName() const;
     QByteArray getImage() const;
@@ -27,6 +28,7 @@ public:
     QJsonObject toJson() const;
     static Account fromJson(const QJsonObject& accountJSON);
     bool operator < (const Account& other) const;
+    bool operator == (const Account& other) const;
 
 
 };

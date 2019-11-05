@@ -50,15 +50,25 @@ void ServerController::addClient(QWebSocket *socketToAdd){
 
     //notify the new socket about all the accounts
     //actually connected on the document just opened by him
-    QList<Account*> accounts;
+    QList<Account*> accountsOnline;
     for(auto otherSocket : this->socketsOnDocument) {
         if(otherSocket != socketToAdd){
             Account *otherAccount = this->server->getAccount(otherSocket);
-            accounts.append(otherAccount);
+            accountsOnline.append(otherAccount);
         }
     }
 
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accounts);
+    QString nameDocument = this->nameDocumentAssociated;
+    QList<int> allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);   //TODO: da sistemare, questa riga è da togliere: farsi restituire direttamente gli account senza passare
+                                                                                             //         per i siteid
+    QList<Account> allAccountsOfDocument = this->server->getDb()->getAllAccounts(allSiteIdsOfDocument);
+
+    for(Account* acc : accountsOnline){
+        allAccountsOfDocument.removeOne(*acc);
+    }
+    // now allAccountsOfDocument contains online offline accounts
+
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accountsOnline, allAccountsOfDocument);
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
@@ -128,7 +138,8 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         connect(signalSender, &QWebSocket::textMessageReceived, this->server, &Server::handleLoggedRequests);
         connect(signalSender, &QWebSocket::disconnected, this->server, &Server::disconnectAccount);
 
-        QList<QString> nameDocuments = this->server->getDb()->getAllDocuments();
+        Account* account = this->server->getAccount(signalSender);
+        QList<QString> nameDocuments = this->server->getDb()->getAllDocuments(account->getSiteId());
         QByteArray sendMsgToClientQuitted = ServerMessageFactory::createClosedEditorReply(nameDocuments);
         signalSender->sendTextMessage(sendMsgToClientQuitted);
 
@@ -142,6 +153,15 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
         if(destroyServContr)
             delete (this);
+    }
+    else if(header == "getUriReq"){
+        QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+        QString nameDocument = requestObjJSON["nameDocument"].toString();
+
+        QString uri = this->server->getDb()->getUri(nameDocument);
+
+        QByteArray sendMsgToClient = ServerMessageFactory::createGetUriReply(nameDocument, uri);
+        signalSender->sendTextMessage(sendMsgToClient);
     }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();

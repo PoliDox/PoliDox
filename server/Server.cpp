@@ -87,9 +87,8 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
             //in case of success, result will contain siteId and [image(TODO!!)]
             loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
             this->socket2account[signalSender] = loggedAccount;
-            qDebug() << this->getAccount(signalSender)->getName();
 
-            nameDocuments = this->dbOperations->getAllDocuments();
+            nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
 
             disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
             connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
@@ -165,9 +164,18 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     }
     else if (header == "createFileReq"){
         //create and open the file
-        bool result = this->dbOperations->insertNewDocument(nameDocument);
+        //when a user creates a file he has, by default, the permission to open it
+        QString nameAccount = this->socket2account[signalSender]->getName();
+        QString uriOfDocument = this->generateUri(nameAccount, nameDocument);
+        bool result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);
 
+        bool result2 = false;
         if(result){
+            Account* loggedAccount = this->socket2account[signalSender];
+            result2 = this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
+        }
+
+        if(result2){
             QList<Char> emptyList;
             fileServContr = this->initializeServerController(nameDocument, emptyList);
             this->file2serverController[nameDocument] = fileServContr;
@@ -179,9 +187,58 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
         }
 
     }
+    else if(header == "permissionReq"){
+        QString uri = requestObjJSON["uri"].toString();
+        int siteId = requestObjJSON["siteId"].toInt();      // siteId of account who is asking
+                                                            // for permission
+        bool response = true;
+        try {
+            QString nameDocument = this->dbOperations->getDocument(uri);
+        } catch (std::exception e) {
+            //does not exists a document with that uri   //TODO: da testare
+            response = false;
+            nameDocument = "";
+        }
+
+        if(response)
+            this->dbOperations->insertNewPermission(nameDocument, siteId);
+
+        QByteArray sendMsgToClient = ServerMessageFactory::createPermissionReply(response, nameDocument);
+        signalSender->sendTextMessage(sendMsgToClient);
+    }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
+}
+
+
+int Server::getDigits(std::string s) {
+    long long int digits = 0;
+    int runningLength = 0;
+    int prevLength = 0;
+    for ( auto it = s.rbegin(); it != s.rend(); ++it ) {
+        runningLength += prevLength;
+        //if digits is a 7 digit number then appending a 3 digit number would overflow an int
+        digits += (long long int)*it * pow(10, runningLength);
+        //we have to work out the length of the current digit
+        //so we know how much we need to shift by next time
+        int dLength = 0;
+        for ( int d = *it; d > 0; dLength++, d /= 10 );
+        prevLength = dLength;
+        if ( digits >= 100000000 ) break;
+    }
+    return digits % 100000000;
+}
+
+
+//TODO
+QString Server::generateUri(QString& nameAccount, QString& nameDocument){
+    std::string uri("file://");
+    int accountHashed = this->getDigits(nameAccount.toUtf8().constData());
+    int documentHashed = this->getDigits(nameDocument.toUtf8().constData());
+
+    uri = uri + std::to_string(accountHashed) + "/" + std::to_string(documentHashed) + "/" + nameDocument.toUtf8().constData();
+    return QString::fromStdString(uri);
 }
 
 
