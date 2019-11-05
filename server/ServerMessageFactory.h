@@ -17,9 +17,11 @@ public:
     static QByteArray createNewClientMessage(const Account *account);
     static QByteArray createLoginReply(bool response, const Account *account, QList<QString>& nameDocuments);
     static QByteArray createRegistrationUserReply(bool response, double siteIdOfRegisteredUser);
-    static QByteArray createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts);
+    static QByteArray createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline);
     static QByteArray createClosedEditorReply(QList<QString>& nameDocuments);
     static QByteArray createClosedEditorRemote(const Account *accountQuitted);
+    static QByteArray createGetUriReply(QString& nameDocument, QString& uri);
+    static QByteArray createPermissionReply(bool response, QString& nameDocument);
 };
 
 

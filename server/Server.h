@@ -22,6 +22,7 @@ private:
     DatabaseManager *dbOperations;
 
     ServerController* initializeServerController(QString& nameDocument, QList<Char>& orderedInserts);
+    int getDigits(std::string s);
 
 public:
     explicit Server(quint16 port, QObject *parent = nullptr);
@@ -29,6 +30,7 @@ public:
     DatabaseManager* getDb();
     void removeSocket2AccountPair(QWebSocket *socketOfAccount);
     void removeFile2ServcontrPair(QString filename);
+    QString generateUri(QString& nameAccount, QString& nameDocument);
     virtual ~Server();
 
 /* ======================================================================

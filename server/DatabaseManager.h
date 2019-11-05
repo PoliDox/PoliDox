@@ -13,6 +13,7 @@
 #include <mongocxx/uri.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
+#include "Account.h"
 
 #include "Char.h"
 
@@ -39,11 +40,18 @@ public:
     DatabaseManager();
     int registerUser(QString& name, QString& password, QByteArray& image);
     int checkPassword(QString& name, QString& password);
-    bool insertNewDocument(QString& documentName);
-    bool insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
+    bool insertNewDocument(QString& documentName, QString& uri);
+    QString getUri(QString& documentName);
+    QString getDocument(QString& uriOfDocument);
+    bool insertNewPermission(QString& nameDocument, int siteId);
+    bool insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
+                      QString& family, int size, int bold, int italic, int underline, int alignment);
     bool deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
     QList<Char> getAllInserts(QString& nameDocument);
-    QList<QString> getAllDocuments();
+    QList<QString> getAllDocuments(int siteId);
+    QList<int> getAllAccounts(QString& nameDocument);
+    QList<Account> getAllAccounts(QList<int>& siteIdAccounts);
+    Account getAccount(int siteId);
     mongocxx::database getDb();
     ~DatabaseManager();
 };

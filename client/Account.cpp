@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <cstdlib>
 
+
+
 Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image, int p_color)
     : siteId(p_siteId), name(p_name), image(p_image) {
 
@@ -16,6 +18,15 @@ Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image,
         color = p_color;
     }
 }
+
+
+Account::Account(const Account& other){
+    this->siteId = other.siteId;
+    this->name = other.name;
+    this->image = other.image;
+    this->color = other.color;
+}
+
 
 int Account::getSiteId() const {
     return this->siteId;
@@ -66,5 +77,8 @@ bool Account::operator < (const Account& other) const {
 }
 
 
+bool Account::operator == (const Account& other) const {
+    return this->siteId == other.siteId;
+}
 
 

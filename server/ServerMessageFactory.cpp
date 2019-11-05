@@ -91,10 +91,11 @@ QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, doub
 }
 
 
-QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts){
+QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline) {
     QJsonObject objToReturn;
     QJsonArray crdtFormattedJson;
     QJsonArray accountsFormattedJson;
+    QJsonArray accountsOfflineFormattedJson;
     QString responseString;
     responseString = response ? "ok" : "fail";
 
@@ -110,9 +111,43 @@ QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, 
             accountsFormattedJson.append(jsonAccount);
         }
         objToReturn.insert("accounts", accountsFormattedJson);
+
+        for (Account& ac : accountsOffline) {
+            QJsonValue jsonAccount = QJsonValue(ac.toJson());
+            accountsOfflineFormattedJson.append(jsonAccount);
+        }
+        objToReturn.insert("accountsOffline", accountsOfflineFormattedJson);
     }
 
     QJsonDocument docOfObj(objToReturn);
     return docOfObj.toJson(QJsonDocument::Indented);
 }
 
+
+QByteArray ServerMessageFactory::createGetUriReply(QString& nameDocument, QString& uri){
+    QJsonObject objToReturn;
+
+    objToReturn.insert("action", "getUriRepl");
+    objToReturn.insert("nameDocument", nameDocument);
+    objToReturn.insert("uri", uri);
+
+    QJsonDocument docOfObj(objToReturn);
+    return docOfObj.toJson(QJsonDocument::Indented);
+}
+
+
+QByteArray ServerMessageFactory::createPermissionReply(bool response, QString& nameDocument){
+    QJsonObject objToReturn;
+    QString responseString;
+    if(response)
+        responseString = "ok";
+    else
+        responseString = "fail";
+
+    objToReturn.insert("action", "permissionRepl");
+    objToReturn.insert("response", responseString);
+    objToReturn.insert("nameDocument", nameDocument);
+
+    QJsonDocument docOfObj(objToReturn);
+    return docOfObj.toJson(QJsonDocument::Indented);
+}
