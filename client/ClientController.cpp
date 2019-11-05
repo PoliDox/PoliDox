@@ -107,13 +107,13 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
-        m_editor->handleRemoteOperation(INSERT_OP, symbol.getSiteId(), linPos, symbol.getValue());
+        m_editor->handleRemoteOperation(INSERT_OP, symbol, linPos);
 
     } else if (l_header== "delete") {
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteDelete(symbol);
-        m_editor->handleRemoteOperation(DELETE_OP, symbol.getSiteId(), linPos);
+        m_editor->handleRemoteOperation(DELETE_OP, symbol, linPos);
 
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();

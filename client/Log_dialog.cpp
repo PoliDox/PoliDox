@@ -59,7 +59,9 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
 
     QString new_file("Create new file");
+    QString fileFromUri("Insert URI");
     files->addItem(new_file);
+    files->addItem(fileFromUri);
     files->addItems(p_files);
 
     QGridLayout* grid_layout = new QGridLayout(this->ui->groupBox);
@@ -258,6 +260,8 @@ void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
     if(item->text().compare("Create new file") == 0){
         nfd->show();
+    }else if(item->text().compare("Insert URI")==0){
+        //TODO uri
     }
     else{
         this->hide();

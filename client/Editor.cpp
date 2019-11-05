@@ -331,7 +331,7 @@ void Editor::addClient(const Account& user)
     //m_textEdit->raise();
 }
 
-void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
+void Editor::handleRemoteOperation(EditOp op, Char symbol, int position)
 {
     /*
     qDebug() << "Cursors positions: ";
@@ -344,11 +344,39 @@ void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
     */
 
     handlingOperation = true;
-    QTextCursor& remCursor = m_users[siteId].cursor;
-    /* SETTAGGIO STILE */
+    QTextCursor& remCursor = m_users[symbol.getSiteId()].cursor;
+
     remCursor.setPosition(position);
-    if (op == INSERT_OP)
-        remCursor.insertText(QString(ch));
+    if (op == INSERT_OP){
+
+        remCursor.insertText(QString(symbol.getValue()));
+
+        QTextCharFormat fmt;
+        tStyle style=symbol.getStyle();
+
+        if(style.is_bold)
+            fmt.setFontWeight(75);
+        if(style.is_italic)
+            fmt.setFontItalic(true);
+        if(style.is_underline)
+            fmt.setFontUnderline(true);
+
+        int alignment=style.alignment;
+
+        if(alignment==1)
+            m_textEdit->setAlignment(Qt::AlignLeft);
+        else if(alignment==4)
+            m_textEdit->setAlignment(Qt::AlignCenter);
+        else if(alignment==2)
+            m_textEdit->setAlignment(Qt::AlignRight);
+        else if(alignment==8)
+            m_textEdit->setAlignment(Qt::AlignJustify);
+
+        remCursor.mergeCharFormat(fmt);
+        m_textEdit->mergeCurrentCharFormat(fmt);
+
+
+    }
     else if (op == DELETE_OP)
        remCursor.deleteChar();
 
