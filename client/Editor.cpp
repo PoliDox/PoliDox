@@ -20,6 +20,16 @@
 #include <QCheckBox>
 #include <iostream>
 
+void setItem(QColor color,QListWidgetItem* item){
+
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setCheckState(Qt::Unchecked);
+    color.setAlpha(80);
+    item->setBackgroundColor(color);
+
+}
+
 Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
 {
@@ -31,6 +41,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
+
+    uriD = new UriDialog();
 
     setWindowTitle("PoliDox");
     ui->currentFile->setText(fileName);
@@ -90,17 +102,9 @@ void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Acco
     //fill offline list
     //No addOfflineUser because no online users to move at boot time
     for(Account acc : contributorsOffline){
+
         QListWidgetItem* item= new QListWidgetItem(acc.getName());
-
-        item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-
-        QColor color(acc.getColor());
-        color.setAlpha(80);
-        item->setBackgroundColor(color);
-
-        item->setCheckState(Qt::Unchecked);
-
+        setItem(acc.getColor(),item);
         ui->offlineList->addItem(item);
     }
 
@@ -222,20 +226,12 @@ void Editor::addOnlineUser(Account account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
-    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-    item->setCheckState(Qt::Unchecked);
-
-    QColor color(account.getColor());
-    color.setAlpha(80);
-    item->setBackgroundColor(color);
+    setItem(account.getColor(),item);
 
     if(items.size()>0){
 
         if(_dItem->checkState() == Qt::Checked)
             item->setCheckState(Qt::Checked);
-        else
-            item->setCheckState(Qt::Unchecked);
 
         delete _dItem;
     }
@@ -259,17 +255,10 @@ void Editor::addOfflineUser(Account account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
-    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-
-    QColor color(account.getColor());
-    color.setAlpha(80);
-    item->setBackgroundColor(color);
+    setItem(account.getColor(),item);
 
     if (_dItem->checkState() == Qt::Checked)
         item->setCheckState(Qt::Checked);
-    else
-        item->setCheckState(Qt::Unchecked);
 
     delete _dItem;
     ui->offlineList->addItem(item);
@@ -645,4 +634,11 @@ void Editor::on_actionOpen_triggered()
     m_textEdit->setText(text);
     file.close();
     */
+}
+
+
+
+void Editor::on_URI_clicked()
+{
+    this->uriD->show();
 }
