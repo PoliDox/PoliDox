@@ -32,6 +32,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
 
+    uriD = new UriDialog();
+
     setWindowTitle("PoliDox");
     ui->currentFile->setText(fileName);
 

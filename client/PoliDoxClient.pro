@@ -19,7 +19,8 @@ HEADERS += \
     Log_dialog.h \
     Client.h \
     NewFileDialog.h \
-    Styler.h
+    Styler.h \
+    UriDialog.h
 
 SOURCES += \
     CRDT.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
     Account.cpp \
     NewFileDialog.cpp \
     Styler.cpp \
+    UriDialog.cpp \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp \
@@ -45,7 +47,8 @@ FORMS += \
     editor.ui \
     listfiles.ui \
     log_dialog.ui \
-    newfiledialog.ui
+    newfiledialog.ui \
+    uridialog.ui
 
 RESOURCES += \
     Resources.qrc

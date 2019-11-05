@@ -10,6 +10,7 @@
 #include "Account.h"
 #include "Styler.h"
 #include "ClientController.h"
+#include "UriDialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -99,6 +100,7 @@ private:
     // Maps siteIds to a struct identifying a remote user
     // N.B. You can use it to iterate over all Accounts!    
     QMap<int, User> m_users;
+    UriDialog *uriD;
     Ui::Editor *ui;
 
 protected:
