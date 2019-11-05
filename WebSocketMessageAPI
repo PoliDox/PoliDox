@@ -63,6 +63,25 @@ CLOSED EDITOR REMOTE		//to notify other clients connected on that document that 
 "action" = "closedEditorRemote"
 "account" = { ... }         //the account who has just quitted the document
 
+GET URI REQUEST
+"action" = "getUriReq"
+"nameDocument" = ...
+
+GET URI REPLY 
+"action" = "getUriRepl"
+"nameDocument" = ...
+"uri" = ...
+
+REQUEST OF ADD PERMISSION ON DOCUMENT VIA URI
+"action" = "permissionReq"
+"nameDocument" = ...
+"uri" = ...
+"siteId" = ...     //the siteId of the account who is asking for permission 
+
+REPLY OF ADD PERMISSION ON DOCUMENT VIA URI 
+"action" = "permissionRepl"	
+response = "ok"/"fail"			//for example, fail if uri inserted is not correct for that nameDocument
+
 
 
 NEW REMOTE FILE        // ???
