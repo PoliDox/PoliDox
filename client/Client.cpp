@@ -91,8 +91,18 @@ void Client::onMessageReceived(const QString &p_msg)
         //std::cout << "JSON ARRIVATO:" << p_msg.toUtf8().constData() << "\n\n\n";
         QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
+        QJsonArray JSONaccountsOffline = _JSONobj["accountsOffline"].toArray();
 
-        m_document = new ClientController(&m_socket, m_user.getSiteId(), c_fileName);
+        QList<Account> contributorsOnline;
+        QList<Account> contributorsOffline;
+
+        if (l_header == "openFileRepl") {
+            for (const QJsonValue accOnline : JSONaccounts)
+                contributorsOnline.push_back(Account::fromJson(accOnline.toObject()));
+            for (const QJsonValue accOffline : JSONaccountsOffline)
+                contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
+        }
+        m_document = new ClientController(&m_socket, m_user.getSiteId(), c_fileName, contributorsOnline, contributorsOffline);
         m_document->init(JSONcrdt, JSONaccounts);
 
         loginWindow.hide();
@@ -123,9 +133,4 @@ void Client::onDocClosed()
     m_socket.sendTextMessage(jsonString);
 
     loginWindow.show();
-
-    // TODO Dav:
-    // Qua farei già la show del Log_dialog e quando poi arriva la closedEditorRepl
-    // riempiamo la lista di file (vedi giù), ma se non dovesse arrivare la reply almeno abbiamo
-    // il dialog mostrato, sennò si impallerebbe tutto
 }

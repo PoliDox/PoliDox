@@ -3,11 +3,11 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName) :
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
     m_socket(p_socket)
 {        
     m_crdt = new CrdtClient(p_siteId);
-    m_editor = new Editor(this, nullptr, fileName);
+    m_editor = new Editor(this, nullptr, fileName, contributorsOnline, contributorsOffline);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
@@ -60,10 +60,7 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
     for (const QJsonValue& ac : p_accounts) {
         Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
         m_editor->addClient(account);
-        emit newUserOnline(account);
     }
-
-
 }
 
 QVector<int> ClientController::getUserChars(int p_siteId)
