@@ -3,7 +3,9 @@
 #include <QLabel>
 #include "ClientMessageFactory.h"
 
+
 ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
+
     m_socket(p_socket)
 {        
     m_crdt = new CrdtClient(p_siteId);
@@ -157,9 +159,14 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         charsRemoved--;
     }
 
+    bool _SELECTION= charsAdded==charsRemoved;
+
     // It could happen that some chars were removed and some others were added at the same time
+
+
     for (int i = 0; i < charsRemoved; i++) {
         m_crdt->localDelete(position);
+
     }
 
     for (int i = 0; i < charsAdded; i++) {
@@ -173,11 +180,6 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         }
 
         Char symbol(_char,m_crdt->getSiteId());
-
-        bool _SELECTION=false;
-
-        if(charsAdded==charsRemoved)
-             _SELECTION=true;
 
         m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert
         m_editor->resetActionToggle(position,_SELECTION);

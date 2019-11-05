@@ -10,7 +10,7 @@
 
 
 #define MAXNUM 100
-//#define DEBUG_OUTPUT
+#define DEBUG_OUTPUT
 
 
 double CrdtClient::getSiteId() const {
@@ -158,6 +158,8 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
 
     unsigned long rowSize=0;
 
+    char value=symbolToInsert.getValue();
+
     //QDateTime asd(QDateTime::currentDateTime());
     //uint unixTime = asd.toTime_t();
 
@@ -176,7 +178,7 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
 #endif
 
     // symbolToInsert(value, siteId);
-    char value=symbolToInsert.getValue();
+
 
     rowSize=this->_symbols[row].size();
 
