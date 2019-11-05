@@ -123,6 +123,10 @@ void Editor::initUserList(){
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
+    QPixmap uri("./uri.png");
+    QIcon uriIcon(uri);
+    ui->URI_icon->setPixmap(uriIcon.pixmap(QSize(10,10)));
+
     QListWidgetItem* item= new QListWidgetItem("You",ui->onlineList);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
@@ -309,14 +313,14 @@ QChar Editor::at(int pos)
 }
 
 void Editor::addClient(const Account& user)
-{   
+{
     // Add user to the map of remote users
     int siteId = user.getSiteId();
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
     remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;font-family:American Typewriter;font-weight:bold");
     remoteLabel->lower();
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
-    m_users[siteId] = newUser;    
+    m_users[siteId] = newUser;
 
     // Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_users[siteId].cursor;
@@ -449,7 +453,7 @@ void Editor::on_actionSave_as_triggered()
 void Editor::on_actionQuit_triggered()
 {
     this->hide();
-    emit quit_editor();    
+    emit quit_editor();
 }
 
 void Editor::on_actionCopy_triggered()
