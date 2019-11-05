@@ -88,6 +88,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
     //fill offline list
+    //No addOfflineUser because no online users to move at boot time
     for(Account acc : contributorsOffline){
         QListWidgetItem* item= new QListWidgetItem(acc.getName());
 
@@ -104,20 +105,8 @@ void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Acco
     }
 
     //fill online list
-    for(Account acc : contributorsOnline){
-        QListWidgetItem* item= new QListWidgetItem(acc.getName());
-
-        item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-
-        QColor color(acc.getColor());
-        color.setAlpha(80);
-        item->setBackgroundColor(color);
-
-        item->setCheckState(Qt::Unchecked);
-
-        ui->onlineList->addItem(item);
-    }
+    for(Account acc : contributorsOnline)
+        addOnlineUser(acc);
 }
 
 void Editor::initUserList(){
@@ -261,11 +250,11 @@ void Editor::addOfflineUser(Account account){
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
-    if(items.size()==0)
+    if (items.size()==0)
         std::cout << "PANIC! USER NOT FOUND"<< std::endl;
-    else if(items.size()>1)
+    else if (items.size()>1)
         std::cout << "PANIC! MORE USER WITH SAME USERNAME"<< std::endl;
-    else if(items.size()==1)
+    else if (items.size()==1)
          _dItem=items.at(0); //there should be always one item in this list
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
@@ -277,7 +266,7 @@ void Editor::addOfflineUser(Account account){
     color.setAlpha(80);
     item->setBackgroundColor(color);
 
-    if(_dItem->checkState() == Qt::Checked)
+    if (_dItem->checkState() == Qt::Checked)
         item->setCheckState(Qt::Checked);
     else
         item->setCheckState(Qt::Unchecked);
