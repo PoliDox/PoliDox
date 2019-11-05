@@ -123,10 +123,6 @@ void Editor::initUserList(){
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
-    QPixmap uri("./uri.png");
-    QIcon uriIcon(uri);
-    ui->URI_icon->setPixmap(uriIcon.pixmap(QSize(10,10)));
-
     QListWidgetItem* item= new QListWidgetItem("You",ui->onlineList);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
@@ -671,8 +667,7 @@ void Editor::on_actionOpen_triggered()
 }
 
 
-
-void Editor::on_URI_clicked()
+void Editor::on_actionURI_triggered()
 {
     this->uriD->show();
 }
