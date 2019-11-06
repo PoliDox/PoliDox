@@ -107,21 +107,30 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     }
     QJsonObject requestObjJSON = requestDocJSON.object();
 
-    QJsonObject charJson = requestObjJSON["char"].toObject();
-    Char charObj = Char::fromJson(charJson);
-    tStyle charStyle = charObj.getStyle();
-    QString charValue(charObj.getValue());
-    std::vector<int> fractPos(charObj.getFractionalPosition());
-    int siteId = charObj.getSiteId();
-
     QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
+        //todo: rifattorizzare
+        QJsonObject charJson = requestObjJSON["char"].toObject();
+        Char charObj = Char::fromJson(charJson);
+        tStyle charStyle = charObj.getStyle();
+        QString charValue(charObj.getValue());
+        std::vector<int> fractPos(charObj.getFractionalPosition());
+        int siteId = charObj.getSiteId();
+
         this->crdt->remoteInsert(charObj);
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
                                             charStyle.font_family, charStyle.font_size, charStyle.is_bold,
                                             charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
     }
     else if(header == "delete"){
+        //todo: rifattorizzare
+        QJsonObject charJson = requestObjJSON["char"].toObject();
+        Char charObj = Char::fromJson(charJson);
+        tStyle charStyle = charObj.getStyle();
+        QString charValue(charObj.getValue());
+        std::vector<int> fractPos(charObj.getFractionalPosition());
+        int siteId = charObj.getSiteId();
+
         this->crdt->remoteDelete(charObj);
         this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
     }

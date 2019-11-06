@@ -433,7 +433,6 @@ Account DatabaseManager::getAccount(int siteId){
 QList<QString> DatabaseManager::getAllDocuments(int siteId){
     QList<QString> nameDocuments;
     mongocxx::collection documentCollection = (*this->db)["documentPermission"];
-
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value documentsToRetrieve =
         elementBuilder << "siteId" << siteId
