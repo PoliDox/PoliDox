@@ -119,8 +119,8 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
 }
 
 
-ServerController* Server::initializeServerController(QString& nameDocument, QList<Char>& orderedInserts){
-    ServerController *fileServContr = new ServerController(nameDocument, this);
+ServerController* Server::initializeServerController(QString& nameDocument, QString& uri, QList<Char>& orderedInserts){
+    ServerController *fileServContr = new ServerController(nameDocument, uri, this);
     fileServContr->createCrdt(orderedInserts);
     return fileServContr;
 }
@@ -155,9 +155,10 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
     if (header == "openFileReq") {
         // TODO: controlla che il file esista nel DB e manda un errore se non è così!
-        if( !(this->file2serverController.contains(nameDocument)) ){            
+        if( !(this->file2serverController.contains(nameDocument)) ){
             QList<Char> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
-            fileServContr = this->initializeServerController(nameDocument, orderedInserts);
+            QString uri = dbOperations->getUri(nameDocument);
+            fileServContr = this->initializeServerController(nameDocument, uri, orderedInserts);
 
             this->file2serverController[nameDocument] = fileServContr;
         } else {
@@ -174,6 +175,9 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     else if (header == "createFileReq"){
         //create and open the file
         //when a user creates a file he has, by default, the permission to open it
+
+        // TODO: if the filename already exists, return error
+
         QString nameAccount = this->socket2account[signalSender]->getName();
         QString uriOfDocument = this->generateUri(nameAccount, nameDocument);
         bool result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);
@@ -186,7 +190,8 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
         if(result2){
             QList<Char> emptyList;
-            fileServContr = this->initializeServerController(nameDocument, emptyList);
+            QString uri = dbOperations->getUri(nameDocument);
+            fileServContr = this->initializeServerController(nameDocument, uri, emptyList);
             this->file2serverController[nameDocument] = fileServContr;
 
             fileServContr->addClient(signalSender);

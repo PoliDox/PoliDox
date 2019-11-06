@@ -4,9 +4,9 @@
 
 
 
-ServerController::ServerController(QString &nameDocumentAssociated, Server *server) {
-    this->nameDocumentAssociated = nameDocumentAssociated;
-    this->server = server;
+ServerController::ServerController(QString& p_nameDocumentAssociated, QString& p_uriAssociated, Server *p_server) :
+    nameDocumentAssociated(p_nameDocumentAssociated), uriAssociated(p_uriAssociated), server(p_server)
+{
     this->crdt = nullptr;
     //nothing else to do???
 }
@@ -68,7 +68,7 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
     // now allAccountsOfDocument contains online offline accounts
 
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, nameDocument, this->crdt, accountsOnline, allAccountsOfDocument);
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, nameDocument, uriAssociated, this->crdt, accountsOnline, allAccountsOfDocument);
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 

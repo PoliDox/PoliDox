@@ -95,6 +95,7 @@ void Client::onMessageReceived(const QString &p_msg)
         }
         //std::cout << "JSON ARRIVATO:" << p_msg.toUtf8().constData() << "\n\n\n";
         QString nameDocument = _JSONobj["nameDocument"].toString();
+        QString uri = _JSONobj["uri"].toString();
         QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
         QJsonArray JSONaccountsOffline = _JSONobj["accountsOffline"].toArray();
@@ -108,7 +109,7 @@ void Client::onMessageReceived(const QString &p_msg)
             for (const QJsonValue accOffline : JSONaccountsOffline)
                 contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
         }
-        m_document = new ClientController(&m_socket, m_user.getSiteId(), nameDocument, contributorsOnline, contributorsOffline);
+        m_document = new ClientController(&m_socket, m_user.getSiteId(), nameDocument, uri, contributorsOnline, contributorsOffline);
         m_document->init(JSONcrdt, JSONaccounts);
 
         loginWindow.hide();

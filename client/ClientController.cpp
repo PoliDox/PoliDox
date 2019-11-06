@@ -4,12 +4,11 @@
 #include "ClientMessageFactory.h"
 
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId, QString fileName, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
-
-    m_socket(p_socket)
+ClientController::ClientController(QWebSocket *p_socket, double p_siteId, const QString& fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
+    m_socket(p_socket), m_filename(fileName), m_uri(p_uri)
 {        
     m_crdt = new CrdtClient(p_siteId);
-    m_editor = new Editor(this, nullptr, fileName, contributorsOnline, contributorsOffline);
+    m_editor = new Editor(this, nullptr, contributorsOnline, contributorsOffline);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 
@@ -48,6 +47,7 @@ ClientController::~ClientController()
 
 //TODO: da ottimizzare, evire le copie, soprattutto sui vettori
 void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accounts) {
+
     std::vector<std::vector<Char>> symbolsOfOpenedDocument = CRDT::fromJson(p_crdt);
     this->m_crdt->setSymbols(symbolsOfOpenedDocument);
 

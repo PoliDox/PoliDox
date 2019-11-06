@@ -30,7 +30,7 @@ void setItem(QColor color,QListWidgetItem* item){
 
 }
 
-Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
@@ -42,9 +42,10 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
 
-    uriD = new UriDialog();
+    m_uriDialog = new UriDialog();
 
     setWindowTitle("PoliDox");
+    QString fileName = controller->getFilename();
     ui->currentFile->setText(fileName);
 
     initUserList();
@@ -669,5 +670,5 @@ void Editor::on_actionOpen_triggered()
 
 void Editor::on_actionURI_triggered()
 {
-    this->uriD->show();
+    this->m_uriDialog->show();
 }
