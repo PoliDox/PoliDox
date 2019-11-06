@@ -42,7 +42,9 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
 
-    m_uriDialog = new UriDialog();
+    m_showUriDialog = new ShowUriDialog();
+    QString uri = controller->getUri();
+    m_showUriDialog->setUri(uri);
 
     setWindowTitle("PoliDox");
     QString fileName = controller->getFilename();
@@ -669,6 +671,6 @@ void Editor::on_actionOpen_triggered()
 
 
 void Editor::on_actionURI_triggered()
-{
-    this->m_uriDialog->show();
+{    
+    this->m_showUriDialog->show();
 }
