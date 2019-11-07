@@ -3,6 +3,9 @@ bottone nella registration form per tornare al login form se ho cliccato sign up
 aggiungere una lista di account offline al messaggio openFileRepl. guarda WebSocketMessageAPI
 Aggiungere delle label ai pulsanti con i nomi delle azioni quando si tiene il cursore sopra il pulsante
 Vietare nomi di file vuoti
+Non si riesce a rimpicciolire l'editor
+Non si riesce a selezionare la label con l'URI
+
 
 NON URGENTI
 Non-Ascii characters

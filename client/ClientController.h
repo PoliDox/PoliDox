@@ -26,6 +26,7 @@ private:
     Editor *m_editor;
     CrdtClient *m_crdt; // TODO: use smart-pointer
     QWebSocket *m_socket;
+    int m_siteId;
     QString m_filename;
     QString m_uri;
 

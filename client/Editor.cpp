@@ -325,12 +325,13 @@ void Editor::addClient(const Account& user)
     QTextCursor& remoteCursor = m_users[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
+    qDebug() << "Adding cursor" << user.getName() << "at coord" << curCoord.left() << "," << curCoord.top();
     remoteLabel->move(curCoord.left()-2, curCoord.top()-7);
     remoteLabel->setVisible(true);
     //m_textEdit->raise();
 }
 
-void Editor::handleRemoteOperation(EditOp op, Char symbol, int position)
+void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int siteId)
 {
     /*
     qDebug() << "Cursors positions: ";
@@ -343,7 +344,7 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position)
     */
 
     handlingOperation = true;
-    QTextCursor& remCursor = m_users[symbol.getSiteId()].cursor;
+    QTextCursor& remCursor = m_users[siteId].cursor;
 
     remCursor.setPosition(position);
     if (op == INSERT_OP){
@@ -388,9 +389,11 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position)
 void Editor::updateCursors()
 {
     for (auto it = m_users.begin(); it != m_users.end(); it++) {
-
-        User& user = it.value();
+        User& user = it.value();        
+        qDebug() << "remoteCursor " << user.account.getName() << " (" << user.account.getSiteId()
+                 << ") at position " << user.cursor.position();
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+        qDebug() << "Moving cursor" << user.account.getName() << "at coord" << remoteCoord.left() << "," << remoteCoord.top();
         user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
         user.label->setVisible(true);
     }

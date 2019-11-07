@@ -43,7 +43,7 @@ public:
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
-    void handleRemoteOperation(EditOp op, Char symbol, int position);
+    void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
     void resetBackgroundColor(int pos);
     void setCharacterStyle(int index,Char& symbol);
     void resetActionToggle(int pos,bool selection);

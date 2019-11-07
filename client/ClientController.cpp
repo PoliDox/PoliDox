@@ -5,7 +5,7 @@
 
 
 ClientController::ClientController(QWebSocket *p_socket, double p_siteId, const QString& fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
-    m_socket(p_socket), m_filename(fileName), m_uri(p_uri)
+    m_socket(p_socket), m_filename(fileName), m_uri(p_uri), m_siteId(p_siteId)
 {        
     m_crdt = new CrdtClient(p_siteId);
     m_editor = new Editor(this, nullptr, contributorsOnline, contributorsOffline);
@@ -14,7 +14,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, const 
 
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
-        QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
+        QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol, m_siteId);
 
         //qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
 
@@ -23,7 +23,7 @@ ClientController::ClientController(QWebSocket *p_socket, double p_siteId, const 
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
-        QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol);
+        QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol, m_siteId);
 
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
 
@@ -107,13 +107,15 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
-        m_editor->handleRemoteOperation(INSERT_OP, symbol, linPos);
+        int siteId = _JSONobj["siteId"].toInt();
+        m_editor->handleRemoteOperation(INSERT_OP, symbol, linPos, siteId);
 
     } else if (l_header== "delete") {
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteDelete(symbol);
-        m_editor->handleRemoteOperation(DELETE_OP, symbol, linPos);
+        int siteId = _JSONobj["siteId"].toInt();
+        m_editor->handleRemoteOperation(DELETE_OP, symbol, linPos, siteId);
 
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();

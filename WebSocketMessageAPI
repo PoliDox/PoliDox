@@ -1,10 +1,12 @@
 INSERT
 "action" = "insert"
 "char" = { ... }
+"siteId" = ...
 
 DELETE
 "action" = "delete"
 "char" = { ... }
+"siteId" = ...
 
 NEW CLIENT CONNECTED ON DOCUMENT
 "action" = "newClient"
