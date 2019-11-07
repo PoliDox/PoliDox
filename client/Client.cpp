@@ -99,7 +99,6 @@ void Client::onMessageReceived(const QString &p_msg)
         QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
         QJsonArray JSONaccountsOffline = _JSONobj["accountsOffline"].toArray();
-
         QList<Account> contributorsOnline;
         QList<Account> contributorsOffline;
 

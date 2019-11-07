@@ -146,10 +146,12 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     ServerController *fileServContr = nullptr;
     QString nameDocument = requestObjJSON["nameDocument"].toString();
     QString uri = requestObjJSON["uri"].toString();
+    bool isFromUri = false;
 
     QString header = requestObjJSON["action"].toString();
     if (nameDocument == "") {
         nameDocument = this->dbOperations->getDocument(uri);
+        isFromUri = true;
     }
     qDebug() << "name document: " << nameDocument;
 
@@ -163,6 +165,14 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
             this->file2serverController[nameDocument] = fileServContr;
         } else {
             fileServContr = this->file2serverController[nameDocument];
+        }
+
+        //TODO: mettere a posto, rifattorizzare!!!
+        //       vedere come fare la chiave composta nameDocument+siteId, perché
+        //       in documentPermission no può rimenre il campo _id settato di default
+        if(isFromUri){
+            Account* loggedAccount = this->socket2account[signalSender];
+            this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
         }
 
         //TODO: gestire la open file reply nel caso in cui la richiesta

@@ -61,13 +61,16 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     QString nameDocument = this->nameDocumentAssociated;
     QList<int> allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);   //TODO: da sistemare, questa riga è da togliere: farsi restituire direttamente gli account senza passare
                                                                                              //         per i siteid
+   std::cout << "SIZE ALL siteids : "<<allSiteIdsOfDocument.size() << std::endl;
     QList<Account> allAccountsOfDocument = this->server->getDb()->getAllAccounts(allSiteIdsOfDocument);
-
+    std::cout << "SIZE ALL: "<<allAccountsOfDocument.size() << std::endl;
+    std::cout << "SIZE ON: "<<accountsOnline.size() << std::endl;
     for(Account* acc : accountsOnline){
         allAccountsOfDocument.removeOne(*acc);
     }
     // now allAccountsOfDocument contains online offline accounts
-
+    std::cout << "SIZE ALL: "<<allAccountsOfDocument.size() << std::endl;
+    std::cout << "SIZE ON: "<<accountsOnline.size() << std::endl;
     QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, nameDocument, uriAssociated, this->crdt, accountsOnline, allAccountsOfDocument);
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
