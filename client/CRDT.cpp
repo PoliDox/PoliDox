@@ -257,7 +257,7 @@ int CRDT::remoteDelete(Char& symbol) {
              deleteRowAt(_row);
     }
     else
-        throw std::string("REMOTE DELETE FAILED, CHAR NOT FOUND!");
+        std::cout << "DELETE ANDATA A VUOTO" << std::endl;
 
 
     _LINEARpos=_toLinear(_row,_index);
