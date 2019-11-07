@@ -389,11 +389,14 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
 void Editor::updateCursors()
 {
     for (auto it = m_users.begin(); it != m_users.end(); it++) {
-        User& user = it.value();        
-        qDebug() << "remoteCursor " << user.account.getName() << " (" << user.account.getSiteId()
-                 << ") at position " << user.cursor.position();
+        User& user = it.value();                
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
-        qDebug() << "Moving cursor" << user.account.getName() << "at coord" << remoteCoord.left() << "," << remoteCoord.top();
+        qDebug() << "remoteCursor " << user.account.getName() << " (" << user.account.getSiteId()
+                 << ") at position " << user.cursor.position() << " (coord. " << remoteCoord.left() << ","
+                 << remoteCoord.top() << ")";
+        QRect localCoord = m_textEdit->cursorRect(*m_localCursor);
+        qDebug() << "localCursor at position " << m_localCursor->position() << "(coord. " << localCoord.left()
+                 << "," << localCoord.top() << ")";
         user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
         user.label->setVisible(true);
     }
