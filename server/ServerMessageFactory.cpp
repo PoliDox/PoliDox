@@ -91,7 +91,18 @@ QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, doub
 }
 
 
-QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString filename, QString uri, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline) {
+//used only for response == false
+QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString typeError) {
+    if(response)
+        throw "ServerMessageFactory::createOpenFileReply(bool response) : response can be only false";
+
+    QList<Account*> emptyList;
+    QList<Account> emptyList2;
+    return ServerMessageFactory::createOpenFileReply(false, typeError, QString(), QString(), nullptr, emptyList, emptyList2);
+}
+
+
+QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString typeError, QString filename, QString uri, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline) {
     QJsonObject objToReturn;
     QJsonArray crdtFormattedJson;
     QJsonArray accountsFormattedJson;
@@ -100,9 +111,9 @@ QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString file
     responseString = response ? "ok" : "fail";
 
     objToReturn.insert("action", "openFileRepl");
-    objToReturn.insert("response", responseString);
 
-    if (response) {        
+    if (response) {
+        objToReturn.insert("response", responseString);
         objToReturn.insert("nameDocument", filename);
         objToReturn.insert("uri", uri);
 
@@ -120,6 +131,10 @@ QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString file
             accountsOfflineFormattedJson.append(jsonAccount);
         }
         objToReturn.insert("accountsOffline", accountsOfflineFormattedJson);
+    }
+    else {
+        responseString = responseString + " " + typeError;
+        objToReturn.insert("response", responseString);
     }
 
     QJsonDocument docOfObj(objToReturn);

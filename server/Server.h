@@ -30,7 +30,7 @@ public:
     DatabaseManager* getDb();
     void removeSocket2AccountPair(QWebSocket *socketOfAccount);
     void removeFile2ServcontrPair(QString filename);
-    QString generateUri(QString& nameAccount, QString& nameDocument);
+    QString generateUri(QString nameAccount, QString& nameDocument);
     virtual ~Server();
 
 /* ======================================================================
