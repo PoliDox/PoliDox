@@ -206,7 +206,7 @@
     <string>toolBar_2</string>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color:transparent</string>
+    <string notr="true"/>
    </property>
    <property name="movable">
     <bool>false</bool>
@@ -274,12 +274,18 @@
    <addaction name="separator"/>
   </widget>
   <action name="actionNew">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Resources.qrc">
      <normaloff>:/images/images/filenew.png</normaloff>:/images/images/filenew.png</iconset>
    </property>
    <property name="text">
     <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionOpen">
@@ -290,6 +296,9 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionSave_as">
    <property name="icon">
@@ -298,6 +307,9 @@
    </property>
    <property name="text">
     <string>Save as</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionCopy">
@@ -308,6 +320,9 @@
    <property name="text">
     <string>Copy</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="actionPaste">
    <property name="icon">
@@ -316,6 +331,9 @@
    </property>
    <property name="text">
     <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionCut">
@@ -326,6 +344,9 @@
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionUndo">
    <property name="icon">
@@ -335,6 +356,9 @@
    <property name="text">
     <string>Undo</string>
    </property>
+   <property name="shortcut">
+    <string/>
+   </property>
   </action>
   <action name="actionRedo">
    <property name="icon">
@@ -343,6 +367,9 @@
    </property>
    <property name="text">
     <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
    </property>
   </action>
   <action name="actionQuit">
