@@ -36,17 +36,17 @@ REGISTER USER REPL
 
 OPEN FILE REQ
 "action" = "openFileReq"
-"nameDocument" = ...
-"uri" = ...
+"nameDocument" = ...		//depending on the type of the request, one of these two must be an empty string!!
+"uri" = ...					//depending on the type of the request, one of these two must be an empty string!!
 
 OPEN FILE REPL
 "action" = "openFileRepl"
-"response" = "ok"/"fail"
+"response" = "ok" / "fail create" / "fail uri" / "fail name"    //if fail, the fields below are empty
 "nameDocument" = ...
 "uri" = ...
 "crdt" = { ... }        // here comes the crdt formatted in json array 
-"accounts" = { // array of clients with this file currently open }
-"accountsOffline" = { //array of offline clients in this file }		//TODO
+"accounts" = { // array of OTHER clients with this file currently open }
+"accountsOffline" = { //array of offline clients in this file }		
 
 CREATE FILE REQ
 "action" = "createFileReq"
@@ -63,24 +63,7 @@ CLOSED EDITOR REMOTE		//to notify other clients connected on that document that 
 "action" = "closedEditorRemote"
 "account" = { ... }         //the account who has just quitted the document
 
-GET URI REQUEST
-"action" = "getUriReq"
-"nameDocument" = ...
 
-GET URI REPLY 
-"action" = "getUriRepl"
-"nameDocument" = ...
-"uri" = ...
-
-REQUEST OF ADD PERMISSION ON DOCUMENT VIA URI
-"action" = "permissionReq"
-"uri" = ...
-"siteId" = ...     //the siteId of the account who is asking for permission 
-
-REPLY OF ADD PERMISSION ON DOCUMENT VIA URI 
-"action" = "permissionRepl"	
-response = "ok"/"fail"			//for example, fail if inserted uri does not correspond to any nameDocument
-"nameDocument" = ...			//only if ok, empty otherwise
 
 
 
