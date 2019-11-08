@@ -16,7 +16,6 @@ private:
     QWebSocket m_socket;
     Account m_user;    
     Log_Dialog loginWindow;
-    QString c_fileName;
 
 public:
     Client();

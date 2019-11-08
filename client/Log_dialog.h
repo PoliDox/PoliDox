@@ -8,6 +8,7 @@
 #include "Editor.h"
 #include "ListFiles.h"
 #include "NewFileDialog.h"
+#include "InsertUriDialog.h"
 
 namespace Ui {
 class Log_Dialog;
@@ -29,6 +30,7 @@ signals:
     void signupDataSubmitted(QString p_user, QString p_passw);
     void fileSelected(QString p_filename);
     void newFileSelected(QString p_filename);
+    void uriSelected(QString p_uri);
 
 private slots:
     void on_pushButton_login_clicked();
@@ -41,6 +43,7 @@ private:
     Editor *editor;
     ListFiles *lf;
     NewFileDialog *nfd;
+    InsertUriDialog *uriDialog;
 
     void createRegistrationForm();
     void cleanRegistrationForm();

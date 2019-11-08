@@ -1,10 +1,12 @@
 INSERT
 "action" = "insert"
 "char" = { ... }
+"siteId" = ...
 
 DELETE
 "action" = "delete"
 "char" = { ... }
+"siteId" = ...
 
 NEW CLIENT CONNECTED ON DOCUMENT
 "action" = "newClient"
@@ -35,10 +37,13 @@ REGISTER USER REPL
 OPEN FILE REQ
 "action" = "openFileReq"
 "nameDocument" = ...
+"uri" = ...
 
 OPEN FILE REPL
 "action" = "openFileRepl"
 "response" = "ok"/"fail"
+"nameDocument" = ...
+"uri" = ...
 "crdt" = { ... }        // here comes the crdt formatted in json array 
 "accounts" = { // array of clients with this file currently open }
 "accountsOffline" = { //array of offline clients in this file }		//TODO
@@ -46,11 +51,6 @@ OPEN FILE REPL
 CREATE FILE REQ
 "action" = "createFileReq"
 "nameDocument" = ...
-
-CREATE FILE REPL
-"action" = "createFileRepl"
-"response" = "ok"/"fail"
-"crdt" = { //empty }
 
 CLOSED EDITOR REQ
 "action" = "closedEditorReq"

@@ -10,7 +10,7 @@
 #include "Account.h"
 #include "Styler.h"
 #include "ClientController.h"
-#include "UriDialog.h"
+#include "ShowUriDialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -37,13 +37,13 @@ class Editor : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, QString fileName = "", const QList<Account>& contributorsOnline = {}, const QList<Account>& contributorsOffline = {});
+    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, const QList<Account>& contributorsOnline = {}, const QList<Account>& contributorsOffline = {});
     ~Editor() override;
 
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
-    void handleRemoteOperation(EditOp op, int siteId, int position, char ch = 0);
+    void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
     void resetBackgroundColor(int pos);
     void setCharacterStyle(int index,Char& symbol);
     void resetActionToggle(int pos,bool selection);
@@ -64,6 +64,7 @@ private slots:
     void on_actionCut_triggered();
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();
+    void on_actionURI_triggered();
 
     void on_actionBold_triggered();
     void on_actionItalic_triggered();
@@ -82,9 +83,6 @@ private slots:
 
     void highLightUser(QListWidgetItem * item);
 
-
-    void on_URI_clicked();
-
 private:
     void createActions();
     void createStatusBar();
@@ -94,7 +92,6 @@ private:
     void highlightUserChars(int p_siteId);
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
 
-    QString fileName;
     ClientController *controller;
     bool handlingOperation;
     QTextEdit *m_textEdit;
@@ -103,7 +100,7 @@ private:
     // Maps siteIds to a struct identifying a remote user
     // N.B. You can use it to iterate over all Accounts!    
     QMap<int, User> m_users;
-    UriDialog *uriD;
+    ShowUriDialog *m_showUriDialog;
     Ui::Editor *ui;
 
 protected:

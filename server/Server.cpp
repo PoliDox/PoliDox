@@ -119,8 +119,8 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
 }
 
 
-ServerController* Server::initializeServerController(QString& nameDocument, QList<Char>& orderedInserts){
-    ServerController *fileServContr = new ServerController(nameDocument, this);
+ServerController* Server::initializeServerController(QString& nameDocument, QString& uri, QList<Char>& orderedInserts){
+    ServerController *fileServContr = new ServerController(nameDocument, uri, this);
     fileServContr->createCrdt(orderedInserts);
     return fileServContr;
 }
@@ -130,6 +130,8 @@ ServerController* Server::initializeServerController(QString& nameDocument, QLis
 //- The only valid actions can be "openFileReq","createFileReq"
 void Server::handleLoggedRequests(const QString& genericRequestString){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
+
+    //qDebug() << genericRequestString.toUtf8().constData();
 
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
@@ -141,18 +143,36 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     }
     requestObjJSON = requestDocJSON.object();
 
-    // No switch case for strings in C++ :((
     ServerController *fileServContr = nullptr;
     QString nameDocument = requestObjJSON["nameDocument"].toString();
+    QString uri = requestObjJSON["uri"].toString();
+    bool isFromUri = false;
+
     QString header = requestObjJSON["action"].toString();
+    if (nameDocument == "") {
+        nameDocument = this->dbOperations->getDocument(uri);
+        isFromUri = true;
+    }
+    qDebug() << "name document: " << nameDocument;
+
     if (header == "openFileReq") {
+        // TODO: controlla che il file esista nel DB e manda un errore se non è così!
         if( !(this->file2serverController.contains(nameDocument)) ){
             QList<Char> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
-            fileServContr = this->initializeServerController(nameDocument, orderedInserts);
+            QString uri = dbOperations->getUri(nameDocument);
+            fileServContr = this->initializeServerController(nameDocument, uri, orderedInserts);
 
             this->file2serverController[nameDocument] = fileServContr;
         } else {
             fileServContr = this->file2serverController[nameDocument];
+        }
+
+        //TODO: mettere a posto, rifattorizzare!!!
+        //       vedere come fare la chiave composta nameDocument+siteId, perché
+        //       in documentPermission no può rimenre il campo _id settato di default
+        if(isFromUri){
+            Account* loggedAccount = this->socket2account[signalSender];
+            this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
         }
 
         //TODO: gestire la open file reply nel caso in cui la richiesta
@@ -165,6 +185,9 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     else if (header == "createFileReq"){
         //create and open the file
         //when a user creates a file he has, by default, the permission to open it
+
+        // TODO: if the filename already exists, return error
+
         QString nameAccount = this->socket2account[signalSender]->getName();
         QString uriOfDocument = this->generateUri(nameAccount, nameDocument);
         bool result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);
@@ -177,7 +200,8 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
         if(result2){
             QList<Char> emptyList;
-            fileServContr = this->initializeServerController(nameDocument, emptyList);
+            QString uri = dbOperations->getUri(nameDocument);
+            fileServContr = this->initializeServerController(nameDocument, uri, emptyList);
             this->file2serverController[nameDocument] = fileServContr;
 
             fileServContr->addClient(signalSender);

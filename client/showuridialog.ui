@@ -14,12 +14,18 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="1">
-    <widget class="QLabel" name="UriLabel">
-     <property name="text">
-      <string/>
+   <item row="2" column="2">
+    <spacer name="horizontalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="0" column="0">
     <spacer name="horizontalSpacer">
@@ -34,10 +40,10 @@
      </property>
     </spacer>
    </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label">
+   <item row="2" column="1">
+    <widget class="QLabel" name="UriLabel">
      <property name="text">
-      <string>Copy this URI to share this file</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -67,18 +73,12 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="2">
-    <spacer name="horizontalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Copy this URI to share the file:</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
   </layout>
  </widget>

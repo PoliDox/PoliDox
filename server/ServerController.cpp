@@ -4,9 +4,9 @@
 
 
 
-ServerController::ServerController(QString &nameDocumentAssociated, Server *server) {
-    this->nameDocumentAssociated = nameDocumentAssociated;
-    this->server = server;
+ServerController::ServerController(QString& p_nameDocumentAssociated, QString& p_uriAssociated, Server *p_server) :
+    nameDocumentAssociated(p_nameDocumentAssociated), uriAssociated(p_uriAssociated), server(p_server)
+{
     this->crdt = nullptr;
     //nothing else to do???
 }
@@ -61,14 +61,17 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     QString nameDocument = this->nameDocumentAssociated;
     QList<int> allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);   //TODO: da sistemare, questa riga è da togliere: farsi restituire direttamente gli account senza passare
                                                                                              //         per i siteid
+   std::cout << "SIZE ALL siteids : "<<allSiteIdsOfDocument.size() << std::endl;
     QList<Account> allAccountsOfDocument = this->server->getDb()->getAllAccounts(allSiteIdsOfDocument);
-
+    std::cout << "SIZE ALL: "<<allAccountsOfDocument.size() << std::endl;
+    std::cout << "SIZE ON: "<<accountsOnline.size() << std::endl;
     for(Account* acc : accountsOnline){
         allAccountsOfDocument.removeOne(*acc);
     }
     // now allAccountsOfDocument contains online offline accounts
-
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, this->crdt, accountsOnline, allAccountsOfDocument);
+    std::cout << "SIZE ALL: "<<allAccountsOfDocument.size() << std::endl;
+    std::cout << "SIZE ON: "<<accountsOnline.size() << std::endl;
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, nameDocument, uriAssociated, this->crdt, accountsOnline, allAccountsOfDocument);
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
@@ -107,21 +110,30 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     }
     QJsonObject requestObjJSON = requestDocJSON.object();
 
-    QJsonObject charJson = requestObjJSON["char"].toObject();
-    Char charObj = Char::fromJson(charJson);
-    tStyle charStyle = charObj.getStyle();
-    QString charValue(charObj.getValue());
-    std::vector<int> fractPos(charObj.getFractionalPosition());
-    int siteId = charObj.getSiteId();
-
     QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
+        //todo: rifattorizzare
+        QJsonObject charJson = requestObjJSON["char"].toObject();
+        Char charObj = Char::fromJson(charJson);
+        tStyle charStyle = charObj.getStyle();
+        QString charValue(charObj.getValue());
+        std::vector<int> fractPos(charObj.getFractionalPosition());
+        int siteId = charObj.getSiteId();
+
         this->crdt->remoteInsert(charObj);
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
                                             charStyle.font_family, charStyle.font_size, charStyle.is_bold,
                                             charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
     }
     else if(header == "delete"){
+        //todo: rifattorizzare
+        QJsonObject charJson = requestObjJSON["char"].toObject();
+        Char charObj = Char::fromJson(charJson);
+        tStyle charStyle = charObj.getStyle();
+        QString charValue(charObj.getValue());
+        std::vector<int> fractPos(charObj.getFractionalPosition());
+        int siteId = charObj.getSiteId();
+
         this->crdt->remoteDelete(charObj);
         this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
     }

@@ -30,7 +30,7 @@ void setItem(QColor color,QListWidgetItem* item){
 
 }
 
-Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
@@ -42,9 +42,12 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, QString fileName
     m_localCursor = new QTextCursor(m_textDoc);
     m_textEdit->setTextCursor(*m_localCursor);
 
-    uriD = new UriDialog();
+    m_showUriDialog = new ShowUriDialog();
+    QString uri = controller->getUri();
+    m_showUriDialog->setUri(uri);
 
     setWindowTitle("PoliDox");
+    QString fileName = controller->getFilename();
     ui->currentFile->setText(fileName);
 
     initUserList();
@@ -309,25 +312,26 @@ QChar Editor::at(int pos)
 }
 
 void Editor::addClient(const Account& user)
-{   
+{
     // Add user to the map of remote users
     int siteId = user.getSiteId();
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
     remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;font-family:American Typewriter;font-weight:bold");
     remoteLabel->lower();
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
-    m_users[siteId] = newUser;    
+    m_users[siteId] = newUser;
 
     // Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_users[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
+    qDebug() << "Adding cursor" << user.getName() << "at coord" << curCoord.left() << "," << curCoord.top();
     remoteLabel->move(curCoord.left()-2, curCoord.top()-7);
     remoteLabel->setVisible(true);
     //m_textEdit->raise();
 }
 
-void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
+void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int siteId)
 {
     /*
     qDebug() << "Cursors positions: ";
@@ -341,10 +345,40 @@ void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
 
     handlingOperation = true;
     QTextCursor& remCursor = m_users[siteId].cursor;
-    /* SETTAGGIO STILE */
+
     remCursor.setPosition(position);
-    if (op == INSERT_OP)
-        remCursor.insertText(QString(ch));
+    if (op == INSERT_OP){
+
+        QTextCharFormat fmt;
+        tStyle style=symbol.getStyle();
+
+        fmt.setFontPointSize(style.font_size);
+
+        if(style.is_bold)
+            fmt.setFontWeight(75);
+        if(style.is_italic)
+            fmt.setFontItalic(true);
+        if(style.is_underline)
+            fmt.setFontUnderline(true);
+
+        int alignment=style.alignment;
+
+        if(alignment==1)
+            m_textEdit->setAlignment(Qt::AlignLeft);
+        else if(alignment==4)
+            m_textEdit->setAlignment(Qt::AlignCenter);
+        else if(alignment==2)
+            m_textEdit->setAlignment(Qt::AlignRight);
+        else if(alignment==8)
+            m_textEdit->setAlignment(Qt::AlignJustify);
+
+        remCursor.mergeCharFormat(fmt);
+        m_textEdit->mergeCurrentCharFormat(fmt);
+
+        remCursor.insertText(QString(symbol.getValue()));
+
+
+    }
     else if (op == DELETE_OP)
        remCursor.deleteChar();
 
@@ -355,9 +389,14 @@ void Editor::handleRemoteOperation(EditOp op, int siteId, int position, char ch)
 void Editor::updateCursors()
 {
     for (auto it = m_users.begin(); it != m_users.end(); it++) {
-
-        User& user = it.value();
+        User& user = it.value();                
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+        qDebug() << "remoteCursor " << user.account.getName() << " (" << user.account.getSiteId()
+                 << ") at position " << user.cursor.position() << " (coord. " << remoteCoord.left() << ","
+                 << remoteCoord.top() << ")";
+        QRect localCoord = m_textEdit->cursorRect(*m_localCursor);
+        qDebug() << "localCursor at position " << m_localCursor->position() << "(coord. " << localCoord.left()
+                 << "," << localCoord.top() << ")";
         user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
         user.label->setVisible(true);
     }
@@ -449,7 +488,7 @@ void Editor::on_actionSave_as_triggered()
 void Editor::on_actionQuit_triggered()
 {
     this->hide();
-    emit quit_editor();    
+    emit quit_editor();
 }
 
 void Editor::on_actionCopy_triggered()
@@ -637,8 +676,7 @@ void Editor::on_actionOpen_triggered()
 }
 
 
-
-void Editor::on_URI_clicked()
-{
-    this->uriD->show();
+void Editor::on_actionURI_triggered()
+{    
+    this->m_showUriDialog->show();
 }

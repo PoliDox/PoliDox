@@ -17,11 +17,12 @@ class ServerController : public QObject {
 private:
     QList<QWebSocket*> socketsOnDocument;
     QString nameDocumentAssociated;
+    QString uriAssociated;
     Server *server;
     CRDT *crdt;
 
 public:
-    ServerController(QString &nameDocumentAssociated, Server *server);
+    ServerController(QString &p_nameDocumentAssociated, QString &p_uriAssociated, Server *p_server);
     void addClient(QWebSocket *socketToAdd);
     void notifyOtherClients(QWebSocket *newSocket);
     void createCrdt(QList<Char>& orderedInserts);

@@ -1,5 +1,6 @@
 #include "Log_dialog.h"
 #include "ui_log_dialog.h"
+#include "ClientMessageFactory.h"
 #include <QMessageBox>
 #include <QDebug>
 #include <QListWidget>
@@ -26,9 +27,14 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
 
     lf = new ListFiles();
     nfd = new NewFileDialog(this);
+    uriDialog = new InsertUriDialog(this);
 
     connect(nfd, &NewFileDialog::getFileName, this, [&](QString newfilename){
         emit newFileSelected(newfilename);
+    });
+
+    connect(uriDialog, &InsertUriDialog::getUriName, this, [&](QString uri) {
+       emit uriSelected(uri);
     });
 
 }
@@ -59,7 +65,9 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
 
     QString new_file("Create new file");
+    QString fileFromUri("Insert URI");
     files->addItem(new_file);
+    files->addItem(fileFromUri);
     files->addItems(p_files);
 
     QGridLayout* grid_layout = new QGridLayout(this->ui->groupBox);
@@ -254,10 +262,12 @@ void Log_Dialog::cleanRegistrationForm(){
 
 void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
-    qDebug() << "SELECTED FILE: "<< item->text();
+    //qDebug() << "SELECTED FILE: "<< item->text();
 
     if(item->text().compare("Create new file") == 0){
         nfd->show();
+    }else if(item->text().compare("Insert URI")==0){
+        uriDialog->show();
     }
     else{
         this->hide();

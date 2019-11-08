@@ -91,7 +91,7 @@ QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, doub
 }
 
 
-QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline) {
+QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString filename, QString uri, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline) {
     QJsonObject objToReturn;
     QJsonArray crdtFormattedJson;
     QJsonArray accountsFormattedJson;
@@ -102,7 +102,10 @@ QByteArray ServerMessageFactory::createOpenFileReply(bool response, CRDT *crdt, 
     objToReturn.insert("action", "openFileRepl");
     objToReturn.insert("response", responseString);
 
-    if (response) {
+    if (response) {        
+        objToReturn.insert("nameDocument", filename);
+        objToReturn.insert("uri", uri);
+
         crdtFormattedJson = crdt->toJson();
         objToReturn.insert("crdt", crdtFormattedJson);
 

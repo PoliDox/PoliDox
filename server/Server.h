@@ -21,7 +21,7 @@ private:
     QMap<QString, ServerController*> file2serverController;
     DatabaseManager *dbOperations;
 
-    ServerController* initializeServerController(QString& nameDocument, QList<Char>& orderedInserts);
+    ServerController* initializeServerController(QString& nameDocument, QString& uri, QList<Char>& orderedInserts);
     int getDigits(std::string s);
 
 public:

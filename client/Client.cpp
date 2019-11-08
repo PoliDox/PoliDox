@@ -24,13 +24,18 @@ Client::Client()
     connect(&loginWindow, &Log_Dialog::fileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createOpenFileMessage(p_filename);
         m_socket.sendTextMessage(message);
-        c_fileName = p_filename;
+        // TODO: delete this, c_fileName should be filled at openFileRepl
+        //c_fileName = p_filename;
+    });
+
+    connect(&loginWindow, &Log_Dialog::uriSelected, this, [&](const QString& p_uri) {
+        QByteArray message = ClientMessageFactory::createOpenFileMessage(QString(), p_uri);
+        m_socket.sendTextMessage(message);
     });
 
     connect(&loginWindow, &Log_Dialog::newFileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createNewFileMessage(p_filename);
         m_socket.sendTextMessage(message);
-        c_fileName = p_filename;
     });
 
     loginWindow.exec();
@@ -89,10 +94,11 @@ void Client::onMessageReceived(const QString &p_msg)
             return;
         }
         //std::cout << "JSON ARRIVATO:" << p_msg.toUtf8().constData() << "\n\n\n";
+        QString nameDocument = _JSONobj["nameDocument"].toString();
+        QString uri = _JSONobj["uri"].toString();
         QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
         QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
         QJsonArray JSONaccountsOffline = _JSONobj["accountsOffline"].toArray();
-
         QList<Account> contributorsOnline;
         QList<Account> contributorsOffline;
 
@@ -102,7 +108,7 @@ void Client::onMessageReceived(const QString &p_msg)
             for (const QJsonValue accOffline : JSONaccountsOffline)
                 contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
         }
-        m_document = new ClientController(&m_socket, m_user.getSiteId(), c_fileName, contributorsOnline, contributorsOffline);
+        m_document = new ClientController(&m_socket, m_user.getSiteId(), nameDocument, uri, contributorsOnline, contributorsOffline);
         m_document->init(JSONcrdt, JSONaccounts);
 
         loginWindow.hide();

@@ -7,13 +7,13 @@ namespace Ui {
 class UriDialog;
 }
 
-class UriDialog : public QDialog
+class ShowUriDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit UriDialog(QWidget *parent = nullptr);
-    ~UriDialog();
+    explicit ShowUriDialog(QWidget *parent = nullptr);
+    ~ShowUriDialog();
 
     void setUri(QString uri);
 
