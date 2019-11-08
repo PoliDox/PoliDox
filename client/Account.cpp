@@ -65,7 +65,10 @@ QJsonObject Account::toJson() const {
 
 Account Account::fromJson(const QJsonObject& accountJSON) {
     int l_siteId = accountJSON["siteId"].toInt();
-    QString l_name = accountJSON["name"].toString();
+    QString l_name = accountJSON["name"].toString();     //TODO: nel caso in cui questa funzione sia chiamata dal db, non esisterà il campo name
+                                                         //       nel JSON, vedere se questo potrebbe generare errore oppure no!!
+    if(l_name == "")
+        l_name = accountJSON["_id"].toString(); //non cancellare, serve per la conversione dal db  =)
     int l_color = accountJSON["color"].toInt();
     //qDebug() << "JsonColorClient: " << hex << l_color;
     qDebug() << "ACCOUNT " << accountJSON ;

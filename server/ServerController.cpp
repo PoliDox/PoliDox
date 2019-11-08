@@ -49,7 +49,9 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     this->notifyOtherClients(socketToAdd);
 
     //notify the new socket about all the accounts
-    //actually connected on the document just opened by him
+    //actually connected on the document just opened by him.
+    //accountsOnline contains all the OTHER accounts connected
+    //on that document except me
     QList<Account*> accountsOnline;
     for(auto otherSocket : this->socketsOnDocument) {
         if(otherSocket != socketToAdd){
@@ -59,19 +61,20 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
 
     QString nameDocument = this->nameDocumentAssociated;
-    QList<int> allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);   //TODO: da sistemare, questa riga è da togliere: farsi restituire direttamente gli account senza passare
-                                                                                             //         per i siteid
-   std::cout << "SIZE ALL siteids : "<<allSiteIdsOfDocument.size() << std::endl;
+    //TODO: da sistemare, questa riga qui soto è da togliere: farsi
+    //       restituire direttamente gli account senza passare per i siteid
+    QList<int> allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);
     QList<Account> allAccountsOfDocument = this->server->getDb()->getAllAccounts(allSiteIdsOfDocument);
-    std::cout << "SIZE ALL: "<<allAccountsOfDocument.size() << std::endl;
-    std::cout << "SIZE ON: "<<accountsOnline.size() << std::endl;
+
     for(Account* acc : accountsOnline){
         allAccountsOfDocument.removeOne(*acc);
     }
-    // now allAccountsOfDocument contains online offline accounts
-    std::cout << "SIZE ALL: "<<allAccountsOfDocument.size() << std::endl;
-    std::cout << "SIZE ON: "<<accountsOnline.size() << std::endl;
-    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, nameDocument, uriAssociated, this->crdt, accountsOnline, allAccountsOfDocument);
+    Account* accJustConnected = this->server->getAccount(socketToAdd);
+    allAccountsOfDocument.removeOne( *accJustConnected );   //remove also myself from this list
+    // now allAccountsOfDocument contains only offline accounts
+
+    QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(true, QString(""), nameDocument, uriAssociated,
+                                                                           this->crdt, accountsOnline, allAccountsOfDocument);
     socketToAdd->sendTextMessage(sendMsgToClient);
 }
 
@@ -121,6 +124,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         int siteId = charObj.getSiteId();
 
         this->crdt->remoteInsert(charObj);
+        //TODO: rifattorizzare il metodo qui sotto, passargli il Char anziché tutto questo
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
                                             charStyle.font_family, charStyle.font_size, charStyle.is_bold,
                                             charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
@@ -155,6 +159,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
         Account* account = this->server->getAccount(signalSender);
         QList<QString> nameDocuments = this->server->getDb()->getAllDocuments(account->getSiteId());
+
         QByteArray sendMsgToClientQuitted = ServerMessageFactory::createClosedEditorReply(nameDocuments);
         signalSender->sendTextMessage(sendMsgToClientQuitted);
 
@@ -168,15 +173,6 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
         if(destroyServContr)
             delete (this);
-    }
-    else if(header == "getUriReq"){
-        QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
-        QString nameDocument = requestObjJSON["nameDocument"].toString();
-
-        QString uri = this->server->getDb()->getUri(nameDocument);
-
-        QByteArray sendMsgToClient = ServerMessageFactory::createGetUriReply(nameDocument, uri);
-        signalSender->sendTextMessage(sendMsgToClient);
     }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();

@@ -115,7 +115,7 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
     }
 
     this->incrementCounterOfCollection("user");
-    return (int)siteId;
+    return siteId;
 }
 
 
@@ -161,7 +161,7 @@ bool DatabaseManager::insertNewDocument(QString& documentName, QString& uri){
     try {
         documentCollection.insert_one(docToInsertView);
     } catch (std::exception e) {
-        //caso documento con "documentName" già presente
+        //fail, there is alredy a document with that name
         return false;
     }
     return true;
@@ -173,15 +173,18 @@ bool DatabaseManager::insertNewPermission(QString& nameDocument, int siteId){
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value permToInsert =
-        elementBuilder << "nameDocument" << nameDocument.toUtf8().constData()
-                       << "siteId"       << siteId
+        elementBuilder << "_id" << bsoncxx::builder::stream::open_document
+                            << "nameDocument" << nameDocument.toUtf8().constData()
+                            << "siteId"       << siteId
+                            << bsoncxx::builder::stream::close_document
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view permToInsertView = permToInsert.view();
 
     try {
         documentPermCollection.insert_one(permToInsertView);
     } catch (std::exception e) {
-        //caso documento con "documentName" già presente
+        // in case of fail, it means that the user still has the permission
+        // for that  document, so we can simply ignore the exception
         return false;
     }
     return true;
@@ -211,6 +214,8 @@ QString DatabaseManager::getUri(QString& documentName){
 }
 
 
+// return an empty string if the uri passed here does not have
+// a document associated
 QString DatabaseManager::getDocument(QString& uriOfDocument){
     mongocxx::collection documentCollection = (*this->db)["document"];
 
@@ -229,7 +234,7 @@ QString DatabaseManager::getDocument(QString& uriOfDocument){
         return appo;
     }
     else {
-        throw "DatabaseManager::getDocument exception";
+        return QString("");
     }
 }
 
@@ -330,8 +335,8 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
             // TODO: print some debug
             throw "DatabaseManager::getAllInserts  error";       //TODO: da sistemare
         }
-
         QJsonObject insertObjJson = stringDocJSON.object();
+
         Char charToInsert = Char::fromJson(insertObjJson);
 
         orderedChars.push_back(charToInsert);
@@ -351,13 +356,13 @@ QList<int> DatabaseManager::getAllAccounts(QString& nameDocument){
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value accountsToRetrieve =
-        elementBuilder << "nameDocument" << nameDocument.toUtf8().constData()
+        elementBuilder << "_id.nameDocument" << nameDocument.toUtf8().constData()
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view accountsToRetrieveView = accountsToRetrieve.view();
 
     mongocxx::cursor resultIterator = documentCollection.find(accountsToRetrieveView);
     for(auto elem : resultIterator) {
-        bsoncxx::document::element siteIdAccount = elem["siteId"];
+        bsoncxx::document::element siteIdAccount = elem["_id"]["siteId"];
         int siteId = siteIdAccount.get_int32().value;
         siteIdAccounts.append(siteId);
     }
@@ -368,36 +373,14 @@ QList<int> DatabaseManager::getAllAccounts(QString& nameDocument){
 
 QList<Account> DatabaseManager::getAllAccounts(QList<int>& siteIdAccounts){
     QList<Account> accounts;
-    mongocxx::collection userCollection = (*this->db)["user"];
 
-    auto array_builder = bsoncxx::builder::basic::array{};
-    for(int elem : siteIdAccounts)
-        array_builder.append(elem);
-
-    auto elementBuilder = bsoncxx::builder::stream::document{};
-    bsoncxx::document::value accountsToRetrieve =
-        elementBuilder << "siteId" << array_builder         //TODO: controllare se funziona
-                       << bsoncxx::builder::stream::finalize;
-    bsoncxx::document::view accountsToRetrieveView = accountsToRetrieve.view();
-
-    mongocxx::cursor resultIterator = userCollection.find(accountsToRetrieveView);
-
-    for (auto elem : resultIterator) {
-        QString accountString = QString::fromStdString(bsoncxx::to_json(elem));
-        QJsonDocument stringDocJSON = QJsonDocument::fromJson(accountString.toUtf8());
-        if (stringDocJSON.isNull()) {
-            // TODO: print some debug
-            throw "DatabaseManager::getAllAccounts(QList<int>)  error";       //TODO: da sistemare
-        }
-
-        QJsonObject accountObjJson = stringDocJSON.object();
-        Account accountToInsert = Account::fromJson(accountObjJson);
-
-        accounts.append(accountToInsert);
+    for(int siteId : siteIdAccounts){
+        accounts.append( this->getAccount(siteId) );
     }
 
     return accounts;
 }
+
 
 
 Account DatabaseManager::getAccount(int siteId){
@@ -417,15 +400,15 @@ Account DatabaseManager::getAccount(int siteId){
         QJsonDocument stringDocJSON = QJsonDocument::fromJson(accountString.toUtf8());
         if (stringDocJSON.isNull()) {
             // TODO: print some debug
-            throw "DatabaseManager::getAllAccounts(QList<int>)  error";       //TODO: da sistemare
+            throw "DatabaseManager::getAccount(int)  error";
         }
 
         QJsonObject accountObjJson = stringDocJSON.object();
         Account accountToReturn = Account::fromJson(accountObjJson);
         return accountToReturn;
     }
-    else{
-        throw "DatabaseManager::getAccount error";       //TODO: da sistemare
+    else {
+        throw "DatabaseManager::getAccount(int) query result error";       //TODO: da sistemare
     }
 }
 
@@ -435,13 +418,13 @@ QList<QString> DatabaseManager::getAllDocuments(int siteId){
     mongocxx::collection documentCollection = (*this->db)["documentPermission"];
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value documentsToRetrieve =
-        elementBuilder << "siteId" << siteId
+        elementBuilder << "_id.siteId" << siteId
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view documentsToRetrieveView = documentsToRetrieve.view();
 
     mongocxx::cursor resultIterator = documentCollection.find(documentsToRetrieveView);
     for(auto elem : resultIterator) {
-        bsoncxx::document::element nameDocument = elem["nameDocument"];
+        bsoncxx::document::element nameDocument = elem["_id"]["nameDocument"];
         bsoncxx::stdx::string_view nameDocumentView = nameDocument.get_utf8().value;
         QString appo = QString::fromStdString( nameDocumentView.to_string() );
 

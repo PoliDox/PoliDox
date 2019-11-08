@@ -131,11 +131,8 @@ ServerController* Server::initializeServerController(QString& nameDocument, QStr
 void Server::handleLoggedRequests(const QString& genericRequestString){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
-    //qDebug() << genericRequestString.toUtf8().constData();
-
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
-
     requestDocJSON = QJsonDocument::fromJson(genericRequestString.toUtf8());
     if (requestDocJSON.isNull()) {
         // TODO: print some debug
@@ -145,38 +142,38 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
     ServerController *fileServContr = nullptr;
     QString nameDocument = requestObjJSON["nameDocument"].toString();
-    QString uri = requestObjJSON["uri"].toString();
     bool isFromUri = false;
 
     QString header = requestObjJSON["action"].toString();
-    if (nameDocument == "") {
-        nameDocument = this->dbOperations->getDocument(uri);
-        isFromUri = true;
-    }
-    qDebug() << "name document: " << nameDocument;
-
     if (header == "openFileReq") {
-        // TODO: controlla che il file esista nel DB e manda un errore se non è così!
+        QString uri = requestObjJSON["uri"].toString();     //will be empty if it is not a uri request
+
+        if (nameDocument == "") {
+            //is a uri request
+            nameDocument = this->dbOperations->getDocument(uri);
+            if(nameDocument == ""){
+                //the user has inserted an invalid uri
+                QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(false, QString("uri"));
+                signalSender->sendTextMessage(sendMsgToClient);
+                return;
+            }
+            else{
+                Account* loggedAccount = this->socket2account[signalSender];
+                this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
+                isFromUri = true;
+            }
+        }
+
         if( !(this->file2serverController.contains(nameDocument)) ){
             QList<Char> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
-            QString uri = dbOperations->getUri(nameDocument);
+            if(!isFromUri)
+                uri = dbOperations->getUri(nameDocument);
             fileServContr = this->initializeServerController(nameDocument, uri, orderedInserts);
 
             this->file2serverController[nameDocument] = fileServContr;
         } else {
             fileServContr = this->file2serverController[nameDocument];
         }
-
-        //TODO: mettere a posto, rifattorizzare!!!
-        //       vedere come fare la chiave composta nameDocument+siteId, perché
-        //       in documentPermission no può rimenre il campo _id settato di default
-        if(isFromUri){
-            Account* loggedAccount = this->socket2account[signalSender];
-            this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
-        }
-
-        //TODO: gestire la open file reply nel caso in cui la richiesta
-        //      non vada a buon fine
 
         fileServContr->addClient(signalSender);
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
@@ -186,49 +183,30 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
         //create and open the file
         //when a user creates a file he has, by default, the permission to open it
 
-        // TODO: if the filename already exists, return error
-
-        QString nameAccount = this->socket2account[signalSender]->getName();
-        QString uriOfDocument = this->generateUri(nameAccount, nameDocument);
-        bool result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);
-
-        bool result2 = false;
-        if(result){
-            Account* loggedAccount = this->socket2account[signalSender];
-            result2 = this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
+        if(nameDocument == ""){
+            //the user can not insert a name that is an empty string
+            QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(false, QString("name"));
+            signalSender->sendTextMessage(sendMsgToClient);
+            return;
         }
 
-        if(result2){
-            QList<Char> emptyList;
-            QString uri = dbOperations->getUri(nameDocument);
-            fileServContr = this->initializeServerController(nameDocument, uri, emptyList);
-            this->file2serverController[nameDocument] = fileServContr;
-
-            fileServContr->addClient(signalSender);
-            disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
-        } else {
-            //TODO: gestire la reply in caso di fallimento
+        Account* loggedAccount = this->socket2account[signalSender];
+        QString uriOfDocument = this->generateUri(loggedAccount->getName(), nameDocument);
+        bool result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);   //false if there is already a document with that name
+        if(!result){
+            QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(false, QString("create"));
+            signalSender->sendTextMessage(sendMsgToClient);
+            return;
         }
 
-    }
-    else if(header == "permissionReq"){
-        QString uri = requestObjJSON["uri"].toString();
-        int siteId = requestObjJSON["siteId"].toInt();      // siteId of account who is asking
-                                                            // for permission
-        bool response = true;
-        try {
-            QString nameDocument = this->dbOperations->getDocument(uri);
-        } catch (std::exception e) {
-            //does not exists a document with that uri   //TODO: da testare
-            response = false;
-            nameDocument = "";
-        }
+        this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
 
-        if(response)
-            this->dbOperations->insertNewPermission(nameDocument, siteId);
+        QList<Char> emptyList;
+        fileServContr = this->initializeServerController(nameDocument, uriOfDocument, emptyList);
+        this->file2serverController[nameDocument] = fileServContr;
 
-        QByteArray sendMsgToClient = ServerMessageFactory::createPermissionReply(response, nameDocument);
-        signalSender->sendTextMessage(sendMsgToClient);
+        fileServContr->addClient(signalSender);
+        disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
     }
     else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
@@ -256,7 +234,7 @@ int Server::getDigits(std::string s) {
 
 
 //TODO
-QString Server::generateUri(QString& nameAccount, QString& nameDocument){
+QString Server::generateUri(QString nameAccount, QString& nameDocument){
     std::string uri("file://");
     int accountHashed = this->getDigits(nameAccount.toUtf8().constData());
     int documentHashed = this->getDigits(nameDocument.toUtf8().constData());
