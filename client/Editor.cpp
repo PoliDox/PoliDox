@@ -19,6 +19,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <iostream>
+#include <QMetaObject>
 
 void setItem(QColor color,QListWidgetItem* item){
 
@@ -57,9 +58,9 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
         if (!handlingOperation) {
-           //qDebug() << "QTextDocument::contentsChange";
-           updateCursors();
-           emit textChanged(position, charsRemoved, charsAdded);
+            // We call this asynchrounously, since cursor coordinates are not updated yet
+            QMetaObject::invokeMethod(this, "updateCursors", Qt::QueuedConnection);
+            emit textChanged(position, charsRemoved, charsAdded);
         }
     });
 
