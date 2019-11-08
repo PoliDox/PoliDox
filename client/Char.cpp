@@ -69,7 +69,7 @@ QJsonObject Char::toJson() const {
 Char Char::fromJson(const QJsonObject& charJSON){
     char value = charJSON["value"].toString().at(0).toLatin1();
     int siteId = (int)charJSON["siteId"].toDouble();
-    QJsonArray fractionalPositionObjJSON = charJSON["position"].toArray();  //TODO: mettersi d'accordo sul campo, position o fractionalPosition
+    QJsonArray fractionalPositionObjJSON = charJSON["position"].toArray();
 
     std::vector<int> fractionalPosition;
     for(auto elem : fractionalPositionObjJSON){
