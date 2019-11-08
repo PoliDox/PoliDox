@@ -88,7 +88,7 @@ private:
     void createStatusBar();
     void initUserList();
     void initRichTextToolBar();
-    void updateCursors();
+    Q_INVOKABLE void updateCursors();
     void highlightUserChars(int p_siteId);
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
 
