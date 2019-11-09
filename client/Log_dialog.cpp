@@ -99,7 +99,8 @@ void Log_Dialog::on_pushButton_register_clicked()
 
 }
 
-void Log_Dialog::manageRegistrationData(){
+
+void Log_Dialog::registrationOk(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
@@ -116,11 +117,20 @@ void Log_Dialog::manageRegistrationData(){
     ui->lineEdit_username->setText(username);
     ui->lineEdit_password->setText(password);
 
+}
+
+
+void Log_Dialog::sendRegistrationData(){
+
+    QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
+    QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
+
+    QString username=user_linedit->text();
+    QString password=pwd_linedit->text();
+
     //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
 
     emit signupDataSubmitted(username, password);
-
-
 
 }
 
@@ -199,19 +209,19 @@ void Log_Dialog::createRegistrationForm(){
     pwd->setFixedSize(300,30);
     submit->setFixedSize(100,30);
 
-    grid_layout->addWidget(name,0,0,0);
-    grid_layout->addWidget(name_form,1,0,0);
-    grid_layout->addWidget(surname,2,0,0);
-    grid_layout->addWidget(surname_form,3,0,0);
-    grid_layout->addWidget(usr,4,0,0);
-    grid_layout->addWidget(usr_form,5,0,0);
-    grid_layout->addWidget(pwd,6,0,0);
-    grid_layout->addWidget(pwd_form,7,0,0);
-    grid_layout->addWidget(submit,9,0,0);
-    grid_layout->addWidget(cancel,9,1,0);
+    grid_layout->addWidget(name,0,0,nullptr);
+    grid_layout->addWidget(name_form,1,0,nullptr);
+    grid_layout->addWidget(surname,2,0,nullptr);
+    grid_layout->addWidget(surname_form,3,0,nullptr);
+    grid_layout->addWidget(usr,4,0,nullptr);
+    grid_layout->addWidget(usr_form,5,0,nullptr);
+    grid_layout->addWidget(pwd,6,0,nullptr);
+    grid_layout->addWidget(pwd_form,7,0,nullptr);
+    grid_layout->addWidget(submit,9,0,nullptr);
+    grid_layout->addWidget(cancel,9,1,nullptr);
 
 
-    connect(submit,&QPushButton::clicked,this,&Log_Dialog::manageRegistrationData);
+    connect(submit,&QPushButton::clicked,this,&Log_Dialog::sendRegistrationData);
 
     connect(cancel,&QPushButton::clicked,this,&Log_Dialog::cleanRegistrationForm);
 

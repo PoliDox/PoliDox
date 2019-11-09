@@ -89,6 +89,7 @@ void Client::onMessageReceived(const QString &p_msg)
             QMessageBox::warning(&loginWindow, "Registration", "Couldn't create user: username already exists");
             return;
         }
+        loginWindow.registrationOk();
 
     } else if (l_header == "openFileRepl") {
         QString replCode = _JSONobj["response"].toString();
@@ -108,7 +109,7 @@ void Client::onMessageReceived(const QString &p_msg)
             for (const QJsonValue accOffline : JSONaccountsOffline)
                 contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
 
-            m_document = new ClientController(&m_socket, m_user.getSiteId(), nameDocument, uri, contributorsOnline, contributorsOffline);
+            m_document = new ClientController(&m_socket, m_user, nameDocument, uri, contributorsOnline, contributorsOffline);
             m_document->init(JSONcrdt);
 
             loginWindow.hide();

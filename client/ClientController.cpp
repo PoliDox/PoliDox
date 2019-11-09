@@ -4,10 +4,11 @@
 #include "ClientMessageFactory.h"
 
 
-ClientController::ClientController(QWebSocket *p_socket, double p_siteId, const QString& fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
-    m_socket(p_socket), m_filename(fileName), m_uri(p_uri), m_siteId(p_siteId)
+ClientController::ClientController(QWebSocket *p_socket, const Account& p_account, const QString& p_fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
+    m_socket(p_socket), m_filename(p_fileName), m_uri(p_uri), m_account(p_account)
 {        
-    m_crdt = new CrdtClient(p_siteId);
+    m_siteId = p_account.getSiteId();
+    m_crdt = new CrdtClient(m_siteId);
     m_editor = new Editor(this, nullptr, contributorsOnline, contributorsOffline);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);

@@ -13,20 +13,21 @@ class ClientController : public QObject {
     Q_OBJECT
 
 public:
-    ClientController(QWebSocket *p_socket, double p_siteId, const QString& fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline);
+    ClientController(QWebSocket *p_socket, const Account& account, const QString& fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline);
     ~ClientController();
 
     void init(const QJsonArray& p_crdt);
     QVector<int> getUserChars(int p_siteId);
     QString getFilename() { return m_filename; }
     QString getUri() { return m_uri; }
-
+    Account getAccount() { return m_account; }
 
 private:
     Editor *m_editor;
     CrdtClient *m_crdt; // TODO: use smart-pointer
     QWebSocket *m_socket;
-    int m_siteId;
+    Account m_account;
+    int m_siteId; // TODO: redundant wrt m_account, delete?
     QString m_filename;
     QString m_uri;
 

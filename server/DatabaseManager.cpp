@@ -403,7 +403,9 @@ Account DatabaseManager::getAccount(int siteId){
             throw "DatabaseManager::getAccount(int)  error";
         }
 
+        int color = Account::generateColor();
         QJsonObject accountObjJson = stringDocJSON.object();
+        accountObjJson.insert("color", color);
         Account accountToReturn = Account::fromJson(accountObjJson);
         return accountToReturn;
     }
