@@ -165,6 +165,7 @@ void Log_Dialog::createRegistrationForm(){
     QLineEdit* surname_form=new QLineEdit(ui->groupBox);
     QLineEdit* usr_form=new QLineEdit(ui->groupBox);
     QLineEdit* pwd_form=new QLineEdit(ui->groupBox);
+    pwd_form->setEchoMode(QLineEdit::Password);
 
     name_form->setStyleSheet("background-color:transparent;");
     surname_form->setStyleSheet("background-color:transparent;");
