@@ -89,6 +89,7 @@ void Client::onMessageReceived(const QString &p_msg)
             QMessageBox::warning(&loginWindow, "Registration", "Couldn't create user: username already exists");
             return;
         }
+        loginWindow.registrationOk();
 
     } else if (l_header == "openFileRepl") {
         QString replCode = _JSONobj["response"].toString();

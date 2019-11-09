@@ -99,7 +99,8 @@ void Log_Dialog::on_pushButton_register_clicked()
 
 }
 
-void Log_Dialog::manageRegistrationData(){
+
+void Log_Dialog::registrationOk(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
@@ -116,11 +117,20 @@ void Log_Dialog::manageRegistrationData(){
     ui->lineEdit_username->setText(username);
     ui->lineEdit_password->setText(password);
 
+}
+
+
+void Log_Dialog::sendRegistrationData(){
+
+    QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
+    QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
+
+    QString username=user_linedit->text();
+    QString password=pwd_linedit->text();
+
     //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
 
     emit signupDataSubmitted(username, password);
-
-
 
 }
 
@@ -211,7 +221,7 @@ void Log_Dialog::createRegistrationForm(){
     grid_layout->addWidget(cancel,9,1,nullptr);
 
 
-    connect(submit,&QPushButton::clicked,this,&Log_Dialog::manageRegistrationData);
+    connect(submit,&QPushButton::clicked,this,&Log_Dialog::sendRegistrationData);
 
     connect(cancel,&QPushButton::clicked,this,&Log_Dialog::cleanRegistrationForm);
 

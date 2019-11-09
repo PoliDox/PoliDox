@@ -24,6 +24,7 @@ public:
     void setEditor(Editor *);
 
     void displayFiles(const QList<QString> p_files);
+    void registrationOk();
 
 signals:
     void authDataSubmitted(QString p_user, QString p_passw);
@@ -36,7 +37,7 @@ private slots:
     void on_pushButton_login_clicked();
     void on_pushButton_register_clicked();
     void onClickedFile(QListWidgetItem *item);
-    void manageRegistrationData();
+    void sendRegistrationData();
 
 private:
     Ui::Log_Dialog *ui;
