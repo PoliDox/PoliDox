@@ -25,5 +25,8 @@
         <file>images/zoomin.png</file>
         <file>images/zoomout.png</file>
         <file>images/uri.png</file>
+        <file>images/logo.png</file>
+        <file>images/offline.png</file>
+        <file>images/online.png</file>
     </qresource>
 </RCC>

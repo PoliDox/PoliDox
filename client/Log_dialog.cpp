@@ -12,7 +12,7 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setFixedSize(374,575);
-    this->ui->logo->setStyleSheet("background-image: url(./logo.png);background-repeat:none;background-position:center;");
+    this->ui->logo->setStyleSheet("background-image: url(://images/images/logo.png);background-repeat:none;background-position:center;");
 
     this->ui->pushButton_register->setStyleSheet("color:crimson");
     //this->ui->pushButton_login->setStyleSheet("background-color:#4d79ff;color:white");

@@ -113,11 +113,11 @@ void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Acco
 
 void Editor::initUserList(){
 
-    QPixmap online("./online.png");
+    QPixmap online("://images/images/online.png");
     QIcon onlineIcon(online);
     ui->label->setPixmap(onlineIcon.pixmap(QSize(10,10)));
 
-    QPixmap offline("./offline.png");
+    QPixmap offline("://images/images/offline.png");
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
