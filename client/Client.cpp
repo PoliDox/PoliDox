@@ -74,8 +74,7 @@ void Client::onMessageReceived(const QString &p_msg)
         m_user = Account::fromJson(accountObj);
         qDebug() << "Authenticated with siteId" << m_user.getSiteId();
         int r, g, b;
-        m_user.getColor().getRgb(&r, &g, &b);
-        qDebug() << "Color " << r << ", " << g << ", " << b;
+        m_user.getColor().getRgb(&r, &g, &b);        
 
         QJsonArray _JSONfiles=_JSONobj["nameDocuments"].toArray();
         QList<QString> l_files;
