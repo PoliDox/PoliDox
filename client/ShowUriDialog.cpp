@@ -18,8 +18,8 @@ ShowUriDialog::~ShowUriDialog()
 }
 
 void ShowUriDialog::setUri(QString uri){
-    //QString htmlUri = "<span style=\" font-size:8pt; font-weight:600; color:#aa0000;\">" + uri + "</span>";
-    QString htmlUri = uri;
-    qDebug() << "htmlUri: " << htmlUri;
-    ui->UriLabel->setText(uri);
+    QString htmlUri = "<span style=\" font-size:14pt; font-weight:600;\">" + uri + "</span>";
+    //QString htmlUri = uri;
+    //qDebug() << "htmlUri: " << htmlUri;
+    ui->UriLabel->setText(htmlUri);
 }
