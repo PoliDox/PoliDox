@@ -87,6 +87,9 @@
      <property name="text">
       <string>Copy this URI to share the file:</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
    </item>
   </layout>
