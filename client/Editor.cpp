@@ -121,7 +121,8 @@ void Editor::initUserList(){
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
-    QListWidgetItem* item= new QListWidgetItem("You",ui->onlineList);
+    QListWidgetItem* item = new QListWidgetItem("You",ui->onlineList);
+    setItem(controller->getAccount().getColor(), item);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(Qt::Unchecked);
@@ -140,29 +141,36 @@ void Editor::highlightUser(QListWidgetItem *item) {
 
     // TODO: controlla se item->text() == You
 
-    // Search among the online users
-    QList<User> valuesList = m_onlineUsers.values();
-    auto onlineHIT = std::find_if(valuesList.begin(), valuesList.end(), [item](User user){
-            return user.account.getName() == item->text();
-    });
+    if ("You" == item->text()) {
+        siteID = controller->getAccount().getSiteId();
+        color = controller->getAccount().getColor();
+    } else {
 
-    if (onlineHIT == valuesList.end()) {
-        // Search among the offline users
-        auto offlineHIT = std::find_if(m_offlineUsers.begin(), m_offlineUsers.end(), [item](Account acc){
-            return acc.getName() == item->text();
+        // Search among the online users
+        QList<User> valuesList = m_onlineUsers.values();
+        auto onlineHIT = std::find_if(valuesList.begin(), valuesList.end(), [item](User user){
+                return user.account.getName() == item->text();
         });
 
-        if (offlineHIT == m_offlineUsers.end()) {
-            qWarning() << "PANIC: USER DOES NOT EXIST";
+        if (onlineHIT == valuesList.end()) {
+            // Search among the offline users
+            auto offlineHIT = std::find_if(m_offlineUsers.begin(), m_offlineUsers.end(), [item](Account acc){
+                return acc.getName() == item->text();
+            });
+
+            if (offlineHIT == m_offlineUsers.end()) {
+                qWarning() << "PANIC: USER DOES NOT EXIST";
+                return;
+            } else {
+                siteID = offlineHIT->getSiteId();
+                color = offlineHIT->getColor();
+            }
 
         } else {
-            siteID = offlineHIT->getSiteId();
-            color = offlineHIT->getColor();
+            siteID = onlineHIT->account.getSiteId();
+            color = onlineHIT->account.getColor();
         }
 
-    } else {        
-        siteID = onlineHIT->account.getSiteId();
-        color = onlineHIT->account.getColor();
     }
 
     bool checked = item->checkState() == Qt::Checked;
