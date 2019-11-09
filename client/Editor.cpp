@@ -154,8 +154,17 @@ void Editor::highlightUser(QListWidgetItem *item) {
         siteID = userHIT->account.getSiteId();
         color = userHIT->account.getColor();
     } else {
-        // TODO: search offline users
-        std::cout << "PANIC! USER ONLINE NOT FOUND" << std::endl;
+
+        auto it=std::find_if(m_offlineUsers.begin(),m_offlineUsers.end(),[item](Account account){
+
+                if(account.getName()==item->text())
+                    return true;
+                else
+                    return false;
+        });
+
+        siteID=it->getSiteId();
+        color=it->getColor();
     }
 
     bool checked = item->checkState() == Qt::Checked;
