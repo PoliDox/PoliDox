@@ -143,31 +143,26 @@ void Editor::highlightUser(QListWidgetItem *item) {
     // Search among the online users
     QList<User> valuesList = m_onlineUsers.values();
     auto onlineHIT = std::find_if(valuesList.begin(), valuesList.end(), [item](User user){
-            if(user.account.getName()==item->text())
-                return true;
-            else
-                return false;
+            return user.account.getName() == item->text();
     });
 
-    if (onlineHIT != valuesList.end()) {
-        siteID = onlineHIT->account.getSiteId();
-        color = onlineHIT->account.getColor();
-
-    } else {
+    if (onlineHIT == valuesList.end()) {
         // Search among the offline users
         auto offlineHIT = std::find_if(m_offlineUsers.begin(), m_offlineUsers.end(), [item](Account acc){
-            if(acc.getName()==item->text())
-                return true;
-            else
-                return false;
+            return acc.getName() == item->text();
         });
 
-        if (offlineHIT != m_offlineUsers.end()) {
+        if (offlineHIT == m_offlineUsers.end()) {
+            qWarning() << "PANIC: USER DOES NOT EXIST";
+
+        } else {
             siteID = offlineHIT->getSiteId();
             color = offlineHIT->getColor();
-        } else {
-            qWarning() << "PANIC: USER DOES NOT EXIST";
         }
+
+    } else {        
+        siteID = onlineHIT->account.getSiteId();
+        color = onlineHIT->account.getColor();
     }
 
     bool checked = item->checkState() == Qt::Checked;
