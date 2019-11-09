@@ -78,8 +78,8 @@ private slots:
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered();
 
-    void addOnlineUser(Account account);
-    void addOfflineUser(Account account);
+    void addOnlineUser(Account account);    
+    void onUserOffline(Account account);
 
     void highlightUser(QListWidgetItem * item);
 
