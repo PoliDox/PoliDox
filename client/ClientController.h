@@ -16,7 +16,7 @@ public:
     ClientController(QWebSocket *p_socket, double p_siteId, const QString& fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline);
     ~ClientController();
 
-    void init(const QJsonArray& p_crdt, const QJsonArray& p_accounts);
+    void init(const QJsonArray& p_crdt);
     QVector<int> getUserChars(int p_siteId);
     QString getFilename() { return m_filename; }
     QString getUri() { return m_uri; }
@@ -34,9 +34,7 @@ public slots:
     void onTextMessageReceived(const QString& _JSONstring);
     void onTextChanged(int position, int charsRemoved, int charsAdded);
 
-signals:
-    void newUserOnline(Account account);
-    void userOffline(Account account);
+signals:        
     void docClosed();
 
 };

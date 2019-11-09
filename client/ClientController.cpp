@@ -46,7 +46,7 @@ ClientController::~ClientController()
 
 
 //TODO: da ottimizzare, evire le copie, soprattutto sui vettori
-void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accounts) {
+void ClientController::init(const QJsonArray& p_crdt) {
 
     std::vector<std::vector<Char>> symbolsOfOpenedDocument = CRDT::fromJson(p_crdt);
     this->m_crdt->setSymbols(symbolsOfOpenedDocument);
@@ -57,12 +57,6 @@ void ClientController::init(const QJsonArray& p_crdt, const QJsonArray& p_accoun
         for(Char symbol : elem)
             text += symbol.getValue();
     m_editor->init(text);
-
-    // Initialize accounts
-    for (const QJsonValue& ac : p_accounts) {
-        Account account = Account::fromJson(ac.toObject());     //TODO: verificare se l'oggetto account viene creato correttamente
-        m_editor->addClient(account);
-    }
 }
 
 QVector<int> ClientController::getUserChars(int p_siteId)
@@ -120,14 +114,13 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
-        m_editor->addClient(newUser);
-        emit newUserOnline(newUser);
+        m_editor->addClient(newUser);        
         //qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else if (l_header == "closedEditorRemote") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
-        emit userOffline(offlineUser);
+        m_editor->removeClient(offlineUser);
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();

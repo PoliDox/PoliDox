@@ -79,10 +79,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
     });
 
-    connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
-    connect(controller,&ClientController::userOffline,this,&Editor::addOfflineUser);
-
-
 }
 
 /*bool Editor::eventFilter(QObject *target, QEvent *event){
@@ -104,17 +100,15 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
     //fill offline list
-    //No addOfflineUser because no online users to move at boot time
     for(Account acc : contributorsOffline){
-
-        QListWidgetItem* item= new QListWidgetItem(acc.getName());
-        setItem(acc.getColor(),item);
-        ui->offlineList->addItem(item);
+        m_offlineUsers.append(acc);
+        addOfflineUser(acc);
     }
 
     //fill online list
-    for(Account acc : contributorsOnline)
-        addOnlineUser(acc);
+    for(Account acc : contributorsOnline) {
+        addClient(acc);
+    }
 }
 
 void Editor::initUserList(){
@@ -134,89 +128,43 @@ void Editor::initUserList(){
 
     ui->onlineList->addItem(item);
 
-    connect(ui->onlineList,&QListWidget::itemChanged,this,&Editor::highLightUser);
-    connect(ui->offlineList,&QListWidget::itemChanged,this,&Editor::highLightUser);
+    connect(ui->onlineList,&QListWidget::itemChanged,this,&Editor::highlightUser);
+    connect(ui->offlineList,&QListWidget::itemChanged,this,&Editor::highlightUser);
 
 }
 
-void Editor::highLightUser(QListWidgetItem * item){
+void Editor::highlightUser(QListWidgetItem *item) {
 
     int siteID=-1;
+    QColor color;
 
-    QList<User> valuesList = m_users.values(); // get a list of all the values
+    // TODO: controlla se item->text() == You
+
+    QList<User> valuesList = m_onlineUsers.values(); // get a list of all the values
 
     auto userHIT=std::find_if(valuesList.begin(),valuesList.end(),[item](User user){
 
-            if(user.account.getName()==item->text().toUtf8().constData())
+            if(user.account.getName()==item->text())
                 return true;
             else
                 return false;
     });
 
-    if(userHIT!=valuesList.end())
-        siteID=userHIT->account.getSiteId();
-    else
+    if (userHIT!=valuesList.end()) {
+        siteID = userHIT->account.getSiteId();
+        color = userHIT->account.getColor();
+    } else {
+        // TODO: search offline users
         std::cout << "PANIC! USER ONLINE NOT FOUND" << std::endl;
-
-    QVector<int> userChars = controller->getUserChars(siteID);
-    QMap<int,int> map;
-
-    int start=0,
-        lenght=0;
-
-    if(userChars.size()>0){
-
-        for(int i=1;i<=userChars.size();i++){
-
-            if(lenght==0)
-                start=userChars[i-1];
-
-            lenght++;
-
-            if(i==userChars.size()){
-                 map.insert(start,lenght);
-                 break;
-            }
-
-            if(userChars[i]-userChars[i-1]>1){
-
-                map.insert(start,lenght);
-                lenght=0;
-
-            }
-        }
     }
 
-    // TODO: could be dangerous, use handlingOperation instead?
-    disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
+    bool checked = item->checkState() == Qt::Checked;
 
-    QColor color;
-
-    if(item->checkState() == Qt::Checked){
-        color=QColor(m_users[siteID].account.getColor());
-        color.setAlpha(80);
-    }
-    else
-        color=QColor("transparent");
-
-    for (auto it = map.begin(); it != map.end(); ++it){
-
-        QTextCharFormat fmt;
-        fmt.setBackground(color);
-        QTextCursor cursor(m_textEdit->document());
-        cursor.setPosition(it.key(), QTextCursor::MoveAnchor);
-        cursor.setPosition(it.key()+it.value(), QTextCursor::KeepAnchor);
-        cursor.mergeCharFormat(fmt);
-        m_textEdit->mergeCurrentCharFormat(fmt);
-    }
-
-    // TODO: could be dangerous, use handlingOperation instead?
-    connect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
-
+    highlightUserChars(siteID, color, checked);
 
 }
 
-void Editor::addOnlineUser(Account account){
+void Editor::addOnlineUser(const Account& account){
 
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->offlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
@@ -245,7 +193,16 @@ void Editor::addOnlineUser(Account account){
 
 }
 
-void Editor::addOfflineUser(Account account){
+// WARNING: la vecchia addOfflineUser è stata rinominata in onUserOffline!!
+void Editor::addOfflineUser(const Account& account)
+{    
+    // WARNING: la vecchia addOfflineUser è stata rinominata in onUserOffline!!
+    QListWidgetItem* item= new QListWidgetItem(account.getName());
+    setItem(account.getColor(),item);
+    ui->offlineList->addItem(item);
+}
+
+void Editor::removeClient(const Account& account){
 
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
@@ -320,16 +277,18 @@ void Editor::addClient(const Account& user)
     remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;font-family:American Typewriter;font-weight:bold");
     remoteLabel->lower();
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
-    m_users[siteId] = newUser;
+    m_onlineUsers[siteId] = newUser;
 
     // Draw the remote cursor at position 0
-    QTextCursor& remoteCursor = m_users[siteId].cursor;
+    QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
     qDebug() << "Adding cursor" << user.getName() << "at coord" << curCoord.left() << "," << curCoord.top();
     remoteLabel->move(curCoord.left()-2, curCoord.top()-7);
     remoteLabel->setVisible(true);
     //m_textEdit->raise();
+
+    addOnlineUser(user);
 }
 
 void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int siteId)
@@ -345,7 +304,7 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     */
 
     handlingOperation = true;
-    QTextCursor& remCursor = m_users[siteId].cursor;
+    QTextCursor& remCursor = m_onlineUsers[siteId].cursor;
 
     remCursor.setPosition(position);
     if (op == INSERT_OP){
@@ -389,7 +348,7 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
 
 void Editor::updateCursors()
 {
-    for (auto it = m_users.begin(); it != m_users.end(); it++) {
+    for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
         User& user = it.value();                
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
         qDebug() << "remoteCursor " << user.account.getName() << " (" << user.account.getSiteId()
@@ -401,6 +360,65 @@ void Editor::updateCursors()
         user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
         user.label->setVisible(true);
     }
+}
+
+void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
+{
+    QVector<int> userChars = controller->getUserChars(p_siteId);
+    QMap<int,int> map;
+
+    int start=0,
+        lenght=0;
+
+    if(userChars.size()>0){
+
+        for(int i=1;i<=userChars.size();i++){
+
+            if(lenght==0)
+                start=userChars[i-1];
+
+            lenght++;
+
+            if(i==userChars.size()){
+                 map.insert(start,lenght);
+                 break;
+            }
+
+            if(userChars[i]-userChars[i-1]>1){
+
+                map.insert(start,lenght);
+                lenght=0;
+
+            }
+        }
+    }
+
+    // TODO: could be dangerous, use handlingOperation instead?
+    disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
+
+    QColor color;
+
+    if(p_checked){
+        color = p_color;
+        color.setAlpha(80);
+    }
+    else
+        color=QColor("transparent");
+
+    for (auto it = map.begin(); it != map.end(); ++it){
+
+        QTextCharFormat fmt;
+        fmt.setBackground(color);
+        QTextCursor cursor(m_textEdit->document());
+        cursor.setPosition(it.key(), QTextCursor::MoveAnchor);
+        cursor.setPosition(it.key()+it.value(), QTextCursor::KeepAnchor);
+        cursor.mergeCharFormat(fmt);
+        m_textEdit->mergeCurrentCharFormat(fmt);
+    }
+
+    // TODO: could be dangerous, use handlingOperation instead?
+    connect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
+
 }
 
 void Editor::resetBackgroundColor(int pos){
@@ -633,25 +651,6 @@ void Editor::on_actionJustify_triggered()
     m_textEdit->setAlignment(Qt::AlignJustify);
 
 }
-
-
-
-/* void Editor::highlightUserChars(int p_siteId)
-{
-
-    QVector<int> userChars = controller->getUserChars(p_siteId);
-    QTextCursor tmpCursor(m_textDoc);
-    QColor color = m_users[p_siteId].account.getColor();
-    QTextCharFormat format;
-    format.setBackground(color.lighter(160));
-    for (int charPos : userChars) {
-        tmpCursor.setPosition(charPos);
-        tmpCursor.select(QTextCursor::WordUnderCursor);
-        tmpCursor.mergeCharFormat(format);
-        // MaBorghe perchè se una parola è lunga 20lettere la evidenzi 20 volte ? =(
-    }
-}
-*/
 
 /* Handler di gestione dell'apertura di un nuovo file */
 void Editor::on_actionOpen_triggered()

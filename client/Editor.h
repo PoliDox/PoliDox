@@ -43,6 +43,7 @@ public:
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
+    void removeClient(const Account& account);
     void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
     void resetBackgroundColor(int pos);
     void setCharacterStyle(int index,Char& symbol);
@@ -52,7 +53,6 @@ public:
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
     void quit_editor();
-
 
 private slots:
     void on_actionNew_triggered();
@@ -76,12 +76,9 @@ private slots:
     void on_actionLeftAllignmet_triggered();
     void on_actionAlignCenter_triggered();
     void on_actionAlignRight_triggered();
-    void on_actionJustify_triggered();
+    void on_actionJustify_triggered(); 
 
-    void addOnlineUser(Account account);
-    void addOfflineUser(Account account);
-
-    void highLightUser(QListWidgetItem * item);
+    void highlightUser(QListWidgetItem * item);
 
 private:
     void createActions();
@@ -89,8 +86,10 @@ private:
     void initUserList();
     void initRichTextToolBar();
     Q_INVOKABLE void updateCursors();
-    void highlightUserChars(int p_siteId);
+    void highlightUserChars(int p_siteId, QColor p_color, bool p_checked);
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
+    void addOnlineUser(const Account& account);
+    void addOfflineUser(const Account& account);
 
     ClientController *controller;
     bool handlingOperation;
@@ -99,7 +98,8 @@ private:
     QTextCursor *m_localCursor;
     // Maps siteIds to a struct identifying a remote user
     // N.B. You can use it to iterate over all Accounts!    
-    QMap<int, User> m_users;
+    QMap<int, User> m_onlineUsers;
+    QList<Account> m_offlineUsers;
     ShowUriDialog *m_showUriDialog;
     Ui::Editor *ui;
 
