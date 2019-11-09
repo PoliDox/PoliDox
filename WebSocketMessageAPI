@@ -39,6 +39,10 @@ OPEN FILE REQ
 "nameDocument" = ...		//depending on the type of the request, one of these two must be an empty string!!
 "uri" = ...					//depending on the type of the request, one of these two must be an empty string!!
 
+CREATE FILE REQ
+"action" = "createFileReq"
+"nameDocument" = ...
+
 OPEN FILE REPL
 "action" = "openFileRepl"
 "response" = "ok" / "fail create" / "fail uri" / "fail name"    //if fail, the fields below are empty
@@ -47,10 +51,6 @@ OPEN FILE REPL
 "crdt" = { ... }        // here comes the crdt formatted in json array 
 "accounts" = { // array of OTHER clients with this file currently open }
 "accountsOffline" = { //array of offline clients in this file }		
-
-CREATE FILE REQ
-"action" = "createFileReq"
-"nameDocument" = ...
 
 CLOSED EDITOR REQ
 "action" = "closedEditorReq"
@@ -62,9 +62,6 @@ CLOSED EDITOR REPL         	//this is send only to the client that has just clos
 CLOSED EDITOR REMOTE		//to notify other clients connected on that document that a client has just quitted the document 
 "action" = "closedEditorRemote"
 "account" = { ... }         //the account who has just quitted the document
-
-
-
 
 
 NEW REMOTE FILE        // ???
