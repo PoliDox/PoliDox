@@ -107,7 +107,7 @@ void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Acco
 
     //fill online list
     for(Account acc : contributorsOnline) {
-        addClient(acc);
+        addClient(acc); // m_onlineUsers.add + addOnlineUser
     }
 }
 
@@ -188,15 +188,14 @@ void Editor::addOnlineUser(const Account& account){
         delete _dItem;
     }
 
-
     ui->onlineList->addItem(item);
 
 }
 
-// WARNING: la vecchia addOfflineUser è stata rinominata in onUserOffline!!
+// WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
 void Editor::addOfflineUser(const Account& account)
 {    
-    // WARNING: la vecchia addOfflineUser è stata rinominata in onUserOffline!!
+    // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
     QListWidgetItem* item= new QListWidgetItem(account.getName());
     setItem(account.getColor(),item);
     ui->offlineList->addItem(item);
@@ -204,6 +203,11 @@ void Editor::addOfflineUser(const Account& account)
 
 void Editor::removeClient(const Account& account){
 
+    // 1. Update data structures
+    m_onlineUsers.remove(account.getSiteId());
+    m_offlineUsers.append(account);
+
+    // 2. Update view in editor
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
@@ -271,7 +275,7 @@ QChar Editor::at(int pos)
 
 void Editor::addClient(const Account& user)
 {
-    // Add user to the map of remote users
+    // 1. Add user to the map of remote users
     int siteId = user.getSiteId();
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
     remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;font-family:American Typewriter;font-weight:bold");
@@ -279,7 +283,10 @@ void Editor::addClient(const Account& user)
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
-    // Draw the remote cursor at position 0
+    // 2. If user's not a new contributor, remove him/her from list of offline users
+    m_offlineUsers.removeAll(user);
+
+    // 3. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
