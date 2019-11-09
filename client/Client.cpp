@@ -12,14 +12,18 @@ Client::Client()
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
-    connect(&loginWindow, &Log_Dialog::authDataSubmitted, this, [&](QString p_user, QString p_passw) {
+    connect(&loginWindow, &Log_Dialog::authDataSubmitted, this, [&](QString p_user, QString p_passw) {   
         QByteArray message = ClientMessageFactory::createLoginMessage(p_user, p_passw);
         m_socket.sendTextMessage(message);
     });
 
     connect(&loginWindow, &Log_Dialog::signupDataSubmitted, this, [&](QString p_user, QString p_passw) {
-        QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw);
-        m_socket.sendTextMessage(message);
+        if (p_user != "You") {
+            QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw);
+            m_socket.sendTextMessage(message);
+        } else {
+            QMessageBox::warning(&loginWindow, "Registration", "\"You\" is not a valid username");
+        }
     });
 
     connect(&loginWindow, &Log_Dialog::fileSelected, this, [&](const QString& p_filename) {

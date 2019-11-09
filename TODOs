@@ -1,6 +1,11 @@
 URGENTI
 aggiungere una lista di account offline al messaggio openFileRepl. guarda WebSocketMessageAPI
 mostra i pallini nella password nel form di registrazione
+cambia cursore quando si passa sopra la URI
+mostra il nome utente col colore associato
+associa un account all'utente locale per poterne mostrare il testo
+Se la registrazione fallisce non tornare alla schermata di login
+
 
 NON URGENTI
 Non-Ascii characters
@@ -8,5 +13,8 @@ Namespaces
 Smartpointers
 Disconnections
 Parametrizzare il numero di porta del server (da command line?)
-Se la registrazione fallisce non tornare alla schermata di login
 Mostra messaggi di errore se non riesce a connettersi al server (magari con un timer)
+
+BUGS
+quando si cambia allineamento al testo il remoto non fa nulla
+quando seleziono il testo di un utente e cancello un carattere in mezzo mi deseleziona anche il carattere a dx

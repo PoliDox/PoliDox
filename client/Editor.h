@@ -81,7 +81,7 @@ private slots:
     void addOnlineUser(Account account);
     void addOfflineUser(Account account);
 
-    void highLightUser(QListWidgetItem * item);
+    void highlightUser(QListWidgetItem * item);
 
 private:
     void createActions();
@@ -89,7 +89,7 @@ private:
     void initUserList();
     void initRichTextToolBar();
     Q_INVOKABLE void updateCursors();
-    void highlightUserChars(int p_siteId);
+    void highlightUserChars(int p_siteId, QColor p_color, bool p_checked);
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
 
     ClientController *controller;
@@ -99,7 +99,8 @@ private:
     QTextCursor *m_localCursor;
     // Maps siteIds to a struct identifying a remote user
     // N.B. You can use it to iterate over all Accounts!    
-    QMap<int, User> m_users;
+    QMap<int, User> m_onlineUsers;
+    QList<Account> m_offlineUsers;
     ShowUriDialog *m_showUriDialog;
     Ui::Editor *ui;
 
