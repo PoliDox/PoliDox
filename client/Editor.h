@@ -43,6 +43,7 @@ public:
     void init(const QString &p_text);
     QChar at(int pos);
     void addClient(const Account& user);
+    void removeClient(const Account& account);
     void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
     void resetBackgroundColor(int pos);
     void setCharacterStyle(int index,Char& symbol);
@@ -52,7 +53,6 @@ public:
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
     void quit_editor();
-
 
 private slots:
     void on_actionNew_triggered();
@@ -76,11 +76,7 @@ private slots:
     void on_actionLeftAllignmet_triggered();
     void on_actionAlignCenter_triggered();
     void on_actionAlignRight_triggered();
-    void on_actionJustify_triggered();
-
-    void addOnlineUser(const Account& account);
-    void addOfflineUser(const Account& account);
-    void onUserOffline(const Account& account);
+    void on_actionJustify_triggered(); 
 
     void highlightUser(QListWidgetItem * item);
 
@@ -92,6 +88,8 @@ private:
     Q_INVOKABLE void updateCursors();
     void highlightUserChars(int p_siteId, QColor p_color, bool p_checked);
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
+    void addOnlineUser(const Account& account);
+    void addOfflineUser(const Account& account);
 
     ClientController *controller;
     bool handlingOperation;

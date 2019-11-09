@@ -114,14 +114,13 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
-        m_editor->addClient(newUser);
-        emit newUserOnline(newUser);
+        m_editor->addClient(newUser);        
         //qDebug() << "New client with siteId" << newUser.getSiteId();
 
     } else if (l_header == "closedEditorRemote") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
-        emit userOffline(offlineUser);
+        m_editor->removeClient(offlineUser);
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();

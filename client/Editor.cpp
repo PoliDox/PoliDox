@@ -79,10 +79,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
     });
 
-    connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
-    connect(controller,&ClientController::userOffline,this,&Editor::onUserOffline);
-
-
 }
 
 /*bool Editor::eventFilter(QObject *target, QEvent *event){
@@ -105,13 +101,13 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
     //fill offline list
     for(Account acc : contributorsOffline){
+        m_offlineUsers.append(acc);
         addOfflineUser(acc);
     }
 
     //fill online list
     for(Account acc : contributorsOnline) {
         addClient(acc);
-        addOnlineUser(acc);
     }
 }
 
@@ -206,7 +202,7 @@ void Editor::addOfflineUser(const Account& account)
     ui->offlineList->addItem(item);
 }
 
-void Editor::onUserOffline(const Account& account){
+void Editor::removeClient(const Account& account){
 
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
@@ -291,6 +287,8 @@ void Editor::addClient(const Account& user)
     remoteLabel->move(curCoord.left()-2, curCoord.top()-7);
     remoteLabel->setVisible(true);
     //m_textEdit->raise();
+
+    addOnlineUser(user);
 }
 
 void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int siteId)

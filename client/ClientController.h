@@ -34,9 +34,7 @@ public slots:
     void onTextMessageReceived(const QString& _JSONstring);
     void onTextChanged(int position, int charsRemoved, int charsAdded);
 
-signals:
-    void newUserOnline(Account account);
-    void userOffline(Account account);
+signals:        
     void docClosed();
 
 };
