@@ -97,6 +97,18 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
 }*/
 
+Editor::~Editor()
+{
+    delete ui;
+}
+
+void Editor::init(const QString &p_text)
+{
+    handlingOperation = true;
+    m_textEdit->setPlainText(p_text);
+    m_textEdit->show();
+    handlingOperation = false;
+}
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
     //fill offline list
@@ -139,11 +151,10 @@ void Editor::highlightUser(QListWidgetItem *item) {
     int siteID = -1;
     QColor color;
 
-    // TODO: controlla se item->text() == You
-
     if ("You" == item->text()) {
         siteID = controller->getAccount().getSiteId();
         color = controller->getAccount().getColor();
+
     } else {
 
         // Search among the online users
@@ -267,21 +278,6 @@ void Editor::initRichTextToolBar(){
     delete separator2;
 
 }
-
-
-Editor::~Editor()
-{
-    delete ui;
-}
-
-void Editor::init(const QString &p_text)
-{
-    handlingOperation = true;
-    m_textEdit->setPlainText(p_text);
-    m_textEdit->show();
-    handlingOperation = false;
-}
-
 
 QChar Editor::at(int pos)
 {
