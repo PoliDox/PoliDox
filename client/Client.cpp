@@ -100,17 +100,17 @@ void Client::onMessageReceived(const QString &p_msg)
             QString uri = _JSONobj["uri"].toString();
             QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
 
-            QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
+            QJsonArray JSONaccountsOnline = _JSONobj["accounts"].toArray();
             QJsonArray JSONaccountsOffline = _JSONobj["accountsOffline"].toArray();
             QList<Account> contributorsOnline;
             QList<Account> contributorsOffline;           
-            for (const QJsonValue accOnline : JSONaccounts)
+            for (const QJsonValue accOnline : JSONaccountsOnline)
                 contributorsOnline.push_back(Account::fromJson(accOnline.toObject()));
             for (const QJsonValue accOffline : JSONaccountsOffline)
                 contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
 
             m_document = new ClientController(&m_socket, m_user.getSiteId(), nameDocument, uri, contributorsOnline, contributorsOffline);
-            m_document->init(JSONcrdt, JSONaccounts);
+            m_document->init(JSONcrdt);
 
             loginWindow.hide();
             disconnect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);

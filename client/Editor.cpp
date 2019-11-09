@@ -80,7 +80,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     });
 
     connect(controller,&ClientController::newUserOnline,this,&Editor::addOnlineUser);
-    connect(controller,&ClientController::userOffline,this,&Editor::addOfflineUser);
+    connect(controller,&ClientController::userOffline,this,&Editor::onUserOffline);
 
 
 }
@@ -104,17 +104,15 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
     //fill offline list
-    //No addOfflineUser because no online users to move at boot time
     for(Account acc : contributorsOffline){
-
-        QListWidgetItem* item= new QListWidgetItem(acc.getName());
-        setItem(acc.getColor(),item);
-        ui->offlineList->addItem(item);
+        addOfflineUser(acc);
     }
 
     //fill online list
-    for(Account acc : contributorsOnline)
+    for(Account acc : contributorsOnline) {
+        addClient(acc);
         addOnlineUser(acc);
+    }
 }
 
 void Editor::initUserList(){
@@ -170,7 +168,7 @@ void Editor::highlightUser(QListWidgetItem *item) {
 
 }
 
-void Editor::addOnlineUser(Account account){
+void Editor::addOnlineUser(const Account& account){
 
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->offlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
@@ -199,7 +197,16 @@ void Editor::addOnlineUser(Account account){
 
 }
 
-void Editor::addOfflineUser(Account account){
+// WARNING: la vecchia addOfflineUser è stata rinominata in onUserOffline!!
+void Editor::addOfflineUser(const Account& account)
+{    
+    // WARNING: la vecchia addOfflineUser è stata rinominata in onUserOffline!!
+    QListWidgetItem* item= new QListWidgetItem(account.getName());
+    setItem(account.getColor(),item);
+    ui->offlineList->addItem(item);
+}
+
+void Editor::onUserOffline(const Account& account){
 
     QListWidgetItem* _dItem;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
