@@ -135,11 +135,6 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 void ClientController::onTextChanged(int position, int charsRemoved, int charsAdded)
 {
 
-    /************************************************************************************************/
-    //This is needed to avoid that the character inserted copies the background of the previous character
-    m_editor->resetBackgroundColor(position);
-    /************************************************************************************************/
-
     qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;
 
     //TODO check if the previous character of position is bold/italic/underlined. If not, disable QToolbar icon.
@@ -165,6 +160,11 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     }
 
     for (int i = 0; i < charsAdded; i++) {
+        /************************************************************************************************/
+        //This is needed to avoid that the character inserted copies the background of the previous character
+        if(i==0)
+            m_editor->resetBackgroundColor(position);
+        /************************************************************************************************/
         QChar qchar = m_editor->at(position+i);
         char _char;
         if (qchar == QChar::ParagraphSeparator) {
