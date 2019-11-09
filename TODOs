@@ -1,6 +1,5 @@
 URGENTI
 aggiungere una lista di account offline al messaggio openFileRepl. guarda WebSocketMessageAPI
-mostra i pallini nella password nel form di registrazione
 cambia cursore quando si passa sopra la URI
 mostra il nome utente col colore associato
 associa un account all'utente locale per poterne mostrare il testo
