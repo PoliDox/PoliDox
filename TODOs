@@ -1,6 +1,6 @@
 URGENTI
 aggiungere una lista di account offline al messaggio openFileRepl. guarda WebSocketMessageAPI
-show dialog with error code if openFileRepl fails
+mostra i pallini nella password nel form di registrazione
 
 NON URGENTI
 Non-Ascii characters
@@ -8,3 +8,5 @@ Namespaces
 Smartpointers
 Disconnections
 Parametrizzare il numero di porta del server (da command line?)
+Se la registrazione fallisce non tornare alla schermata di login
+Mostra messaggi di errore se non riesce a connettersi al server (magari con un timer)

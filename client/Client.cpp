@@ -2,6 +2,7 @@
 #include "ClientMessageFactory.h"
 #include "CrdtClient.h"
 #include <QDebug>
+#include <QMessageBox>
 
 Client::Client()
 {
@@ -61,7 +62,7 @@ void Client::onMessageReceived(const QString &p_msg)
         QString replCode = _JSONobj["response"].toString();
 
         if (replCode != "ok") {
-            qDebug() << "Authentication failed";
+            QMessageBox::warning(&loginWindow, "Login", "Username or password are incorrect");
             return;
         }
 
@@ -82,8 +83,7 @@ void Client::onMessageReceived(const QString &p_msg)
     } else if (l_header == "registerUserRepl") {
         QString replCode = _JSONobj["response"].toString();
         if (replCode != "ok") {
-            // TODO: open dialog showing the error
-            qDebug() << "Registration failed";
+            QMessageBox::warning(&loginWindow, "Registration", "Couldn't create user: username already exists");
             return;
         }
 
@@ -95,17 +95,16 @@ void Client::onMessageReceived(const QString &p_msg)
             QString nameDocument = _JSONobj["nameDocument"].toString();
             QString uri = _JSONobj["uri"].toString();
             QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
+
             QJsonArray JSONaccounts = _JSONobj["accounts"].toArray();
             QJsonArray JSONaccountsOffline = _JSONobj["accountsOffline"].toArray();
             QList<Account> contributorsOnline;
-            QList<Account> contributorsOffline;
+            QList<Account> contributorsOffline;           
+            for (const QJsonValue accOnline : JSONaccounts)
+                contributorsOnline.push_back(Account::fromJson(accOnline.toObject()));
+            for (const QJsonValue accOffline : JSONaccountsOffline)
+                contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
 
-            if (l_header == "openFileRepl") {
-                for (const QJsonValue accOnline : JSONaccounts)
-                    contributorsOnline.push_back(Account::fromJson(accOnline.toObject()));
-                for (const QJsonValue accOffline : JSONaccountsOffline)
-                    contributorsOffline.push_back(Account::fromJson(accOffline.toObject()));
-            }
             m_document = new ClientController(&m_socket, m_user.getSiteId(), nameDocument, uri, contributorsOnline, contributorsOffline);
             m_document->init(JSONcrdt, JSONaccounts);
 
@@ -114,18 +113,13 @@ void Client::onMessageReceived(const QString &p_msg)
 
             connect(m_document, &ClientController::docClosed, this, &Client::onDocClosed);
 
-        } else {
-            QString error;
-            if (replCode == "fail create") {
-                // TODO: chiedere a fede: i filenames sono unici a livello di sistema o a livello account?
-                error = "Couldn't create file: filename is already used";
-            } else if (replCode == "fail uri") {
-                error = "Couldn't open file: Uri is invalid";
-            } else if (replCode == "fail name") {
-                error = "Couldn't open file: filename is invalid";
-            }
-            // TODO: open dialog showing the error
-
+        } else if (replCode == "fail create") {
+            // TODO: chiedere a fede: i filenames sono unici a livello di sistema o a livello account?
+            QMessageBox::warning(&loginWindow, "New file", "Couldn't create file: filename is already used");
+        } else if (replCode == "fail uri") {
+            QMessageBox::warning(&loginWindow, "Open file", "Couldn't open file: Uri is invalid");
+        } else if (replCode == "fail name") {
+            QMessageBox::warning(&loginWindow, "Open file", "Couldn't open file: File name is invalid");
         }
 
     } else if (l_header == "closedEditorRepl") {
