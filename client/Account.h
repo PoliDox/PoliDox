@@ -10,12 +10,12 @@
 //          Please consider that before modifying
 
 class Account {
-
+friend class DatabaseManager;
 private:
     int siteId;
     QString name;
     QByteArray image;
-    int color;
+    int color;   
 
 public:
     Account() = default;
@@ -27,6 +27,7 @@ public:
     QColor getColor() const;
     QJsonObject toJson() const;
     static Account fromJson(const QJsonObject& accountJSON);
+    static int generateColor();
     bool operator < (const Account& other) const;
     bool operator == (const Account& other) const;
 

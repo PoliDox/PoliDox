@@ -2,18 +2,11 @@
 #include <QDebug>
 #include <cstdlib>
 
-
-
 Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image, int p_color)
     : siteId(p_siteId), name(p_name), image(p_image) {
 
     if (p_color < 0) { // default value
-        color = 0;
-        for (int i=0; i < 3; i++) {
-            int randomNr = rand() % 200; // We don't want to get any color near to white
-            randomNr = randomNr << i*8; // We save the color as a single hex value
-            color |= randomNr;            
-        }
+        color = generateColor();
     } else {
         color = p_color;
     }
@@ -73,6 +66,18 @@ Account Account::fromJson(const QJsonObject& accountJSON) {
     //qDebug() << "JsonColorClient: " << hex << l_color;
     qDebug() << "ACCOUNT " << accountJSON ;
     return Account(l_siteId, l_name, "", l_color);
+}
+
+int Account::generateColor()
+{
+    int ret;
+    for (int i=0; i < 3; i++) {
+        int randomNr = rand() % 200; // We don't want to get any color near to white
+        randomNr = randomNr << i*8; // We save the color as a single hex value
+        ret |= randomNr;
+    }
+    qDebug() << "Generated color: " << ret;
+    return ret;
 }
 
 bool Account::operator < (const Account& other) const {
