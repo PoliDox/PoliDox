@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QJsonObject>
 #include <QColor>
+#include <QPixmap>
 
 // WARNING: This file is shared between client and server!
 //          Please consider that before modifying
@@ -23,7 +24,7 @@ public:
     Account(const Account& other);
     int getSiteId() const;
     QString getName() const;
-    QByteArray getImage() const;
+    QPixmap getImage() const;
     QColor getColor() const;
     QJsonObject toJson() const;
     static Account fromJson(const QJsonObject& accountJSON);

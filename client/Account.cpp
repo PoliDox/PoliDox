@@ -30,8 +30,10 @@ QString Account::getName() const {
     return this->name;
 }
 
-QByteArray Account::getImage() const {
-    return this->image;
+QPixmap Account::getImage() const {
+    QPixmap p;
+    p.loadFromData(QByteArray::fromBase64(image), "PNG");
+    return p;
 }
 
 QColor Account::getColor() const
@@ -47,11 +49,8 @@ QJsonObject Account::toJson() const {
     QJsonObject accountJSON;
     accountJSON.insert("siteId", siteId);
     accountJSON.insert("name", name);
-    accountJSON.insert("color", color);
-    //qDebug() << "JsonColorServer: " << hex << color;
-    // TODO: how to send the picture? QByteArray cannot be transformed into a QJsonValue
-    //_JSONobj.insert("image", image);
-
+    accountJSON.insert("color", color);    
+    accountJSON.insert("image", QLatin1String(image));
     return accountJSON;
 }
 
@@ -63,9 +62,9 @@ Account Account::fromJson(const QJsonObject& accountJSON) {
     if(l_name == "")
         l_name = accountJSON["_id"].toString(); //non cancellare, serve per la conversione dal db  =)
     int l_color = accountJSON["color"].toInt();
-    //qDebug() << "JsonColorClient: " << hex << l_color;
+    QByteArray l_image = accountJSON["image"].toString().toLatin1();
     qDebug() << "ACCOUNT " << accountJSON ;
-    return Account(l_siteId, l_name, "", l_color);
+    return Account(l_siteId, l_name, l_image, l_color);
 }
 
 int Account::generateColor()
