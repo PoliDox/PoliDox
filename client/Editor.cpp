@@ -328,27 +328,27 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     if (op == INSERT_OP){
 
         QTextCharFormat fmt;
-        tStyle style=symbol.getStyle();
+        tStyle style = symbol.getStyle();
 
         fmt.setFontPointSize(style.font_size);
-
         if(style.is_bold)
-            fmt.setFontWeight(75);
-        if(style.is_italic)
-            fmt.setFontItalic(true);
-        if(style.is_underline)
-            fmt.setFontUnderline(true);
+            fmt.setFontWeight(50);
 
-        int alignment=style.alignment;
+        fmt.setFontItalic(style.is_italic);
+        fmt.setFontUnderline(style.is_underline);
 
-        if(alignment==1)
-            m_textEdit->setAlignment(Qt::AlignLeft);
-        else if(alignment==4)
-            m_textEdit->setAlignment(Qt::AlignCenter);
-        else if(alignment==2)
-            m_textEdit->setAlignment(Qt::AlignRight);
-        else if(alignment==8)
-            m_textEdit->setAlignment(Qt::AlignJustify);
+        Qt::Alignment alignment = (Qt::Alignment) style.alignment;
+        m_textEdit->setAlignment(alignment);
+//        int alignment=style.alignment;
+
+//        if(alignment==1)
+//            m_textEdit->setAlignment(Qt::AlignLeft);
+//        else if(alignment==4)
+//            m_textEdit->setAlignment(Qt::AlignCenter);
+//        else if(alignment==2)
+//            m_textEdit->setAlignment(Qt::AlignRight);
+//        else if(alignment==8)
+//            m_textEdit->setAlignment(Qt::AlignJustify);
 
         remCursor.mergeCharFormat(fmt);
         m_textEdit->mergeCurrentCharFormat(fmt);
@@ -458,12 +458,13 @@ void Editor::setCharacterStyle(int index, Char &symbol){
 
     QTextCharFormat fmt=cursor.charFormat();
 
-    if(fmt.fontWeight()==50)
+    if(fmt.fontWeight() == 50)
         bold=false;
     else
         bold=true;
 
-    symbol.setStyle(fmt.fontFamily(),fmt.fontPointSize(),bold,fmt.fontItalic(),fmt.fontUnderline(),m_textEdit->alignment());
+    symbol.setStyle(fmt.fontFamily(), fmt.fontPointSize(), bold, fmt.fontItalic(),
+                    fmt.fontUnderline(), (int)m_textEdit->alignment());
 }
 
 void Editor::resetActionToggle(int pos,bool selection){

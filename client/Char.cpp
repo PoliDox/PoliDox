@@ -57,9 +57,8 @@ QJsonObject Char::toJson() const {
     styleJSON.insert("fontSize", style.font_size);
     styleJSON.insert("bold", style.is_bold);
     styleJSON.insert("italic", style.is_italic);
-    styleJSON.insert("underline", style.is_underline);
-    // TODO: ALIGNMENT
-    styleJSON.insert("alignment", 0);
+    styleJSON.insert("underline", style.is_underline);    
+    styleJSON.insert("alignment", style.alignment);
     charJSON.insert("style", styleJSON);
 
     return charJSON;
@@ -78,9 +77,9 @@ Char Char::fromJson(const QJsonObject& charJSON){
 
     QJsonObject styleJSON = charJSON["style"].toObject();
     tStyle l_style = { styleJSON["fontFamily"].toString(), styleJSON["fontSize"].toInt(),
-                       styleJSON["bold"].toInt(), styleJSON["italic"].toInt(),
-                       styleJSON["underline"].toInt() };
-    // TODO: ALIGNMENT!!
+                       styleJSON["bold"].toBool(), styleJSON["italic"].toBool(),
+                       styleJSON["underline"].toBool(), styleJSON["alignment"].toInt() };
+
 
     Char result(value, siteId, fractionalPosition);
     result.style = l_style;
@@ -89,18 +88,13 @@ Char Char::fromJson(const QJsonObject& charJSON){
 }
 
 
-void Char::setStyle(QString family, int size, int bold, int italic, int underline,int al){
+void Char::setStyle(QString family, int size, bool bold, bool italic, bool underline, int al){
 
-    style.font_family=family;
-    style.font_size=size;
-    style.is_bold=bold;
-    style.is_italic=italic;
-    style.is_underline=underline;
-    style.alignment=al;
-}
-
-tStyle Char::getStyle(){
-
-    return style;
+    style.font_family = family;
+    style.font_size = size;
+    style.is_bold = bold;
+    style.is_italic = italic;
+    style.is_underline = underline;
+    style.alignment = al;
 }
 

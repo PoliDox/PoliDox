@@ -14,12 +14,11 @@
 //TODO: ATTENZIONE, DEFINIRE COSTRUTTORE DI COPIA E OPERATORE DI ASSEGNAZIONE!!!
 
 typedef struct Style {
-
     QString font_family;
     int font_size;
-    int is_bold;
-    int is_italic;
-    int is_underline;
+    bool is_bold;
+    bool is_italic;
+    bool is_underline;
     int alignment;
 
 } tStyle;
@@ -44,12 +43,10 @@ public:
 
     // used by the CLIENTcontroller to create the message to be sent to the server
     QJsonObject toJson() const;
-    static Char fromJson(const QJsonObject& _JSONobj);
-    //static Char fromJson2(const QString& stringReturnedFromDb);
+    static Char fromJson(const QJsonObject& _JSONobj);    
 
-
-    void setStyle(QString family, int size, int bold, int italic, int underline,int al);   
-    tStyle getStyle();
+    void setStyle(QString family, int size, bool bold, bool italic, bool underline, int aligmnent);
+    tStyle getStyle() { return style; }
 
 };
 
