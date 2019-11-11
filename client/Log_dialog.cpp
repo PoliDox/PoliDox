@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QListWidget>
 #include <iostream>
+#include <QFileDialog>
+#include <QComboBox>
 
 Log_Dialog::Log_Dialog(QWidget *parent) :
     QDialog(parent),
@@ -155,40 +157,25 @@ void Log_Dialog::createRegistrationForm(){
 
     ui->groupBox->setFixedSize(330,400);
 
-
-    QLabel* name=new QLabel("Name",ui->groupBox);
-    QLabel* surname=new QLabel("Surname",ui->groupBox);
     QLabel* usr=new QLabel("Username",ui->groupBox);
     QLabel* pwd=new QLabel("Password",ui->groupBox);
 
-    name->setObjectName("name");
-    surname->setObjectName("surname");
     usr->setObjectName("user");
     pwd->setObjectName("pwd");
 
-    name->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
-    surname->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     usr->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     pwd->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
 
-    QLineEdit* name_form=new QLineEdit(ui->groupBox);
-    QLineEdit* surname_form=new QLineEdit(ui->groupBox);
     QLineEdit* usr_form=new QLineEdit(ui->groupBox);
     QLineEdit* pwd_form=new QLineEdit(ui->groupBox);
     pwd_form->setEchoMode(QLineEdit::Password);
 
-    name_form->setStyleSheet("background-color:transparent;");
-    surname_form->setStyleSheet("background-color:transparent;");
     usr_form->setStyleSheet("background-color:transparent;");
     pwd_form->setStyleSheet("background-color:transparent;");
 
-    name_form->setObjectName("name_line");
-    surname_form->setObjectName("surname_line");
     usr_form->setObjectName("user_line");
     pwd_form->setObjectName("pwd_line");
 
-    name_form->setPlaceholderText("Insert your name");
-    surname_form->setPlaceholderText("Insert your surname");
     usr_form->setPlaceholderText("Insert your username");
     pwd_form->setPlaceholderText("Insert your password");
 
@@ -199,26 +186,50 @@ void Log_Dialog::createRegistrationForm(){
     submit->setObjectName("submit");
     cancel->setObjectName("cancel");
 
+    QLabel* img_label=new QLabel("Profile pic",ui->groupBox);
+    QLabel* img_path=new QLabel("No file selected",ui->groupBox);
+    QPushButton* img_selection=new QPushButton("upload file",ui->groupBox);
+    QLabel* img_show=new QLabel(ui->groupBox);
+
+    connect(img_selection,&QPushButton::clicked,this,&Log_Dialog::upload_clicked);
+
+    img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
+    img_path->setStyleSheet("background-color:transparent;border: 1px solid #8d918d");
+    img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
+    //img_show->setStyleSheet("background-color:navy;");
+
+    img_label->setObjectName("img_label");
+    img_selection->setObjectName("img_selection");
+    img_path->setObjectName("img_path");
+    img_show->setObjectName("img_show");
+
+
+
     QGridLayout* grid_layout = static_cast<QGridLayout*>(ui->groupBox->layout());
 
+
+    usr->setFixedSize(200,30);
+    pwd->setFixedSize(200,30);
+    img_label->setFixedSize(200,30);
+    submit->setFixedSize(100,30);
+    img_selection->setFixedSize(100,30);
+    img_path->setFixedSize(200,30);
+    img_show->setFixedSize(100,100);
+
+    grid_layout->setHorizontalSpacing(0);
     grid_layout->setVerticalSpacing(0);
 
-    name->setFixedSize(300,30);
-    surname->setFixedSize(300,30);
-    usr->setFixedSize(300,30);
-    pwd->setFixedSize(300,30);
-    submit->setFixedSize(100,30);
+    grid_layout->addWidget(usr,0,0,nullptr);
+    grid_layout->addWidget(usr_form,1,0,nullptr);
+    grid_layout->addWidget(pwd,2,0,nullptr);
+    grid_layout->addWidget(pwd_form,3,0,nullptr);
+    grid_layout->addWidget(img_label,4,0,nullptr);
+    grid_layout->addWidget(img_path,5,0,nullptr);
+    grid_layout->addWidget(img_show,5,1,nullptr);
+    grid_layout->addWidget(img_selection,6,0,nullptr);
 
-    grid_layout->addWidget(name,0,0,nullptr);
-    grid_layout->addWidget(name_form,1,0,nullptr);
-    grid_layout->addWidget(surname,2,0,nullptr);
-    grid_layout->addWidget(surname_form,3,0,nullptr);
-    grid_layout->addWidget(usr,4,0,nullptr);
-    grid_layout->addWidget(usr_form,5,0,nullptr);
-    grid_layout->addWidget(pwd,6,0,nullptr);
-    grid_layout->addWidget(pwd_form,7,0,nullptr);
-    grid_layout->addWidget(submit,9,0,nullptr);
-    grid_layout->addWidget(cancel,9,1,nullptr);
+    grid_layout->addWidget(submit,7,0,nullptr);
+    grid_layout->addWidget(cancel,7,1,nullptr);
 
 
     connect(submit,&QPushButton::clicked,this,&Log_Dialog::sendRegistrationData);
@@ -230,11 +241,7 @@ void Log_Dialog::cleanRegistrationForm(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
-    QLineEdit* name_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("name_line"));
-    QLineEdit* surname_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("surname_line"));
 
-    QLabel* name=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("name"));
-    QLabel* surname=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("surname"));
     QLabel* user=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("user"));
     QLabel* pwd=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("pwd"));
 
@@ -246,11 +253,7 @@ void Log_Dialog::cleanRegistrationForm(){
 
     delete user_linedit;
     delete pwd_linedit;
-    delete name_linedit;
-    delete surname_linedit;
 
-    delete name;
-    delete surname;
     delete user;
     delete pwd;
 
@@ -284,5 +287,30 @@ void Log_Dialog::onClickedFile(QListWidgetItem* item){
         this->hide();
         emit fileSelected(item->text());
     }
+
+}
+
+void Log_Dialog::upload_clicked(bool checked){
+
+
+    QFileDialog* file_selection=new QFileDialog(ui->groupBox);
+    file_selection->setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
+
+    file_selection->show();
+
+    QString filePath;
+    if (file_selection->exec())
+         filePath = file_selection->selectedFiles().at(0);
+
+    QList<QString>splitted=filePath.split("/");
+    QString fileName=splitted.at(splitted.size()-1);
+
+    QLabel* img_path=ui->groupBox->findChild<QLabel*>("img_path");
+    img_path->setText(fileName);
+
+    delete file_selection;
+
+     QLabel* img_show=ui->groupBox->findChild<QLabel*>("img_show");
+     img_show->setStyleSheet("border-image: url("+filePath+") 0 0 0 0 stretch stretch;");
 
 }

@@ -38,6 +38,7 @@ private slots:
     void on_pushButton_register_clicked();
     void onClickedFile(QListWidgetItem *item);
     void sendRegistrationData();
+    void upload_clicked(bool checked);
 
 private:
     Ui::Log_Dialog *ui;
