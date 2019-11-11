@@ -100,9 +100,8 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
     else if (header == "registerUser"){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
-
-        QByteArray image ;// = requestObjJSON["image"].toString();  //TODO: da sistemare, come convertire l'immagine ???
-                                                                    //      vedere anche Account::toJSON()
+        QString strImage = requestObjJSON["image"].toString();
+        QByteArray image = QByteArray::fromBase64(strImage.toLatin1());
 
         bool registrationSuccess = false;
         int siteId = this->dbOperations->registerUser(name, password, image);

@@ -132,7 +132,10 @@ void Log_Dialog::sendRegistrationData(){
 
     //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
 
-    emit signupDataSubmitted(username, password);
+
+    // TODO: passa l'immagine profilo
+    // Consider using the constructor QPixmap(const QString &fileName, const char *format = nullptr)
+    emit signupDataSubmitted(username, password, QPixmap());
 
 }
 

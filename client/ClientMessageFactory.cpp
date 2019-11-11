@@ -1,5 +1,5 @@
 #include "ClientMessageFactory.h"
-
+#include <QBuffer>
 
 QByteArray ClientMessageFactory::createInsertMessage(const Char& p_char, int p_siteId)
 {
@@ -30,12 +30,18 @@ QByteArray ClientMessageFactory::createDeleteMessage(const Char &p_char, int p_s
     return l_doc.toJson(QJsonDocument::Indented);
 }
 
-QByteArray ClientMessageFactory::createRegisterMessage(const QString &p_user, const QString &p_passw)
+QByteArray ClientMessageFactory::createRegisterMessage(const QString &p_user, const QString &p_passw, const QPixmap& p_pic)
 {
     QJsonObject l_obj;
     l_obj.insert("action", "registerUser");
     l_obj.insert("name", p_user);
     l_obj.insert("password", p_passw);
+    // insert image
+    QBuffer buffer;
+    buffer.open(QIODevice::WriteOnly);
+    p_pic.save(&buffer, "PNG");
+    auto const encoded = buffer.data().toBase64();
+    l_obj.insert("image", QLatin1String(encoded));
 
     QJsonDocument l_doc(l_obj);
     return l_doc.toJson(QJsonDocument::Indented);

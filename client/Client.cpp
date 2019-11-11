@@ -17,9 +17,9 @@ Client::Client()
         m_socket.sendTextMessage(message);
     });
 
-    connect(&loginWindow, &Log_Dialog::signupDataSubmitted, this, [&](QString p_user, QString p_passw) {
+    connect(&loginWindow, &Log_Dialog::signupDataSubmitted, this, [&](QString p_user, QString p_passw, QPixmap p_pic) {
         if (p_user != "You") {
-            QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw);
+            QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw, p_pic);
             m_socket.sendTextMessage(message);
         } else {
             QMessageBox::warning(&loginWindow, "Registration", "\"You\" is not a valid username");

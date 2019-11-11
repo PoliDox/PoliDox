@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include <QListWidgetItem>
+#include <QPixmap>
 #include "Editor.h"
 #include "ListFiles.h"
 #include "NewFileDialog.h"
@@ -28,7 +29,7 @@ public:
 
 signals:
     void authDataSubmitted(QString p_user, QString p_passw);
-    void signupDataSubmitted(QString p_user, QString p_passw);
+    void signupDataSubmitted(QString p_user, QString p_passw, QPixmap p_pic);
     void fileSelected(QString p_filename);
     void newFileSelected(QString p_filename);
     void uriSelected(QString p_uri);
