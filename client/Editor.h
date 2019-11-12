@@ -42,7 +42,7 @@ public:
     explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, const QList<Account>& contributorsOnline = {}, const QList<Account>& contributorsOffline = {});
     ~Editor() override;
 
-    void init(const QString &p_text);
+    void init(const QVector<Char>& p_text);
     QChar at(int pos);
     void addClient(const Account& user);
     void removeClient(const Account& account);
@@ -93,6 +93,7 @@ private:
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
     void addOnlineUser(const Account& account);
     void addOfflineUser(const Account& account);
+    void addChar(const Char& p_char, QTextCursor& p_cursor);
 
     ClientController *controller;
     bool handlingOperation;

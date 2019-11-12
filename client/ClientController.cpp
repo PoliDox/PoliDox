@@ -52,11 +52,12 @@ void ClientController::init(const QJsonArray& p_crdt) {
     std::vector<std::vector<Char>> symbolsOfOpenedDocument = CRDT::fromJson(p_crdt);
     this->m_crdt->setSymbols(symbolsOfOpenedDocument);
 
-    QString text;
+    QVector<Char> text;
 
     for(std::vector<Char> elem : this->m_crdt->getSymbols())
         for(Char symbol : elem)
-            text += symbol.getValue();
+            text += symbol;
+
     m_editor->init(text);
 }
 
@@ -99,6 +100,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     // No switch case for strings in C++ :((
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
+        //qDebug() << "REMOTE ISNERT:" << _JSONstring.toUtf8().constData();
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);

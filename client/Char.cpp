@@ -77,8 +77,8 @@ Char Char::fromJson(const QJsonObject& charJSON){
 
     QJsonObject styleJSON = charJSON["style"].toObject();
     tStyle l_style = { styleJSON["fontFamily"].toString(), styleJSON["fontSize"].toInt(),
-                       styleJSON["bold"].toBool(), styleJSON["italic"].toBool(),
-                       styleJSON["underline"].toBool(), styleJSON["alignment"].toInt() };
+                       styleJSON["bold"].toInt(), styleJSON["italic"].toInt(),
+                       styleJSON["underline"].toInt(), styleJSON["alignment"].toInt() };
 
 
     Char result(value, siteId, fractionalPosition);

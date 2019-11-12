@@ -14,11 +14,12 @@
 //TODO: ATTENZIONE, DEFINIRE COSTRUTTORE DI COPIA E OPERATORE DI ASSEGNAZIONE!!!
 
 typedef struct Style {
+    // DON'T CHANGE THE ORDER without changing fromJson()
     QString font_family;
     int font_size;
-    bool is_bold;
-    bool is_italic;
-    bool is_underline;
+    int is_bold;
+    int is_italic;
+    int is_underline;
     int alignment;
 
 } tStyle;
@@ -34,6 +35,7 @@ private:
 public:
     Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition);
     Char(char p_value, int p_siteId);
+    Char() = default;
     std::vector<int> getFractionalPosition();
     void setFractionalPosition(std::vector<int>& fractionalPosition);
     char getValue() const;
@@ -46,7 +48,7 @@ public:
     static Char fromJson(const QJsonObject& _JSONobj);    
 
     void setStyle(QString family, int size, bool bold, bool italic, bool underline, int aligmnent);
-    tStyle getStyle() { return style; }
+    tStyle getStyle() const { return style; }
 
 };
 

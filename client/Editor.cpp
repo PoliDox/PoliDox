@@ -101,10 +101,12 @@ Editor::~Editor()
     delete ui;
 }
 
-void Editor::init(const QString &p_text)
+void Editor::init(const QVector<Char>& p_text)
 {
     handlingOperation = true;
-    m_textEdit->setPlainText(p_text);
+    for (const Char& symbol : p_text) {
+        addChar(symbol, *m_localCursor);
+    }
     m_textEdit->show();
     handlingOperation = false;
 }
@@ -226,6 +228,27 @@ void Editor::addOfflineUser(const Account& account)
     ui->offlineList->addItem(item);
 }
 
+void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
+{
+    QTextCharFormat fmt;
+    tStyle style = p_char.getStyle();
+
+    fmt.setFontPointSize(style.font_size);
+    if (style.is_bold)
+        fmt.setFontWeight(QFont::Bold);
+
+    fmt.setFontItalic(style.is_italic);
+    fmt.setFontUnderline(style.is_underline);
+
+    Qt::Alignment alignment = (Qt::Alignment) style.alignment;
+    m_textEdit->setAlignment(alignment);
+
+    p_cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+    p_cursor.insertText(QString(p_char.getValue()));
+}
+
 void Editor::removeClient(const Account& account){
 
     // 1. Update data structures
@@ -262,7 +285,7 @@ void Editor::initRichTextToolBar(){
     m_fontSize = new QSpinBox(this->ui->textRichToolBar);
 
     m_textEdit->setFont(m_font->currentFont());
-    m_textEdit->setFontPointSize(11);
+    m_textEdit->setFontPointSize(20);
     m_fontSize->setValue(m_textEdit->fontPointSize());
 
     this->ui->textRichToolBar->addWidget(m_font);
@@ -311,51 +334,12 @@ void Editor::addClient(const Account& user)
 
 void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int siteId)
 {
-    /*
-    qDebug() << "Cursors positions: ";
-    for (auto it = m_users.begin(); it != m_users.end(); it++) {
-        int tmp = it.key();
-        User& tmpp = it.value();
-        qDebug() << tmp << ": " << tmpp.cursor.position();
-    }
-    qDebug() << "local: " << m_localCursor->position();
-    */
-
     handlingOperation = true;
     QTextCursor& remCursor = m_onlineUsers[siteId].cursor;
 
     remCursor.setPosition(position);
-    if (op == INSERT_OP){
-
-        QTextCharFormat fmt;
-        tStyle style = symbol.getStyle();
-
-        fmt.setFontPointSize(style.font_size);
-        if(style.is_bold)
-            fmt.setFontWeight(50);
-
-        fmt.setFontItalic(style.is_italic);
-        fmt.setFontUnderline(style.is_underline);
-
-        Qt::Alignment alignment = (Qt::Alignment) style.alignment;
-        m_textEdit->setAlignment(alignment);
-//        int alignment=style.alignment;
-
-//        if(alignment==1)
-//            m_textEdit->setAlignment(Qt::AlignLeft);
-//        else if(alignment==4)
-//            m_textEdit->setAlignment(Qt::AlignCenter);
-//        else if(alignment==2)
-//            m_textEdit->setAlignment(Qt::AlignRight);
-//        else if(alignment==8)
-//            m_textEdit->setAlignment(Qt::AlignJustify);
-
-        remCursor.mergeCharFormat(fmt);
-        m_textEdit->mergeCurrentCharFormat(fmt);
-
-        remCursor.insertText(QString(symbol.getValue()));
-
-
+    if (op == INSERT_OP){      
+       addChar(symbol, remCursor);
     }
     else if (op == DELETE_OP)
        remCursor.deleteChar();
@@ -368,13 +352,7 @@ void Editor::updateCursors()
 {
     for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
         User& user = it.value();                
-        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
-        qDebug() << "remoteCursor " << user.account.getName() << " (" << user.account.getSiteId()
-                 << ") at position " << user.cursor.position() << " (coord. " << remoteCoord.left() << ","
-                 << remoteCoord.top() << ")";
-        QRect localCoord = m_textEdit->cursorRect(*m_localCursor);
-        qDebug() << "localCursor at position " << m_localCursor->position() << "(coord. " << localCoord.left()
-                 << "," << localCoord.top() << ")";
+        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);        
         user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
         user.label->setVisible(true);
     }
