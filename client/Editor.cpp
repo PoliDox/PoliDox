@@ -14,8 +14,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QSpinBox>
-#include <QFontComboBox>
+
 #include <QPushButton>
 #include <QCheckBox>
 #include <iostream>
@@ -259,18 +258,19 @@ void Editor::removeClient(const Account& account){
 void Editor::initRichTextToolBar(){
 
 
-    QFontComboBox* font=new QFontComboBox(this->ui->textRichToolBar);
-    QSpinBox* spinBox=new QSpinBox(this->ui->textRichToolBar);
+    m_font = new QFontComboBox(this->ui->textRichToolBar);
+    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
 
-    m_textEdit->setFont(font->currentFont());
-    m_textEdit->setFontPointSize(20);
-    spinBox->setValue(m_textEdit->fontPointSize());
+    m_textEdit->setFont(m_font->currentFont());
+    m_textEdit->setFontPointSize(11);
+    m_fontSize->setValue(m_textEdit->fontPointSize());
 
-    this->ui->textRichToolBar->addWidget(font);
-    this->ui->textRichToolBar->addWidget(spinBox);
+    this->ui->textRichToolBar->addWidget(m_font);
+    this->ui->textRichToolBar->addWidget(m_fontSize);
 
-    connect(font,&QFontComboBox::currentFontChanged,this,&Editor::fontFamilyChanged);
-    connect(spinBox,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),this,&Editor::fontSizeChanged);
+    connect(m_font, &QFontComboBox::currentFontChanged, this, &Editor::onFontFamilyChanged);
+    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Editor::onFontSizeChanged);
+    connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
 
     QAction* separator1=this->ui->toolBar_2->actions().at(0);
     QAction* separator2=this->ui->textRichToolBar->actions().at(0);
@@ -597,13 +597,13 @@ void Editor::on_actionUnderlined_triggered()
 
 }
 
-void Editor::fontSizeChanged(int i){
+void Editor::onFontSizeChanged(int i){
 
     m_textEdit->setFontPointSize(i);
 
 }
 
-void Editor::fontFamilyChanged(const QFont& font){
+void Editor::onFontFamilyChanged(const QFont& font){
 
     QTextCursor cursor = m_textEdit->textCursor();
     QTextCharFormat fmt;
@@ -612,6 +612,15 @@ void Editor::fontFamilyChanged(const QFont& font){
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
+}
+
+void Editor::onCharFormatChanged(const QTextCharFormat &f)
+{
+    ui->actionBold->setChecked(f.font().bold());
+    ui->actionItalic->setChecked(f.font().italic());
+    ui->actionUnderlined->setChecked(f.font().underline());
+    m_font->setCurrentFont(f.font());
+    m_fontSize->setValue(f.font().pointSize());
 }
 
 void Editor::on_actionLeftAllignmet_triggered()

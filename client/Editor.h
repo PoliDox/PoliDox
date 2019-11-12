@@ -7,6 +7,8 @@
 #include <QMap>
 #include <QLabel>
 #include <QListWidgetItem>
+#include <QSpinBox>
+#include <QFontComboBox>
 #include "Account.h"
 #include "Styler.h"
 #include "ClientController.h"
@@ -70,8 +72,9 @@ private slots:
     void on_actionItalic_triggered();
     void on_actionUnderlined_triggered();
 
-    void fontSizeChanged(int i);
-    void fontFamilyChanged(const QFont& font);
+    void onFontSizeChanged(int i);
+    void onFontFamilyChanged(const QFont& font);
+    void onCharFormatChanged(const QTextCharFormat & f);
 
     void on_actionLeftAllignmet_triggered();
     void on_actionAlignCenter_triggered();
@@ -102,6 +105,9 @@ private:
     QList<Account> m_offlineUsers;
     ShowUriDialog *m_showUriDialog;
     Ui::Editor *ui;
+    // TODO Orribile: spostare in editor.ui
+    QFontComboBox* m_font;
+    QSpinBox* m_fontSize;
 
 protected:
     //bool eventFilter(QObject *target, QEvent *event) override;
