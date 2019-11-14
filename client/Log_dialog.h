@@ -52,7 +52,6 @@ private:
     void cleanRegistrationForm();
     void showLoginForm();
     void hideLoginForm();
-    void reject();
 };
 
 #endif // LOG_DIALOG_H
