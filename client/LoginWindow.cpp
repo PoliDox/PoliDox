@@ -1,5 +1,5 @@
-﻿#include "Log_dialog.h"
-#include "ui_log_dialog.h"
+﻿#include "LoginWindow.h"
+#include "ui_loginwindow.h"
 #include "ClientMessageFactory.h"
 #include <QMessageBox>
 #include <QDebug>
@@ -9,9 +9,9 @@
 #include <QComboBox>
 
 
-Log_Dialog::Log_Dialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::Log_Dialog)
+LoginWindow::LoginWindow(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::LoginWindow)
 {
     ui->setupUi(this);
     this->setFixedSize(374,575);
@@ -44,17 +44,17 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
 
 }
 
-Log_Dialog::~Log_Dialog()
+LoginWindow::~LoginWindow()
 {
     delete ui;
 }
 
-void Log_Dialog::setEditor(Editor *editor){
+void LoginWindow::setEditor(Editor *editor){
     this->editor = editor;
 }
 
 /* METODO SPOSTATO IN LISTFILES */
-void Log_Dialog::displayFiles(const QList<QString> p_files)
+void LoginWindow::displayFiles(const QList<QString> p_files)
 {
     // TODO: replace "SignIn" and "Register" button with a box including all available files
     // When a file is selected, emit the signal onFileSelected
@@ -67,7 +67,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
     this->ui->groupBox->setFixedSize(330,400);
 
     QListWidget* files=new QListWidget(this->ui->groupBox);
-    connect(files,&QListWidget::itemDoubleClicked,this,&Log_Dialog::onClickedFile);
+    connect(files,&QListWidget::itemDoubleClicked,this,&LoginWindow::onClickedFile);
 
     QString new_file("Create new file");
     QString fileFromUri("Insert URI");
@@ -87,7 +87,7 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
 
 }
 
-void Log_Dialog::on_pushButton_login_clicked()
+void LoginWindow::on_pushButton_login_clicked()
 {
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_password->text();
@@ -96,7 +96,7 @@ void Log_Dialog::on_pushButton_login_clicked()
 
 }
 
-void Log_Dialog::on_pushButton_register_clicked()
+void LoginWindow::on_pushButton_register_clicked()
 {
 
     /*QSizePolicy sp_retain = ui->groupBox->sizePolicy();
@@ -110,7 +110,7 @@ void Log_Dialog::on_pushButton_register_clicked()
 }
 
 
-void Log_Dialog::registrationOk(){
+void LoginWindow::registrationOk(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
@@ -130,7 +130,7 @@ void Log_Dialog::registrationOk(){
 }
 
 
-void Log_Dialog::sendRegistrationData(){
+void LoginWindow::sendRegistrationData(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
@@ -147,7 +147,7 @@ void Log_Dialog::sendRegistrationData(){
 
 }
 
-void Log_Dialog::showLoginForm(){
+void LoginWindow::showLoginForm(){
 
     QList<QWidget*> list=this->ui->groupBox->findChildren<QWidget*>();
 
@@ -155,7 +155,7 @@ void Log_Dialog::showLoginForm(){
             (*it)->show();
 }
 
-void Log_Dialog::hideLoginForm(){
+void LoginWindow::hideLoginForm(){
 
     QList<QWidget*> list=ui->groupBox->findChildren<QWidget*>();
 
@@ -164,7 +164,7 @@ void Log_Dialog::hideLoginForm(){
 
 }
 
-void Log_Dialog::createRegistrationForm(){
+void LoginWindow::createRegistrationForm(){
 
     ui->groupBox->setFixedSize(330,400);
 
@@ -202,7 +202,7 @@ void Log_Dialog::createRegistrationForm(){
     QPushButton* img_selection=new QPushButton("upload file",ui->groupBox);
     QLabel* img_show=new QLabel(ui->groupBox);
 
-    connect(img_selection,&QPushButton::clicked,this,&Log_Dialog::upload_clicked);
+    connect(img_selection,&QPushButton::clicked,this,&LoginWindow::upload_clicked);
 
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     img_path->setStyleSheet("background-color:transparent;border: 1px solid #8d918d");
@@ -243,12 +243,12 @@ void Log_Dialog::createRegistrationForm(){
     grid_layout->addWidget(cancel,7,1,nullptr);
 
 
-    connect(submit,&QPushButton::clicked,this,&Log_Dialog::sendRegistrationData);
+    connect(submit,&QPushButton::clicked,this,&LoginWindow::sendRegistrationData);
 
-    connect(cancel,&QPushButton::clicked,this,&Log_Dialog::cleanRegistrationForm);
+    connect(cancel,&QPushButton::clicked,this,&LoginWindow::cleanRegistrationForm);
 
 }
-void Log_Dialog::cleanRegistrationForm(){
+void LoginWindow::cleanRegistrationForm(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
@@ -285,7 +285,7 @@ void Log_Dialog::cleanRegistrationForm(){
 
 }
 
-void Log_Dialog::onClickedFile(QListWidgetItem* item){
+void LoginWindow::onClickedFile(QListWidgetItem* item){
 
     //qDebug() << "SELECTED FILE: "<< item->text();
 
@@ -301,7 +301,7 @@ void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
 }
 
-void Log_Dialog::upload_clicked(bool checked){
+void LoginWindow::upload_clicked(bool checked){
 
     QFileDialog* file_selection=new QFileDialog(ui->groupBox);
     file_selection->setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));

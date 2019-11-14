@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("PoliDox");
-    QCoreApplication::setApplicationName("PoliDox client");
+    QCoreApplication::setApplicationName("PoliDox");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
     Client l_client;

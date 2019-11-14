@@ -1,7 +1,7 @@
 #ifndef LOG_DIALOG_H
 #define LOG_DIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QList>
 #include <QString>
 #include <QListWidgetItem>
@@ -12,16 +12,16 @@
 #include "InsertUriDialog.h"
 
 namespace Ui {
-class Log_Dialog;
+class LoginWindow;
 }
 
-class Log_Dialog : public QDialog
+class LoginWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Log_Dialog(QWidget *parent = nullptr);
-    ~Log_Dialog();
+    explicit LoginWindow(QWidget *parent = nullptr);
+    ~LoginWindow();
     void setEditor(Editor *);
 
     void displayFiles(const QList<QString> p_files);
@@ -42,7 +42,7 @@ private slots:
     void upload_clicked(bool checked);
 
 private:
-    Ui::Log_Dialog *ui;
+    Ui::LoginWindow *ui;
     Editor *editor;
     ListFiles *lf;
     NewFileDialog *nfd;

@@ -4,7 +4,7 @@
 #include <QObject>
 #include "ClientController.h"
 #include "Account.h"
-#include "Log_dialog.h"
+#include "LoginWindow.h"
 #include <QList>
 
 class Client : public QObject
@@ -15,7 +15,7 @@ private:
     ClientController *m_document;
     QWebSocket m_socket;
     Account m_user;
-    Log_Dialog loginWindow;
+    LoginWindow loginWindow;
 
 public:
     Client();

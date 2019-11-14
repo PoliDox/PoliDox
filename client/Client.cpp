@@ -3,21 +3,21 @@
 #include "CrdtClient.h"
 #include <QDebug>
 #include <QMessageBox>
+#include <QTimer>
+#include <QApplication>
 
 Client::Client()
 {
-    m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));
-    // TODO: CHECK IF OPEN SUCCEEDS!
-
+    m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));    
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
-    connect(&loginWindow, &Log_Dialog::authDataSubmitted, this, [&](QString p_user, QString p_passw) {   
+    connect(&loginWindow, &LoginWindow::authDataSubmitted, this, [&](QString p_user, QString p_passw) {
         QByteArray message = ClientMessageFactory::createLoginMessage(p_user, p_passw);
         m_socket.sendTextMessage(message);
     });
 
-    connect(&loginWindow, &Log_Dialog::signupDataSubmitted, this, [&](QString p_user, QString p_passw, QPixmap p_pic) {
+    connect(&loginWindow, &LoginWindow::signupDataSubmitted, this, [&](QString p_user, QString p_passw, QPixmap p_pic) {
         if (p_user != "You") {
             QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw, p_pic);
             m_socket.sendTextMessage(message);
@@ -26,24 +26,32 @@ Client::Client()
         }
     });
 
-    connect(&loginWindow, &Log_Dialog::fileSelected, this, [&](const QString& p_filename) {
+    connect(&loginWindow, &LoginWindow::fileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createOpenFileMessage(p_filename);
         m_socket.sendTextMessage(message);
         // TODO: delete this, c_fileName should be filled at openFileRepl
         //c_fileName = p_filename;
     });
 
-    connect(&loginWindow, &Log_Dialog::uriSelected, this, [&](const QString& p_uri) {
+    connect(&loginWindow, &LoginWindow::uriSelected, this, [&](const QString& p_uri) {
         QByteArray message = ClientMessageFactory::createOpenFileMessage(QString(), p_uri);
         m_socket.sendTextMessage(message);
     });
 
-    connect(&loginWindow, &Log_Dialog::newFileSelected, this, [&](const QString& p_filename) {
+    connect(&loginWindow, &LoginWindow::newFileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createNewFileMessage(p_filename);
         m_socket.sendTextMessage(message);
     });
 
-    loginWindow.exec();
+    QTimer::singleShot(4000, this, [&](){
+        if (m_socket.state() != QAbstractSocket::ConnectedState) {
+            QMessageBox::critical(&loginWindow, "Connection error", "Couldn't connect to server. Please close the application and retry.");
+            QApplication::quit();
+        }
+
+    });
+
+    loginWindow.show();
 
 }
 

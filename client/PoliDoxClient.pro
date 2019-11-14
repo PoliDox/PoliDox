@@ -16,12 +16,12 @@ HEADERS += \
     ClientMessageFactory.h \
     Account.h \
     ListFiles.h \
-    Log_dialog.h \
     Client.h \
     NewFileDialog.h \
     Styler.h \
     InsertUriDialog.h \
-    ShowUriDialog.h
+    ShowUriDialog.h \
+    LoginWindow.h
 
 SOURCES += \
     CRDT.cpp \
@@ -29,7 +29,6 @@ SOURCES += \
     CrdtClient.cpp \
     Editor.cpp \
     ListFiles.cpp \
-    Log_dialog.cpp \
     Account.cpp \
     NewFileDialog.cpp \
     Styler.cpp \
@@ -38,7 +37,8 @@ SOURCES += \
     ClientMessageFactory.cpp \
     Client.cpp \
     InsertUriDialog.cpp \
-    ShowUriDialog.cpp
+    ShowUriDialog.cpp \
+    LoginWindow.cpp
 
 DISTFILES += \
     images/filenew.png \
@@ -48,10 +48,10 @@ DISTFILES += \
 FORMS += \
     editor.ui \
     listfiles.ui \
-    log_dialog.ui \
     newfiledialog.ui \
     inserturidialog.ui \
-    showuridialog.ui
+    showuridialog.ui \
+    loginwindow.ui
 
 RESOURCES += \
     Resources.qrc
