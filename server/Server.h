@@ -8,6 +8,8 @@
 #include "DatabaseManager.h"
 #include "ServerMessageFactory.h"
 
+#define PORT_NUMBER 5678
+
 class ServerController;
 
 class Server : public QObject {
@@ -25,7 +27,7 @@ private:
     int getDigits(std::string s);
 
 public:
-    explicit Server(quint16 port, QObject *parent = nullptr);
+    explicit Server(QObject *parent = nullptr);
     Account* getAccount(QWebSocket *socketOfAccount);
     DatabaseManager* getDb();
     void removeSocket2AccountPair(QWebSocket *socketOfAccount);

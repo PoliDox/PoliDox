@@ -10,7 +10,6 @@
 #include "CRDT.h"
 
 
-
 class ServerController : public QObject {
     Q_OBJECT
 

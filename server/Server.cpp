@@ -9,7 +9,7 @@ static QString getIdentifier(QWebSocket *peer) {
 }
 
 
-Server::Server(quint16 port, QObject *parent) : QObject(parent) {
+Server::Server(QObject *parent) : QObject(parent) {
     thread()->setObjectName("Main Thread");
 
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Polidox Server"),
@@ -17,11 +17,12 @@ Server::Server(quint16 port, QObject *parent) : QObject(parent) {
 
     this->dbOperations = new DatabaseManager();
 
-    if (m_pWebSocketServer->listen(QHostAddress::Any, port))
+    if (m_pWebSocketServer->listen(QHostAddress::Any, PORT_NUMBER))
     {
-        QTextStream(stdout) << "PoliDox server listening on port " << port << '\n';
+        QTextStream(stdout) << "PoliDox server listening on port " << PORT_NUMBER << '\n';
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, &Server::onNewConnection);
     } else {
+        qDebug() << "Couldn't bind to port " << PORT_NUMBER;
         qDebug() << m_pWebSocketServer->errorString();
     }
 }

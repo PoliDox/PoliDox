@@ -8,7 +8,8 @@
 
 Client::Client()
 {
-    m_socket.open(QUrl(QStringLiteral("ws://127.0.0.1:5678")));    
+    QString url = QString("ws://") + SERVER_IP + QString(":") + QString::number(PORT_NUMBER);
+    m_socket.open(QUrl(url));
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
