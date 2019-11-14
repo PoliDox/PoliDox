@@ -12,7 +12,7 @@ Internally it is makes use of the Crdt algorithm, which is described in the webs
 
 ### Smaller paragraph
 
-[here is a link](https://www.dinamosassari.com)
+[here is a link](https://www.dinamobasket.com)
 
 and here is a bullet list:
 - a
