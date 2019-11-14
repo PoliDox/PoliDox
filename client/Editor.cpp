@@ -37,6 +37,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
 
+    setWindowIcon(QIcon("://images/images/logo_small.png"));
+
     m_textDoc = new QTextDocument(m_textEdit);
     m_textEdit->setDocument(m_textDoc);
     m_localCursor = new QTextCursor(m_textDoc);

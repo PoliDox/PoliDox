@@ -28,5 +28,6 @@
         <file>images/logo.png</file>
         <file>images/offline.png</file>
         <file>images/online.png</file>
+        <file>images/logo_small.png</file>
     </qresource>
 </RCC>

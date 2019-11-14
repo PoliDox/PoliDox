@@ -1,4 +1,4 @@
-#include "Log_dialog.h"
+﻿#include "Log_dialog.h"
 #include "ui_log_dialog.h"
 #include "ClientMessageFactory.h"
 #include <QMessageBox>
@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QComboBox>
 
+
 Log_Dialog::Log_Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Log_Dialog)
@@ -15,6 +16,8 @@ Log_Dialog::Log_Dialog(QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(374,575);
     this->ui->logo->setStyleSheet("background-image: url(://images/images/logo.png);background-repeat:none;background-position:center;");
+
+    setWindowIcon(QIcon("://images/images/logo_small.png"));
 
     this->ui->pushButton_register->setStyleSheet("color:crimson");
     //this->ui->pushButton_login->setStyleSheet("background-color:#4d79ff;color:white");
@@ -68,8 +71,13 @@ void Log_Dialog::displayFiles(const QList<QString> p_files)
 
     QString new_file("Create new file");
     QString fileFromUri("Insert URI");
+
+    QListWidgetItem *separator = new QListWidgetItem("\t__________________________\n");
+    separator->setFlags(Qt::NoItemFlags);
     files->addItem(new_file);
     files->addItem(fileFromUri);
+    files->addItem(separator);
+
     files->addItems(p_files);
 
     QGridLayout* grid_layout = new QGridLayout(this->ui->groupBox);
@@ -283,7 +291,7 @@ void Log_Dialog::onClickedFile(QListWidgetItem* item){
 
     if(item->text().compare("Create new file") == 0){
         nfd->show();
-    }else if(item->text().compare("Insert URI")==0){
+    }else if(item->text().compare("Insert URI") == 0){
         uriDialog->show();
     }
     else{
@@ -294,7 +302,6 @@ void Log_Dialog::onClickedFile(QListWidgetItem* item){
 }
 
 void Log_Dialog::upload_clicked(bool checked){
-
 
     QFileDialog* file_selection=new QFileDialog(ui->groupBox);
     file_selection->setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
