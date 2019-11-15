@@ -72,12 +72,16 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     int TLines = ui->textEdit->document()->blockCount();
     ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
 
-    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
+    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){        
         int line = ui->textEdit->textCursor().blockNumber()+1;
         int pos = ui->textEdit->textCursor().columnNumber()+1;
         int TLines = ui->textEdit->document()->blockCount();
 
         ui->statusbar->showMessage(QString("Line:%1 Col:%2 TotLines:%3").arg(line).arg(pos).arg(TLines));
+    });
+
+    connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
+        qDebug() << "Cursor position is now" << m_textEdit->position();
     });
 
 }
