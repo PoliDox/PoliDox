@@ -205,7 +205,7 @@ void Editor::addOnlineUser(const Account& account){
     else if(items.size()==1)
          _dItem=items.at(0); //there should be always one item in this list
 
-    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
+    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
 
     setItem(account.getColor(),item);
 
@@ -312,10 +312,12 @@ QChar Editor::at(int pos)
 void Editor::addClient(const Account& user)
 {
     // 1. Add user to the map of remote users
-    int siteId = user.getSiteId();
-    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
-    remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;font-family:American Typewriter;font-weight:bold");
-    remoteLabel->lower();
+    int siteId = user.getSiteId();    
+    QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
+    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);        
+    remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;");
+    remoteLabel->setFont(font);
+    remoteLabel->lower();    
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
@@ -324,10 +326,12 @@ void Editor::addClient(const Account& user)
 
     // 3. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
-    remoteCursor.setPosition(0);
+    remoteCursor.setPosition(0);    
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
-    qDebug() << "Adding cursor" << user.getName() << "at coord" << curCoord.left() << "," << curCoord.top();
-    remoteLabel->move(curCoord.left()-2, curCoord.top()-7);
+    //qDebug() << "Label width: " << remoteLabel->width();
+    int height = curCoord.bottom()-curCoord.top();
+    remoteLabel->resize(100, height);
+    remoteLabel->move(curCoord.left()-1, curCoord.top()-4);
     remoteLabel->setVisible(true);
     //m_textEdit->raise();
 
@@ -353,9 +357,13 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
 void Editor::updateCursors()
 {
     for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
-        User& user = it.value();                
-        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);        
-        user.label->move(remoteCoord.left()-2, remoteCoord.top()-7);
+        User& user = it.value();
+        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+        //qDebug() << "cursor height:" << remoteCoord.bottom()-remoteCoord.top();
+        //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
+        int height = remoteCoord.bottom()-remoteCoord.top();
+        user.label->resize(100, height);
+        user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
         user.label->setVisible(true);
     }
 }
@@ -391,7 +399,6 @@ void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
         }
     }
 
-    // TODO: could be dangerous, use handlingOperation instead?
     disconnect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
     QColor color;
@@ -414,7 +421,6 @@ void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
         m_textEdit->mergeCurrentCharFormat(fmt);
     }
 
-    // TODO: could be dangerous, use handlingOperation instead?
     connect(this,&Editor::textChanged,controller,&ClientController::onTextChanged);
 
 }
