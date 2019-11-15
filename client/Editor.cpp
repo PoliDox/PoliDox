@@ -81,7 +81,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     });
 
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
-        qDebug() << "Cursor position is now" << m_textEdit->position();
+        QPoint pos = m_textEdit->cursor().pos();
+        qDebug() << "Cursor position is now" << pos.x() << pos.y(); // THAT'S SO WRONG!
     });
 
 }
@@ -330,7 +331,7 @@ void Editor::addClient(const Account& user)
 
     // 3. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
-    remoteCursor.setPosition(0);    
+    remoteCursor.setPosition(1);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
     //qDebug() << "Label width: " << remoteLabel->width();
     int height = curCoord.bottom()-curCoord.top();
