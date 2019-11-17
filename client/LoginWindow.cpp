@@ -72,12 +72,15 @@ void LoginWindow::displayFiles(const QList<QString> p_files)
     QString new_file("Create new file");
     QString fileFromUri("Insert URI");
 
-    QListWidgetItem *separator = new QListWidgetItem("\t__________________________\n");
+    QListWidgetItem *separator = new QListWidgetItem();
+    separator->setSizeHint(QSize(330, 5));
     separator->setFlags(Qt::NoItemFlags);
     files->addItem(new_file);
     files->addItem(fileFromUri);
     files->addItem(separator);
-
+    QFrame *frame = new QFrame();
+    frame->setFrameShape(QFrame::HLine);
+    files->setItemWidget(separator, frame);
     files->addItems(p_files);
 
     QGridLayout* grid_layout = new QGridLayout(this->ui->groupBox);
