@@ -86,7 +86,7 @@ private slots:
 private:
     void createActions();
     void createStatusBar();
-    void initUserList();
+    void initContributorsLists();
     void initRichTextToolBar();
     Q_INVOKABLE void updateCursors();
     void highlightUserChars(int p_siteId, QColor p_color, bool p_checked);

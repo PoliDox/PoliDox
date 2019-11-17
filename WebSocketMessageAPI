@@ -8,6 +8,11 @@ DELETE
 "char" = { ... }
 "siteId" = ...
 
+MOVE CURSOR
+"action" = "move cursor"
+"siteId" = ...
+"pos" = ...
+
 NEW CLIENT CONNECTED ON DOCUMENT
 "action" = "newClient"
 "account" = { ... }

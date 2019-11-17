@@ -52,7 +52,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     QString fileName = controller->getFilename();
     ui->currentFile->setText(fileName);
 
-    initUserList();
+    initContributorsLists();
     bootContributorsLists(contributorsOnline, contributorsOffline);
 
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
@@ -81,8 +81,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     });
 
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
-        QPoint pos = m_textEdit->cursor().pos();
-        qDebug() << "Cursor position is now" << pos.x() << pos.y(); // THAT'S SO WRONG!
+        int pos = m_textEdit->textCursor().position();
+        qDebug() << "Cursor position is now" << pos; // THAT'S SO WRONG!
     });
 
 }
@@ -115,7 +115,9 @@ void Editor::init(const QVector<Char>& p_text)
         addChar(symbol, *m_localCursor);
     }
     m_textEdit->show();
-    handlingOperation = false;
+
+    updateCursors();
+    handlingOperation = false;        
 }
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
@@ -131,7 +133,7 @@ void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Acco
     }
 }
 
-void Editor::initUserList(){
+void Editor::initContributorsLists(){
 
     QPixmap online("://images/images/online.png");
     QIcon onlineIcon(online);
@@ -259,6 +261,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
 void Editor::removeClient(const Account& account){
 
     // 1. Update data structures
+    delete  m_onlineUsers[account.getSiteId()].label;
     m_onlineUsers.remove(account.getSiteId());
     m_offlineUsers.append(account);
 
@@ -333,12 +336,10 @@ void Editor::addClient(const Account& user)
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
-    //qDebug() << "Label width: " << remoteLabel->width();
     int height = curCoord.bottom()-curCoord.top();
     remoteLabel->resize(100, height);
     remoteLabel->move(curCoord.left()-1, curCoord.top()-4);
     remoteLabel->setVisible(true);
-    //m_textEdit->raise();
 
     addOnlineUser(user);
 }
