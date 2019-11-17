@@ -12,6 +12,7 @@ public:
 
     static QByteArray createInsertMessage(const Char& p_char, int p_siteId);
     static QByteArray createDeleteMessage(const Char& p_char, int p_siteId);
+    static QByteArray createCursorMoveMessage(int p_pos, int p_siteId);
     static QByteArray createRegisterMessage(const QString& p_user, const QString& p_passw, const QPixmap& p_pic);
     static QByteArray createLoginMessage(const QString& p_user, const QString& p_passw);
     static QByteArray createOpenFileMessage(const QString& p_filename, const QString& p_uri = QString());

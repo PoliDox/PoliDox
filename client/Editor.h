@@ -48,12 +48,14 @@ public:
     void removeClient(const Account& account);
     void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
     void resetBackgroundColor(int pos);
-    void setCharacterStyle(int index,Char& symbol);
-    void resetActionToggle(int pos,bool selection);
+    void setCharacterStyle(int index, Char& symbol);
+    void resetActionToggle(int pos, bool selection);
+    void moveCursor(int pos, int siteId);
     void closeEvent(QCloseEvent *event) override;
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
+    void cursorPositionChanged(int position);
     void quit_editor();
 
 private slots:

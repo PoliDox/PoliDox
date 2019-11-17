@@ -30,7 +30,7 @@ void ServerController::replicateMessageOnOtherSockets(const QString& messageRece
     requestObjJSON = requestDocJSON.object();
     QString header = requestObjJSON["action"].toString();
 
-    if(header == "insert" || header == "delete"){
+    if (header == "insert" || header == "delete" || header == "cursorMove"){
         for(auto socket : this->socketsOnDocument){
             if(socket != signalSender)
                 socket->sendTextMessage(messageReceivedOnSocket);
@@ -128,20 +128,22 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
                                             charStyle.font_family, charStyle.font_size, charStyle.is_bold,
                                             charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
-    }
-    else if(header == "delete"){
+    } else if (header == "delete") {
         //todo: rifattorizzare
         QJsonObject charJson = requestObjJSON["char"].toObject();
         Char charObj = Char::fromJson(charJson);
-        tStyle charStyle = charObj.getStyle();
+        tStyle charStyle = charObj.getStyle(); // TODO: Delete if unuseful
         QString charValue(charObj.getValue());
         std::vector<int> fractPos(charObj.getFractionalPosition());
         int siteId = charObj.getSiteId();
 
         this->crdt->remoteDelete(charObj);
         this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
-    }
-    else if(header == "closedEditorReq"){
+
+    } else if (header == "cursorMove") {
+        // Do Nothing
+
+    } else if (header == "closedEditorReq") {
         QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
 
         bool destroyServContr = false;
@@ -173,8 +175,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
         if(destroyServContr)
             delete (this);
-    }
-    else {
+    } else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
 

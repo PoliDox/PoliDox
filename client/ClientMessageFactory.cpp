@@ -30,6 +30,17 @@ QByteArray ClientMessageFactory::createDeleteMessage(const Char &p_char, int p_s
     return l_doc.toJson(QJsonDocument::Indented);
 }
 
+QByteArray ClientMessageFactory::createCursorMoveMessage(int p_pos, int p_siteId)
+{
+    QJsonObject l_obj;
+    l_obj.insert("action", "cursorMove");
+    l_obj.insert("siteId", p_siteId);
+    l_obj.insert("position", p_pos);
+
+    QJsonDocument l_doc(l_obj);
+    return l_doc.toJson(QJsonDocument::Indented);
+}
+
 QByteArray ClientMessageFactory::createRegisterMessage(const QString &p_user, const QString &p_passw, const QPixmap& p_pic)
 {
     QJsonObject l_obj;

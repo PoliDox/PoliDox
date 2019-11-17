@@ -16,18 +16,19 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
         QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol, m_siteId);
-
         //qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
-
         m_socket->sendTextMessage(jsonString);
     });
 
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
         QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol, m_siteId);
-
         //std::cout << jsonString.toUtf8().constData() <<std::endl;
+        m_socket->sendTextMessage(jsonString);
+    });
 
+    connect(m_editor, &Editor::cursorPositionChanged, this, [&](int p_pos) {
+        QByteArray jsonString = ClientMessageFactory::createCursorMoveMessage(p_pos, m_siteId);
         m_socket->sendTextMessage(jsonString);
     });
 
@@ -113,6 +114,11 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         int linPos = m_crdt->remoteDelete(symbol);
         int siteId = _JSONobj["siteId"].toInt();
         m_editor->handleRemoteOperation(DELETE_OP, symbol, linPos, siteId);
+
+    } else if (l_header == "cursorMove") {
+        int pos = _JSONobj["position"].toInt();
+        int siteId = _JSONobj["siteId"].toInt();
+        m_editor->moveCursor(pos, siteId);
 
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();

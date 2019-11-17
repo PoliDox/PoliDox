@@ -83,6 +83,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
         qDebug() << "Cursor position is now" << pos; // THAT'S SO WRONG!
+
+        emit cursorPositionChanged(pos);
     });
 
 }
@@ -485,6 +487,17 @@ void Editor::resetActionToggle(int pos,bool selection){
     else if(fmt.fontUnderline())
         underlineAction->setChecked(true);
 
+}
+
+void Editor::moveCursor(int pos, int siteId)
+{
+    User& user = m_onlineUsers[siteId];
+    user.cursor.setPosition(pos);
+    QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+    int height = remoteCoord.bottom()-remoteCoord.top();
+    user.label->resize(100, height);
+    user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
+    user.label->setVisible(true);
 }
 
 void Editor::closeEvent(QCloseEvent *event)
