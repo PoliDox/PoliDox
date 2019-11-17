@@ -331,7 +331,7 @@ void Editor::addClient(const Account& user)
 
     // 3. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
-    remoteCursor.setPosition(1);
+    remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
     //qDebug() << "Label width: " << remoteLabel->width();
     int height = curCoord.bottom()-curCoord.top();
