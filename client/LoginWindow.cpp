@@ -73,7 +73,7 @@ void LoginWindow::displayFiles(const QList<QString> p_files)
     QString fileFromUri("Insert URI");
 
     QListWidgetItem *separator = new QListWidgetItem();
-    separator->setSizeHint(QSize(330, 5));
+    separator->setSizeHint(QSize(300, 15));
     separator->setFlags(Qt::NoItemFlags);
     files->addItem(new_file);
     files->addItem(fileFromUri);
