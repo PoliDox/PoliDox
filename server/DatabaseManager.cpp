@@ -244,7 +244,7 @@ QString DatabaseManager::getDocument(QString& uriOfDocument){
 //      - implementare il vincolo di integrità su nameDocument
 //      - anziché passargli tutti questi attributi, passargli un char e chiamare poi qui dentro il toJson
 bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
-                                   QString& family, int size, int bold, int italic, int underline, int alignment) {
+                                   QString& family, int size, bool bold, bool italic, bool underline, int alignment) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     int counterInsert = this->getCounterOfCollection("insert");

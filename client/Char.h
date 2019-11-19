@@ -17,9 +17,9 @@ typedef struct Style {
     // DON'T CHANGE THE ORDER without changing fromJson()
     QString font_family;
     int font_size;
-    int is_bold;
-    int is_italic;
-    int is_underline;
+    bool is_bold;
+    bool is_italic;
+    bool is_underline;
     int alignment;
 
 } tStyle;
