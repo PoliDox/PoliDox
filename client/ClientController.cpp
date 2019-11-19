@@ -177,7 +177,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         QChar qchar = m_editor->at(position+i);
         char _char;
         if (qchar == QChar::ParagraphSeparator) {
-            qDebug() << "ParagraphSeparator";
+            //qDebug() << "ParagraphSeparator";
             _char = '\n';
         } else {
             _char =  qchar.toLatin1();

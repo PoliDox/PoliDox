@@ -65,6 +65,10 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         }
     });
 
+    connect(m_textDoc, &QTextDocument::undoAvailable, ui->actionUndo, &QAction::setEnabled);
+    connect(m_textDoc, &QTextDocument::redoAvailable, ui->actionRedo, &QAction::setEnabled);
+    ui->actionUndo->setEnabled(false); // TODO: doesn't work!
+    ui->actionRedo->setEnabled(false);
 
     initRichTextToolBar();
 
