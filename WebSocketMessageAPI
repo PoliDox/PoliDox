@@ -24,9 +24,11 @@ LOGIN REQ
 
 LOGIN REPL
 "action" = "loginRepl"
-"response" = "ok"/"fail"
+"response" = "ok"/ "fail auth"/ "fail log"
 "account" = { ... }        //only if ok, null otherwise
 "nameDocuments" = { ... }  //only if ok, empty otherwise
+/* "fail auth" => if username or password are not correct              */
+/* "fail log"  => if the account is already logged on another instance */
 
 REGISTER USER REQ 
 "action" = "registerUser"

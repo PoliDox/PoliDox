@@ -17,14 +17,14 @@ QByteArray ServerMessageFactory::createNewClientMessage(const Account *account) 
 
 
 // if "response" == false then "account" must be null
-QByteArray ServerMessageFactory::createLoginReply(bool response, const Account *account, QList<QString>& nameDocuments) {
+QByteArray ServerMessageFactory::createLoginReply(bool response, QString typeError, const Account *account, QList<QString>& nameDocuments) {
     QJsonObject objToReturn;
     QJsonArray nameDocumentsArray;
     QString responseString;
     if(response)
         responseString = "ok";
     else
-        responseString = "fail";
+        responseString = "fail " + typeError;
 
     objToReturn.insert("action","loginRepl");
     objToReturn.insert("response",responseString);

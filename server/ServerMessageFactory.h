@@ -15,7 +15,7 @@ public:
     ServerMessageFactory() = delete;
 
     static QByteArray createNewClientMessage(const Account *account);
-    static QByteArray createLoginReply(bool response, const Account *account, QList<QString>& nameDocuments);
+    static QByteArray createLoginReply(bool response, QString typeError, const Account *account, QList<QString>& nameDocuments);
     static QByteArray createRegistrationUserReply(bool response, double siteIdOfRegisteredUser);    
     static QByteArray createOpenFileReply(bool response, QString typeError, QString filename, QString uri, CRDT *crdt, QList<Account*>& accounts, QList<Account>& accountsOffline);
     static QByteArray createOpenFileReply(bool response, QString typeError);

@@ -78,24 +78,33 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
             if(account != nullptr && account->getName() == name)
                 alreadyLogged = true;
 
-        int result = -1;
-        if(!alreadyLogged)
-            result = this->dbOperations->checkPassword(name, password);
-        qDebug() << "Authentication result: " << result;
-
-        if(alreadyLogged == false && result >= 0){
-            loginSuccess = true;
-            //in case of success, result will contain siteId and [image(TODO!!)]
-            loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
-            this->socket2account[signalSender] = loggedAccount;
-
-            nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
-
-            disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
-            connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
+        if(alreadyLogged){
+            QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, QString("log"), loggedAccount, nameDocuments);
+            signalSender->sendTextMessage(sendMsgToClient);
+            return;
         }
 
-        QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, loggedAccount, nameDocuments);
+        int result = -1;
+        result = this->dbOperations->checkPassword(name, password);
+        qDebug() << "Authentication result: " << result;
+
+        if(result < 0){
+            QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, QString("auth"), loggedAccount, nameDocuments);
+            signalSender->sendTextMessage(sendMsgToClient);
+            return;
+        }
+
+        loginSuccess = true;
+        //in case of success, result will contain siteId and [image(TODO!!)]
+        loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
+        this->socket2account[signalSender] = loggedAccount;
+
+        nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
+
+        disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
+        connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
+
+        QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, QString(""), loggedAccount, nameDocuments);
         signalSender->sendTextMessage(sendMsgToClient);
     }
     else if (header == "registerUser"){
