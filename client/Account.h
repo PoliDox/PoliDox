@@ -11,7 +11,7 @@
 //          Please consider that before modifying
 
 class Account {
-friend class DatabaseManager;
+
 private:
     int siteId;
     QString name;

@@ -7,6 +7,8 @@
 #include <iostream>
 #include <QFileDialog>
 #include <QComboBox>
+#include <QScrollArea>
+#include <QSizePolicy>
 
 
 LoginWindow::LoginWindow(QWidget *parent) :
@@ -73,7 +75,7 @@ void LoginWindow::displayFiles(const QList<QString> p_files)
     QString fileFromUri("Insert URI");
 
     QListWidgetItem *separator = new QListWidgetItem();
-    separator->setSizeHint(QSize(330, 5));
+    separator->setSizeHint(QSize(300, 15));
     separator->setFlags(Qt::NoItemFlags);
     files->addItem(new_file);
     files->addItem(fileFromUri);
@@ -146,7 +148,8 @@ void LoginWindow::sendRegistrationData(){
 
     // TODO: passa l'immagine profilo
     // Consider using the constructor QPixmap(const QString &fileName, const char *format = nullptr)
-    emit signupDataSubmitted(username, password, QPixmap());
+    QLabel* file_path=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_path"));
+    emit signupDataSubmitted(username, password, QPixmap(file_path->text()));
 
 }
 
@@ -201,22 +204,26 @@ void LoginWindow::createRegistrationForm(){
     cancel->setObjectName("cancel");
 
     QLabel* img_label=new QLabel("Profile pic",ui->groupBox);
-    QLabel* img_path=new QLabel("No file selected",ui->groupBox);
+    QLabel* img_path=new QLabel(ui->groupBox);
     QPushButton* img_selection=new QPushButton("upload file",ui->groupBox);
     QLabel* img_show=new QLabel(ui->groupBox);
+    QLabel* img_warning=new QLabel(ui->groupBox);
 
     connect(img_selection,&QPushButton::clicked,this,&LoginWindow::upload_clicked);
 
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
-    img_path->setStyleSheet("background-color:transparent;border: 1px solid #8d918d");
+    img_path->setStyleSheet("background-color:transparent;"); //border: 1px solid #8d918d
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
-    //img_show->setStyleSheet("background-color:navy;");
+    img_show->setStyleSheet("border: 1px solid #8d918d");
+    img_warning->setStyleSheet("color:red");
+
+    img_warning->setText("Image size must be lower than 10MB");
 
     img_label->setObjectName("img_label");
     img_selection->setObjectName("img_selection");
     img_path->setObjectName("img_path");
     img_show->setObjectName("img_show");
-
+    img_warning->setObjectName("img_warning");
 
 
     QGridLayout* grid_layout = static_cast<QGridLayout*>(ui->groupBox->layout());
@@ -227,23 +234,28 @@ void LoginWindow::createRegistrationForm(){
     img_label->setFixedSize(200,30);
     submit->setFixedSize(100,30);
     img_selection->setFixedSize(100,30);
-    img_path->setFixedSize(200,30);
+    img_path->setFixedSize(300,30);
     img_show->setFixedSize(100,100);
 
+
     grid_layout->setHorizontalSpacing(0);
-    grid_layout->setVerticalSpacing(0);
+    grid_layout->setVerticalSpacing(5);
 
     grid_layout->addWidget(usr,0,0,nullptr);
     grid_layout->addWidget(usr_form,1,0,nullptr);
     grid_layout->addWidget(pwd,2,0,nullptr);
     grid_layout->addWidget(pwd_form,3,0,nullptr);
     grid_layout->addWidget(img_label,4,0,nullptr);
-    grid_layout->addWidget(img_path,5,0,nullptr);
-    grid_layout->addWidget(img_show,5,1,nullptr);
-    grid_layout->addWidget(img_selection,6,0,nullptr);
+    grid_layout->addWidget(img_show,5,0,nullptr);
+    grid_layout->addWidget(img_warning,6,0,nullptr);
+    grid_layout->addWidget(img_selection,7,0,nullptr);
+    grid_layout->addWidget(img_path,8,0,nullptr);
 
-    grid_layout->addWidget(submit,7,0,nullptr);
-    grid_layout->addWidget(cancel,7,1,nullptr);
+    QSpacerItem* spacer= new QSpacerItem(1,10, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    grid_layout->addItem(spacer,9,0);
+
+    grid_layout->addWidget(submit,10,0,nullptr);
+    grid_layout->addWidget(cancel,10,1,nullptr);
 
 
     connect(submit,&QPushButton::clicked,this,&LoginWindow::sendRegistrationData);
@@ -258,19 +270,34 @@ void LoginWindow::cleanRegistrationForm(){
 
     QLabel* user=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("user"));
     QLabel* pwd=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("pwd"));
+    QLabel* img_label=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_label"));
+    QLabel* img_path=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_path"));
+    QLabel* img_show=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_show"));
+    QLabel* img_warning=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_warning"));
+
 
     QPushButton* submit=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("submit"));
     QPushButton* cancel=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("cancel"));
+    QPushButton* img_selection=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("img_selection"));
+
 
     QString username=user_linedit->text();
     QString password=pwd_linedit->text();
+
+    QLayoutItem* spacer=ui->groupBox->layout()->takeAt(0);
+    delete spacer;
 
     delete user_linedit;
     delete pwd_linedit;
 
     delete user;
     delete pwd;
+    delete img_label;
+    delete img_path;
+    delete img_show;
+    delete img_warning;
 
+    delete img_selection;
     delete submit;
     delete cancel;
 
@@ -306,24 +333,38 @@ void LoginWindow::onClickedFile(QListWidgetItem* item){
 
 void LoginWindow::upload_clicked(bool checked){
 
-    QFileDialog* file_selection=new QFileDialog(ui->groupBox);
-    file_selection->setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
+    QFileDialog file_selection(ui->groupBox);
+    file_selection.setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
 
-    file_selection->show();
+    file_selection.show();
 
     QString filePath;
-    if (file_selection->exec())
-         filePath = file_selection->selectedFiles().at(0);
+    if (file_selection.exec())
+         filePath = file_selection.selectedFiles().at(0);
 
-    QList<QString>splitted=filePath.split("/");
-    QString fileName=splitted.at(splitted.size()-1);
+    QFile img(filePath);
+    QLabel* img_warning=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_warning"));
 
-    QLabel* img_path=ui->groupBox->findChild<QLabel*>("img_path");
-    img_path->setText(fileName);
+    if(img.size()>10000000){
+        QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 10MB!");
+        img_warning->setText("Image size must be lower than 10MB");
+        return;
+    }else{
 
-    delete file_selection;
+        img_warning->setStyleSheet("color:green");
+        img_warning->setText("File respect dimension costraint");
 
-     QLabel* img_show=ui->groupBox->findChild<QLabel*>("img_show");
-     img_show->setStyleSheet("border-image: url("+filePath+") 0 0 0 0 stretch stretch;");
+    }
+
+    if(filePath.size()>0){
+
+        QLabel* img_path=ui->groupBox->findChild<QLabel*>("img_path");
+        img_path->setText(filePath);
+
+        QLabel* img_show=ui->groupBox->findChild<QLabel*>("img_show");
+        img_show->setStyleSheet("border-image: url("+filePath+") 0 0 0 0 stretch stretch;");
+
+    }
+
 
 }
