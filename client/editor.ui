@@ -267,7 +267,7 @@
    <addaction name="actionItalic"/>
    <addaction name="actionUnderlined"/>
    <addaction name="separator"/>
-   <addaction name="actionLeftAllignmet"/>
+   <addaction name="actionAlignLeft"/>
    <addaction name="actionAlignCenter"/>
    <addaction name="actionAlignRight"/>
    <addaction name="actionJustify"/>
@@ -357,7 +357,7 @@
     <string>Undo</string>
    </property>
    <property name="shortcut">
-    <string/>
+    <string>Ctrl+Z</string>
    </property>
   </action>
   <action name="actionRedo">
@@ -369,7 +369,7 @@
     <string>Redo</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+Z</string>
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -431,7 +431,7 @@
     <string>Ctrl+U</string>
    </property>
   </action>
-  <action name="actionLeftAllignmet">
+  <action name="actionAlignLeft">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -440,7 +440,10 @@
      <normaloff>:/images/images/leftAll.png</normaloff>:/images/images/leftAll.png</iconset>
    </property>
    <property name="text">
-    <string>LeftAllignmet</string>
+    <string>AlignLeft</string>
+   </property>
+   <property name="toolTip">
+    <string>AlignLeft</string>
    </property>
   </action>
   <action name="actionAlignCenter">
