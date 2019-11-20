@@ -91,7 +91,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile = new Profile(this);
     profile->setImagePic(main_account->getImage());
     profile->setUsername(main_account->getName());
-    //profile->show();
+    profile->show();
 }
 
 /*bool Editor::eventFilter(QObject *target, QEvent *event){

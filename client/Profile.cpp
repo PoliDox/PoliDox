@@ -19,6 +19,15 @@ void Profile::setUsername(const QString& username){
 }
 
 void Profile::setImagePic(const QPixmap &imagePic){
-    QIcon profile_pic(imagePic);
-    ui->image_pic->setPixmap(profile_pic.pixmap(QSize(10,10)));
+    ui->image_pic->setPixmap(imagePic.scaled(200, 200));
+}
+
+void Profile::on_changePassword_clicked()
+{
+    //todo
+}
+
+void Profile::on_changeImage_clicked()
+{
+    //todo
 }
