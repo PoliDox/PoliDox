@@ -83,7 +83,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile = new Profile(this);
     profile->setImagePic(main_account->getImage());
     profile->setUsername(main_account->getName());
-    profile->show();
+    //profile->show();
 
 
     // Connect signals
@@ -117,6 +117,20 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile->setImagePic(main_account->getImage());
     profile->setUsername(main_account->getName());
     profile->show();
+
+    QWidget* empty1 = new QWidget();
+    empty1->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    ui->toolBar_2->addWidget(empty1);
+
+    QAction* account = new QAction("account", this);
+    QPixmap acc("://images/images/account.png");
+    QIcon accoutIcon(acc);
+    account->setIcon(accoutIcon);
+    ui->toolBar_2->addAction(account);
+
+    QWidget* empty2 = new QWidget();
+    empty2->setFixedSize(1,1);
+    ui->toolBar_2->addWidget(empty2);
 }
 
 Editor::~Editor()
@@ -771,4 +785,9 @@ void Editor::on_actionOpen_triggered()
 void Editor::on_actionURI_triggered()
 {    
     this->m_showUriDialog->show();
+}
+
+void Editor::on_actionAccount_triggered()
+{
+
 }
