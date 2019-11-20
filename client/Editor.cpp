@@ -36,6 +36,7 @@ void Editor::assignRandomColor(int siteID){
     QColor color;
     QList<QString> colors=assignedColor.values();
 
+
     while(1){
 
         color=QColor(rand()%255,rand()%255,rand()%255);
@@ -216,7 +217,6 @@ void Editor::highlightUser(QListWidgetItem *item) {
 
     if ("You" == item->text()) {
         siteID = controller->getAccount().getSiteId();
-        //color = controller->getAccount().getColor();
         color=QColor(assignedColor.value(siteID));
 
     } else {
@@ -238,13 +238,11 @@ void Editor::highlightUser(QListWidgetItem *item) {
                 return;
             } else {
                 siteID = offlineHIT->getSiteId();
-                //color = offlineHIT->getColor();
                 color=QColor(assignedColor.value(siteID));
             }
 
         } else {
             siteID = onlineHIT->account.getSiteId();
-            //color = onlineHIT->account.getColor();
             color=QColor(assignedColor.value(siteID));
         }
 
@@ -270,7 +268,6 @@ void Editor::addOnlineUser(const Account& account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
 
-    //setItem(account.getColor(),item);
     QColor color(assignedColor.value(account.getSiteId()));
     setItem(color,item);
 
@@ -292,7 +289,6 @@ void Editor::addOfflineUser(const Account& account)
 {    
     // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
     QListWidgetItem* item= new QListWidgetItem(account.getName());
-    //setItem(account.getColor(),item);
     QColor color(assignedColor.value(account.getSiteId()));
     setItem(color,item);
     ui->offlineList->addItem(item);
@@ -361,8 +357,6 @@ void Editor::removeClient(const Account& account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
-    //setItem(account.getColor(),item);
-
     QColor color(assignedColor.value(account.getSiteId()));
     setItem(color,item);
 
@@ -384,26 +378,20 @@ void Editor::addClient(const Account& user)
 
     int siteId = user.getSiteId();
 
-    if(m_offlineUsers.removeAll(user)==0)
+    if(m_offlineUsers.removeAll(user)==0) //new user for the file!
         assignRandomColor(siteId);
 
-    QColor color(assignedColor.value(siteId));
-
     // 1. Add user to the map of remote users
-    //int siteId = user.getSiteId();
     QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
-    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);        
-    //remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;");
+    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
+    QColor color(assignedColor.value(siteId));
     remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;");
     remoteLabel->setFont(font);
     remoteLabel->lower();    
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
-    // 2. If user's not a new contributor, remove him/her from list of offline users
-    //m_offlineUsers.removeAll(user);
-
-    // 3. Draw the remote cursor at position 0
+    // 2. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
