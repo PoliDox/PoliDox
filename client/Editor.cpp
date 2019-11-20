@@ -308,7 +308,7 @@ void Editor::addOfflineUser(const Account& account)
 {    
     // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
     QListWidgetItem* item= new QListWidgetItem(account.getName());
-    setItem(account.getColor(),item);
+    //setItem(account.getColor(),item);
     ui->offlineList->addItem(item);
 }
 

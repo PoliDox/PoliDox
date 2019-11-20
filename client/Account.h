@@ -17,20 +17,16 @@ private:
     int siteId;
     QString name;
     QByteArray image;
-    int color;
 
 public:
     Account() = default;
-    Account(int p_siteId, const QString& p_name, const QByteArray& p_picture, int p_color = -1);
+    Account(int p_siteId, const QString& p_name, const QByteArray& p_picture);
     Account(const Account& other);
     int getSiteId() const;
     QString getName() const;
     QPixmap getImage() const;
-    QColor getColor() const;
-    QJsonObject toJson() const;
-    static Account fromJson(const QJsonObject& accountJSON);
-    static Account fromJson(const QJsonObject& accountJSON, bool isFromDb);
-    static int generateColor();
+    QJsonObject toJson() const;    
+    static Account fromJson(const QJsonObject& accountJSON, bool isFromDb = false);
     bool operator < (const Account& other) const;
     bool operator == (const Account& other) const;
 
