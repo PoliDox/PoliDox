@@ -19,9 +19,11 @@ Client::Client()
     });
 
     connect(&loginWindow, &LoginWindow::signupDataSubmitted, this, [&](QString p_user, QString p_passw, QPixmap p_pic) {
+        bool l_ret = p_pic.save(QString("~/immagine1"), "PNG");
+        qDebug() << "Image saved: " << l_ret;
         if (p_user != "You") {
             QByteArray message = ClientMessageFactory::createRegisterMessage(p_user, p_passw, p_pic);
-            m_socket.sendTextMessage(message);
+            m_socket.sendTextMessage(message);            
         } else {
             QMessageBox::warning(&loginWindow, "Registration", "\"You\" is not a valid username");
         }
@@ -82,6 +84,9 @@ void Client::onMessageReceived(const QString &p_msg)
         QJsonObject accountObj = _JSONobj["account"].toObject();
         m_user = Account::fromJson(accountObj);
         qDebug() << "Authenticated with siteId" << m_user.getSiteId();
+
+        bool l_ret = m_user.getImage().save(QString("~/immagine2"), "PNG");
+        qDebug() << "Image2 saved" << l_ret;
 
         QJsonArray _JSONfiles=_JSONobj["nameDocuments"].toArray();
         QList<QString> l_files;

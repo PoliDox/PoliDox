@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QFontInfo>
 
 #include <QPushButton>
 #include <QCheckBox>
@@ -31,7 +32,7 @@ void setItem(QColor color,QListWidgetItem* item){
 }
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
-    QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
+    QMainWindow(parent), controller(p_controller), handlingOperation(false), changingFormat(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -66,9 +67,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     });
 
     connect(m_textDoc, &QTextDocument::undoAvailable, ui->actionUndo, &QAction::setEnabled);
-    connect(m_textDoc, &QTextDocument::redoAvailable, ui->actionRedo, &QAction::setEnabled);
-    ui->actionUndo->setEnabled(false); // TODO: doesn't work!
-    ui->actionRedo->setEnabled(false);
+    connect(m_textDoc, &QTextDocument::redoAvailable, ui->actionRedo, &QAction::setEnabled);    
 
     initRichTextToolBar();
 
@@ -125,7 +124,10 @@ void Editor::init(const QVector<Char>& p_text)
     m_textEdit->show();
 
     updateCursors();
-    handlingOperation = false;        
+    handlingOperation = false;
+
+    ui->actionUndo->setEnabled(false); // TODO: doesn't work!
+    ui->actionRedo->setEnabled(false);
 }
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
@@ -323,8 +325,14 @@ void Editor::initRichTextToolBar(){
     this->ui->textRichToolBar->addWidget(m_font);
     this->ui->textRichToolBar->addWidget(m_fontSize);
 
-    connect(m_font, &QFontComboBox::currentFontChanged, this, &Editor::onFontFamilyChanged);
-    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Editor::onFontSizeChanged);
+    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
+        if (!changingFormat)
+            onFontFamilyChanged(font);
+    });
+    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
+        if (!changingFormat)
+            onFontSizeChanged(i);
+    });
     connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
 
     QAction* separator1=this->ui->toolBar_2->actions().at(0);
@@ -380,20 +388,6 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
 
     updateCursors();
     handlingOperation = false;
-}
-
-void Editor::updateCursors()
-{
-    for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
-        User& user = it.value();
-        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
-        //qDebug() << "cursor height:" << remoteCoord.bottom()-remoteCoord.top();
-        //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
-        int height = remoteCoord.bottom()-remoteCoord.top();
-        user.label->resize(100, height);
-        user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
-        user.label->setVisible(true);
-    }
 }
 
 void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
@@ -481,6 +475,7 @@ void Editor::setCharacterStyle(int index, Char &symbol){
                     fmt.fontUnderline(), (int)m_textEdit->alignment());
 }
 
+// TODO: not used, delete?
 void Editor::resetActionToggle(int pos,bool selection){
 
     QTextCursor cursor(m_textDoc);
@@ -509,6 +504,20 @@ void Editor::resetActionToggle(int pos,bool selection){
 
 }
 
+void Editor::updateCursors()
+{
+    for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
+        User& user = it.value();
+        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+        //qDebug() << "cursor height:" << remoteCoord.bottom()-remoteCoord.top();
+        //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
+        int height = remoteCoord.bottom()-remoteCoord.top();
+        user.label->resize(100, height);
+        user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
+        user.label->setVisible(true);
+    }
+}
+
 void Editor::moveCursor(int pos, int siteId)
 {
     User& user = m_onlineUsers[siteId];
@@ -518,6 +527,44 @@ void Editor::moveCursor(int pos, int siteId)
     user.label->resize(100, height);
     user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
     user.label->setVisible(true);
+}
+
+void Editor::onCharFormatChanged(const QTextCharFormat &f)
+{
+    changingFormat = true;
+    qDebug() << "Char format changed";
+    ui->actionBold->setChecked(f.font().bold());
+    ui->actionItalic->setChecked(f.font().italic());
+    ui->actionUnderlined->setChecked(f.font().underline());
+    m_font->setCurrentIndex(m_font->findText(QFontInfo(f.font()).family()));
+    m_fontSize->setValue(f.font().pointSize());
+    changingFormat = false;
+}
+
+
+void Editor::onFontSizeChanged(int i){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFontPointSize(i);
+    //if (!cursor.hasSelection()) // Delete this?
+    //    cursor.select(QTextCursor::WordUnderCursor);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+}
+
+void Editor::onFontFamilyChanged(const QFont& font){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFontFamily(font.family());
+    //if (!cursor.hasSelection()) // Delete this?
+    //    cursor.select(QTextCursor::WordUnderCursor);
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
 }
 
 void Editor::closeEvent(QCloseEvent *event)
@@ -619,41 +666,6 @@ void Editor::on_actionUnderlined_triggered()
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
-}
-
-void Editor::onFontSizeChanged(int i){
-
-    QTextCursor cursor = m_textEdit->textCursor();
-    QTextCharFormat fmt;
-
-    fmt.setFontPointSize(i);
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);
-}
-
-void Editor::onFontFamilyChanged(const QFont& font){
-
-    QTextCursor cursor = m_textEdit->textCursor();
-    QTextCharFormat fmt;
-
-    fmt.setFontFamily(font.family());
-    if (!cursor.hasSelection())
-        cursor.select(QTextCursor::WordUnderCursor);
-    cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);
-
-}
-
-void Editor::onCharFormatChanged(const QTextCharFormat &f)
-{   
-    qDebug() << "Char format changed";
-    ui->actionBold->setChecked(f.font().bold());
-    ui->actionItalic->setChecked(f.font().italic());
-    ui->actionUnderlined->setChecked(f.font().underline());
-    m_font->setCurrentFont(f.font());
-    m_fontSize->setValue(f.font().pointSize());
 }
 
 void Editor::on_actionAlignLeft_triggered()

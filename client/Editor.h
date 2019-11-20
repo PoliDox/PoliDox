@@ -100,6 +100,7 @@ private:
 
     ClientController *controller;
     bool handlingOperation;
+    bool changingFormat;
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_localCursor;
