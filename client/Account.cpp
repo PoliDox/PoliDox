@@ -81,7 +81,7 @@ Account Account::fromJson(const QJsonObject& accountJSON, bool isFromDb) {
         }
     }
 
-    qDebug() << "[Account::fromJson] ACCOUNT.image: " << l_image ;
+    //qDebug() << "[Account::fromJson] ACCOUNT.image: " << l_image ;
     return Account(l_siteId, l_name, l_image, l_color);
 }
 
