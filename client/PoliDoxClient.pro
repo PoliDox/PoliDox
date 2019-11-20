@@ -1,4 +1,5 @@
 QT += widgets
+QT += printsupport
 
 TEMPLATE        = app
 TARGET          = polidox-client
@@ -18,6 +19,7 @@ HEADERS += \
     ListFiles.h \
     Client.h \
     NewFileDialog.h \
+    Profile.h \
     Styler.h \
     InsertUriDialog.h \
     ShowUriDialog.h \
@@ -31,6 +33,7 @@ SOURCES += \
     ListFiles.cpp \
     Account.cpp \
     NewFileDialog.cpp \
+    Profile.cpp \
     Styler.cpp \
     main.cpp \
     Char.cpp \
@@ -50,6 +53,7 @@ FORMS += \
     listfiles.ui \
     newfiledialog.ui \
     inserturidialog.ui \
+    profile.ui \
     showuridialog.ui \
     loginwindow.ui
 
