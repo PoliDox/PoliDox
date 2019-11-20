@@ -38,24 +38,36 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
 
+    setWindowTitle("PoliDox");
+    QString fileName = controller->getFilename();
+    ui->currentFile->setText(fileName);
     setWindowIcon(QIcon("://images/images/logo_small.png"));
 
     m_textDoc = new QTextDocument(m_textEdit);
-    m_textEdit->setDocument(m_textDoc);
-    m_localCursor = new QTextCursor(m_textDoc);
+    m_textEdit->setDocument(m_textDoc);    
+    m_localCursor = new QTextCursor(m_textDoc);        
     m_textEdit->setTextCursor(*m_localCursor);
+
 
     m_showUriDialog = new ShowUriDialog();
     QString uri = controller->getUri();
     m_showUriDialog->setUri(uri);
 
-    setWindowTitle("PoliDox");
-    QString fileName = controller->getFilename();
-    ui->currentFile->setText(fileName);
-
+    // Initialize graphic
     initContributorsLists();
     bootContributorsLists(contributorsOnline, contributorsOffline);
+    initRichTextToolBar();
 
+    int TLines = ui->textEdit->document()->blockCount();
+    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
+
+    profile = new Profile(this);
+    profile->setImagePic(main_account->getImage());
+    profile->setUsername(main_account->getName());
+    //profile->show();
+
+
+    // Connect signals
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
@@ -66,14 +78,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         }
     });
 
-
-    initRichTextToolBar();
-
-
-    int TLines = ui->textEdit->document()->blockCount();
-    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
-
     connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){        
+        // TODO: Use connect below to update on click?
         int line = ui->textEdit->textCursor().blockNumber()+1;
         int pos = ui->textEdit->textCursor().columnNumber()+1;
         int TLines = ui->textEdit->document()->blockCount();
@@ -88,10 +94,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         emit cursorPositionChanged(pos);
     });
 
-    profile = new Profile(this);
-    profile->setImagePic(main_account->getImage());
-    profile->setUsername(main_account->getName());
-    //profile->show();
+
 }
 
 /*bool Editor::eventFilter(QObject *target, QEvent *event){
@@ -160,6 +163,38 @@ void Editor::initContributorsLists(){
 
     connect(ui->onlineList,&QListWidget::itemChanged,this,&Editor::highlightUser);
     connect(ui->offlineList,&QListWidget::itemChanged,this,&Editor::highlightUser);
+
+}
+
+void Editor::initRichTextToolBar(){
+
+    m_font = new QFontComboBox(this->ui->textRichToolBar);
+    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
+
+    m_textEdit->setFont(QFont("DejaVu Sans")); // If you change it, change it also in addChar!
+    m_font->setFont(m_textEdit->currentFont());
+    m_textEdit->setFontPointSize(20);
+    m_fontSize->setValue(m_textEdit->fontPointSize());
+
+    this->ui->textRichToolBar->addWidget(m_font);
+    this->ui->textRichToolBar->addWidget(m_fontSize);
+
+    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
+        // Alternative: connect to onFontFamilyChanged here and disconnect-reconnect in onCharFormatChanged
+        if (!changingFormat)
+            onFontFamilyChanged(font);
+    });
+    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
+        // Alternative: connect to onFontSizeChanged here and disconnect-reconnect in onCharFormatChanged
+        if (!changingFormat)
+            onFontSizeChanged(i);
+    });
+    connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
+
+    QAction* separator1=this->ui->toolBar_2->actions().at(0);
+    QAction* separator2=this->ui->textRichToolBar->actions().at(0);
+    delete separator1;
+    delete separator2;
 
 }
 
@@ -249,8 +284,13 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     QTextCharFormat fmt;
     tStyle style = p_char.getStyle();
 
-    fmt.setFontFamily(style.font_family);
+    if (style.font_family == "")
+        fmt.setFontFamily("DejaVu Sans");
+    else
+        fmt.setFontFamily(style.font_family);
+
     fmt.setFontPointSize(style.font_size);
+
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
     else
@@ -309,36 +349,6 @@ void Editor::removeClient(const Account& account){
 
     delete _dItem;
     ui->offlineList->addItem(item);
-
-}
-
-void Editor::initRichTextToolBar(){
-
-
-    m_font = new QFontComboBox(this->ui->textRichToolBar);
-    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
-
-    m_textEdit->setFont(m_font->currentFont());
-    m_textEdit->setFontPointSize(20);
-    m_fontSize->setValue(m_textEdit->fontPointSize());
-
-    this->ui->textRichToolBar->addWidget(m_font);
-    this->ui->textRichToolBar->addWidget(m_fontSize);
-
-    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
-        if (!changingFormat)
-            onFontFamilyChanged(font);
-    });
-    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
-        if (!changingFormat)
-            onFontSizeChanged(i);
-    });
-    connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
-
-    QAction* separator1=this->ui->toolBar_2->actions().at(0);
-    QAction* separator2=this->ui->textRichToolBar->actions().at(0);
-    delete separator1;
-    delete separator2;
 
 }
 
@@ -467,6 +477,7 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QTextCharFormat fmt=cursor.charFormat();  
     bold = (fmt.fontWeight() == QFont::Bold);
 
+    qDebug() << "Font family:" << fmt.fontFamily();
     symbol.setStyle(fmt.fontFamily(), fmt.fontPointSize(), bold, fmt.fontItalic(),
                     fmt.fontUnderline(), (int)m_textEdit->alignment());
 }
@@ -483,7 +494,7 @@ void Editor::resetActionToggle(int pos,bool selection){
     QAction* italicAction=this->ui->textRichToolBar->actions().at(1);
     QAction* underlineAction=this->ui->textRichToolBar->actions().at(2);
 
-    if(fmt.fontWeight()==50 && boldAction->isChecked() && !selection)
+    if(fmt.fontWeight()==QFont::Bold && boldAction->isChecked() && !selection)
         boldAction->setChecked(false);
     else if(fmt.fontWeight()==75)
         boldAction->setChecked(true);
