@@ -249,6 +249,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     QTextCharFormat fmt;
     tStyle style = p_char.getStyle();
 
+    fmt.setFontFamily(style.font_family);
     fmt.setFontPointSize(style.font_size);
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
