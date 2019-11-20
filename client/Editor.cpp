@@ -544,9 +544,7 @@ void Editor::onFontSizeChanged(int i){
     QTextCursor cursor = m_textEdit->textCursor();
     QTextCharFormat fmt;
 
-    fmt.setFontPointSize(i);
-    //if (!cursor.hasSelection()) // Delete this?
-    //    cursor.select(QTextCursor::WordUnderCursor);
+    fmt.setFontPointSize(i);    
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 }
@@ -556,9 +554,7 @@ void Editor::onFontFamilyChanged(const QFont& font){
     QTextCursor cursor = m_textEdit->textCursor();
     QTextCharFormat fmt;
 
-    fmt.setFontFamily(font.family());
-    //if (!cursor.hasSelection()) // Delete this?
-    //    cursor.select(QTextCursor::WordUnderCursor);
+    fmt.setFontFamily(font.family());    
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
 
