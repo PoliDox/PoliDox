@@ -252,6 +252,8 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     fmt.setFontPointSize(style.font_size);
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
+    else
+        fmt.setFontWeight(QFont::Normal);
 
     fmt.setFontItalic(style.is_italic);
     fmt.setFontUnderline(style.is_underline);
@@ -461,12 +463,8 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QTextCursor cursor(m_textDoc);
     cursor.setPosition(index); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
 
-    QTextCharFormat fmt=cursor.charFormat();
-
-    if(fmt.fontWeight() == 50)
-        bold=false;
-    else
-        bold=true;
+    QTextCharFormat fmt=cursor.charFormat();  
+    bold = (fmt.fontWeight() == QFont::Bold);
 
     symbol.setStyle(fmt.fontFamily(), fmt.fontPointSize(), bold, fmt.fontItalic(),
                     fmt.fontUnderline(), (int)m_textEdit->alignment());

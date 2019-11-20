@@ -101,7 +101,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     // No switch case for strings in C++ :((
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
-        //qDebug() << "REMOTE ISNERT:" << _JSONstring.toUtf8().constData();
+        //qDebug() << "REMOTE INSERT:" << _JSONstring.toUtf8().constData();
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
