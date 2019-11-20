@@ -86,6 +86,7 @@ private slots:
 
     void highlightUser(QListWidgetItem * item);
 
+
 private:
     void createActions();
     void createStatusBar();
@@ -98,6 +99,7 @@ private:
     void addOfflineUser(const Account& account);
     void addChar(const Char& p_char, QTextCursor& p_cursor);
     void updateAlignment();
+    void assignRandomColor(int siteID);
 
     ClientController *controller;
     bool handlingOperation;
@@ -116,8 +118,8 @@ private:
     QSpinBox* m_fontSize;
     Profile *profile;
 
-protected:
-    //bool eventFilter(QObject *target, QEvent *event) override;
+    QMap<int,QString> assignedColor;
+
 
 };
 

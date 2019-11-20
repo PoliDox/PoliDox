@@ -31,6 +31,25 @@ void setItem(QColor color,QListWidgetItem* item){
 
 }
 
+void Editor::assignRandomColor(int siteID){
+
+    QColor color;
+    QList<QString> colors=assignedColor.values();
+
+    while(1){
+
+        color=QColor(rand()%255,rand()%255,rand()%255);
+
+        auto HIT=std::find(colors.begin(),colors.end(),color.name());
+
+        if(HIT==colors.end())
+            break;
+
+    }
+
+    assignedColor.insert(siteID,color.name());
+}
+
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), changingFormat(false), ui(new Ui::Editor)
 {
@@ -38,24 +57,35 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     ui->textEdit->setAcceptRichText(true);
     m_textEdit = ui->textEdit;
 
+    setWindowTitle("PoliDox");
+    QString fileName = controller->getFilename();
+    ui->currentFile->setText(fileName);
     setWindowIcon(QIcon("://images/images/logo_small.png"));
 
     m_textDoc = new QTextDocument(m_textEdit);
-    m_textEdit->setDocument(m_textDoc);
-    m_localCursor = new QTextCursor(m_textDoc);
+    m_textEdit->setDocument(m_textDoc);    
+    m_localCursor = new QTextCursor(m_textDoc);        
     m_textEdit->setTextCursor(*m_localCursor);
 
     m_showUriDialog = new ShowUriDialog();
     QString uri = controller->getUri();
     m_showUriDialog->setUri(uri);
 
-    setWindowTitle("PoliDox");
-    QString fileName = controller->getFilename();
-    ui->currentFile->setText(fileName);
-
+    // Initialize graphic
     initContributorsLists();
     bootContributorsLists(contributorsOnline, contributorsOffline);
+    initRichTextToolBar();
 
+    int TLines = ui->textEdit->document()->blockCount();
+    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
+
+    profile = new Profile(this);
+    profile->setImagePic(main_account->getImage());
+    profile->setUsername(main_account->getName());
+    profile->show();
+
+
+    // Connect signals
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
@@ -66,14 +96,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         }
     });
 
-
-    initRichTextToolBar();
-
-
-    int TLines = ui->textEdit->document()->blockCount();
-    ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
-
     connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){        
+        // TODO: Use connect below to update on click?
         int line = ui->textEdit->textCursor().blockNumber()+1;
         int pos = ui->textEdit->textCursor().columnNumber()+1;
         int TLines = ui->textEdit->document()->blockCount();
@@ -94,22 +118,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile->show();
 }
 
-/*bool Editor::eventFilter(QObject *target, QEvent *event){
-
-    if(event->type()==QEvent::MouseButtonPress){
-        QMouseEvent* mouse_event=static_cast<QMouseEvent*>(event);
-        if(mouse_event->button()==Qt::LeftButton)
-            std::cout << "Mouse left event captured!" << std::endl;
-        else
-            std::cout << "Mouse right event captured!" << std::endl;
-
-        return true;
-    }
-
-    QMainWindow::eventFilter(target,event);
-
-}*/
-
 Editor::~Editor()
 {
     delete ui;
@@ -128,14 +136,18 @@ void Editor::init(const QVector<Char>& p_text)
 }
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
+
     //fill offline list
     for(Account acc : contributorsOffline){
+        assignRandomColor(acc.getSiteId());
         m_offlineUsers.append(acc);
         addOfflineUser(acc);
     }
 
     //fill online list
     for(Account acc : contributorsOnline) {
+
+        assignRandomColor(acc.getSiteId());
         addClient(acc); // m_onlineUsers.add + addOnlineUser
     }
 }
@@ -150,8 +162,14 @@ void Editor::initContributorsLists(){
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
+    int you=controller->getAccount().getSiteId();
+    assignRandomColor(you);
+
+    QColor color=QColor(assignedColor.value(you));
+
     QListWidgetItem* item = new QListWidgetItem("You",ui->onlineList);
-    setItem(controller->getAccount().getColor(), item);
+    //setItem(controller->getAccount().getColor(), item);
+    setItem(color,item);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(Qt::Unchecked);
@@ -163,6 +181,38 @@ void Editor::initContributorsLists(){
 
 }
 
+void Editor::initRichTextToolBar(){
+
+    m_font = new QFontComboBox(this->ui->textRichToolBar);
+    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
+
+    m_textEdit->setFont(QFont("DejaVu Sans")); // If you change it, change it also in addChar!
+    m_font->setFont(m_textEdit->currentFont());
+    m_textEdit->setFontPointSize(20);
+    m_fontSize->setValue(m_textEdit->fontPointSize());
+
+    this->ui->textRichToolBar->addWidget(m_font);
+    this->ui->textRichToolBar->addWidget(m_fontSize);
+
+    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
+        // Alternative: connect to onFontFamilyChanged here and disconnect-reconnect in onCharFormatChanged
+        if (!changingFormat)
+            onFontFamilyChanged(font);
+    });
+    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
+        // Alternative: connect to onFontSizeChanged here and disconnect-reconnect in onCharFormatChanged
+        if (!changingFormat)
+            onFontSizeChanged(i);
+    });
+    connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
+
+    QAction* separator1=this->ui->toolBar_2->actions().at(0);
+    QAction* separator2=this->ui->textRichToolBar->actions().at(0);
+    delete separator1;
+    delete separator2;
+
+}
+
 void Editor::highlightUser(QListWidgetItem *item) {
 
     int siteID = -1;
@@ -170,7 +220,8 @@ void Editor::highlightUser(QListWidgetItem *item) {
 
     if ("You" == item->text()) {
         siteID = controller->getAccount().getSiteId();
-        color = controller->getAccount().getColor();
+        //color = controller->getAccount().getColor();
+        color=QColor(assignedColor.value(siteID));
 
     } else {
 
@@ -191,12 +242,14 @@ void Editor::highlightUser(QListWidgetItem *item) {
                 return;
             } else {
                 siteID = offlineHIT->getSiteId();
-                color = offlineHIT->getColor();
+                //color = offlineHIT->getColor();
+                color=QColor(assignedColor.value(siteID));
             }
 
         } else {
             siteID = onlineHIT->account.getSiteId();
-            color = onlineHIT->account.getColor();
+            //color = onlineHIT->account.getColor();
+            color=QColor(assignedColor.value(siteID));
         }
 
     }
@@ -221,7 +274,10 @@ void Editor::addOnlineUser(const Account& account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
 
-    setItem(account.getColor(),item);
+    //setItem(account.getColor(),item);
+    QColor color(assignedColor.value(account.getSiteId()));
+    setItem(color,item);
+
 
     if(items.size()>0){
 
@@ -240,7 +296,9 @@ void Editor::addOfflineUser(const Account& account)
 {    
     // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
     QListWidgetItem* item= new QListWidgetItem(account.getName());
-    setItem(account.getColor(),item);
+    //setItem(account.getColor(),item);
+    QColor color(assignedColor.value(account.getSiteId()));
+    setItem(color,item);
     ui->offlineList->addItem(item);
 }
 
@@ -249,8 +307,13 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     QTextCharFormat fmt;
     tStyle style = p_char.getStyle();
 
-    fmt.setFontFamily(style.font_family);
+    if (style.font_family == "")
+        fmt.setFontFamily("DejaVu Sans");
+    else
+        fmt.setFontFamily(style.font_family);
+
     fmt.setFontPointSize(style.font_size);
+
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
     else
@@ -302,43 +365,16 @@ void Editor::removeClient(const Account& account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
-    setItem(account.getColor(),item);
+    //setItem(account.getColor(),item);
+
+    QColor color(assignedColor.value(account.getSiteId()));
+    setItem(color,item);
 
     if (_dItem->checkState() == Qt::Checked)
         item->setCheckState(Qt::Checked);
 
     delete _dItem;
     ui->offlineList->addItem(item);
-
-}
-
-void Editor::initRichTextToolBar(){
-
-
-    m_font = new QFontComboBox(this->ui->textRichToolBar);
-    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
-
-    m_textEdit->setFont(m_font->currentFont());
-    m_textEdit->setFontPointSize(20);
-    m_fontSize->setValue(m_textEdit->fontPointSize());
-
-    this->ui->textRichToolBar->addWidget(m_font);
-    this->ui->textRichToolBar->addWidget(m_fontSize);
-
-    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
-        if (!changingFormat)
-            onFontFamilyChanged(font);
-    });
-    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
-        if (!changingFormat)
-            onFontSizeChanged(i);
-    });
-    connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
-
-    QAction* separator1=this->ui->toolBar_2->actions().at(0);
-    QAction* separator2=this->ui->textRichToolBar->actions().at(0);
-    delete separator1;
-    delete separator2;
 
 }
 
@@ -349,18 +385,27 @@ QChar Editor::at(int pos)
 
 void Editor::addClient(const Account& user)
 {
+
+    int siteId = user.getSiteId();
+
+    if(m_offlineUsers.removeAll(user)==0)
+        assignRandomColor(siteId);
+
+    QColor color(assignedColor.value(siteId));
+
     // 1. Add user to the map of remote users
-    int siteId = user.getSiteId();    
+    //int siteId = user.getSiteId();
     QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);        
-    remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;");
+    //remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;");
+    remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;");
     remoteLabel->setFont(font);
     remoteLabel->lower();    
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
     // 2. If user's not a new contributor, remove him/her from list of offline users
-    m_offlineUsers.removeAll(user);
+    //m_offlineUsers.removeAll(user);
 
     // 3. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
@@ -483,7 +528,7 @@ void Editor::resetActionToggle(int pos,bool selection){
     QAction* italicAction=this->ui->textRichToolBar->actions().at(1);
     QAction* underlineAction=this->ui->textRichToolBar->actions().at(2);
 
-    if(fmt.fontWeight()==50 && boldAction->isChecked() && !selection)
+    if(fmt.fontWeight()==QFont::Bold && boldAction->isChecked() && !selection)
         boldAction->setChecked(false);
     else if(fmt.fontWeight()==75)
         boldAction->setChecked(true);
