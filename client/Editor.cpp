@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QPrinter>
 
 #include <QPushButton>
 #include <QCheckBox>
@@ -511,20 +512,22 @@ void Editor::on_actionNew_triggered()
     /* TODO: implementare la creazione di un nuovo file qui */
 }
 
-/* Handler di gestione per il salvataggio ed esportazione del file */
+/* Handler di gestione per il salvataggio ed esportazione del file in formato .PDF*/
 void Editor::on_actionSave_as_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, "Save as");
-    QFile file(fileName);
-    if(!file.open(QFile::WriteOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot save file : " + file.errorString());
-        return;
-    }
-    setWindowTitle(fileName);
-    QTextStream out(&file);
-    QString text = m_textEdit->toPlainText();
-    out << text;
-    file.close();
+
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Export PDF", QString(), "*.pdf");
+    if (QFileInfo(fileName).suffix().isEmpty()) { fileName.append(".pdf"); }
+
+    QPrinter printer(QPrinter::PrinterResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setPaperSize(QPrinter::A4);
+    printer.setOutputFileName(fileName);
+
+    QTextDocument doc;
+    doc.setHtml(m_textEdit->toPlainText());
+    doc.setPageSize(printer.pageRect().size()); // hide the page number
+    doc.print(&printer);
 
 }
 
