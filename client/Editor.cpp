@@ -31,6 +31,25 @@ void setItem(QColor color,QListWidgetItem* item){
 
 }
 
+void Editor::assignRandomColor(int siteID){
+
+    QColor color;
+    QList<QString> colors=assignedColor.values();
+
+    while(1){
+
+        color=QColor(rand()%255,rand()%255,rand()%255);
+
+        auto HIT=std::find(colors.begin(),colors.end(),color.name());
+
+        if(HIT==colors.end())
+            break;
+
+    }
+
+    assignedColor.insert(siteID,color.name());
+}
+
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), changingFormat(false), ui(new Ui::Editor)
 {
@@ -48,7 +67,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     m_localCursor = new QTextCursor(m_textDoc);        
     m_textEdit->setTextCursor(*m_localCursor);
 
-
     m_showUriDialog = new ShowUriDialog();
     QString uri = controller->getUri();
     m_showUriDialog->setUri(uri);
@@ -64,7 +82,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile = new Profile(this);
     profile->setImagePic(main_account->getImage());
     profile->setUsername(main_account->getName());
-    //profile->show();
+    profile->show();
 
 
     // Connect signals
@@ -93,7 +111,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
         emit cursorPositionChanged(pos);
     });
-
 
 }
 
@@ -131,14 +148,18 @@ void Editor::init(const QVector<Char>& p_text)
 }
 
 void Editor::bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsOffline){
+
     //fill offline list
     for(Account acc : contributorsOffline){
+        assignRandomColor(acc.getSiteId());
         m_offlineUsers.append(acc);
         addOfflineUser(acc);
     }
 
     //fill online list
     for(Account acc : contributorsOnline) {
+
+        assignRandomColor(acc.getSiteId());
         addClient(acc); // m_onlineUsers.add + addOnlineUser
     }
 }
@@ -153,8 +174,14 @@ void Editor::initContributorsLists(){
     QIcon offlineIcon(offline);
     ui->label_2->setPixmap(offlineIcon.pixmap(QSize(10,10)));
 
+    int you=controller->getAccount().getSiteId();
+    assignRandomColor(you);
+
+    QColor color=QColor(assignedColor.value(you));
+
     QListWidgetItem* item = new QListWidgetItem("You",ui->onlineList);
-    setItem(controller->getAccount().getColor(), item);
+    //setItem(controller->getAccount().getColor(), item);
+    setItem(color,item);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(Qt::Unchecked);
@@ -205,7 +232,8 @@ void Editor::highlightUser(QListWidgetItem *item) {
 
     if ("You" == item->text()) {
         siteID = controller->getAccount().getSiteId();
-        color = controller->getAccount().getColor();
+        //color = controller->getAccount().getColor();
+        color=QColor(assignedColor.value(siteID));
 
     } else {
 
@@ -226,12 +254,14 @@ void Editor::highlightUser(QListWidgetItem *item) {
                 return;
             } else {
                 siteID = offlineHIT->getSiteId();
-                color = offlineHIT->getColor();
+                //color = offlineHIT->getColor();
+                color=QColor(assignedColor.value(siteID));
             }
 
         } else {
             siteID = onlineHIT->account.getSiteId();
-            color = onlineHIT->account.getColor();
+            //color = onlineHIT->account.getColor();
+            color=QColor(assignedColor.value(siteID));
         }
 
     }
@@ -256,7 +286,10 @@ void Editor::addOnlineUser(const Account& account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
 
-    setItem(account.getColor(),item);
+    //setItem(account.getColor(),item);
+    QColor color(assignedColor.value(account.getSiteId()));
+    setItem(color,item);
+
 
     if(items.size()>0){
 
@@ -342,7 +375,10 @@ void Editor::removeClient(const Account& account){
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
-    setItem(account.getColor(),item);
+    //setItem(account.getColor(),item);
+
+    QColor color(assignedColor.value(account.getSiteId()));
+    setItem(color,item);
 
     if (_dItem->checkState() == Qt::Checked)
         item->setCheckState(Qt::Checked);
@@ -359,18 +395,27 @@ QChar Editor::at(int pos)
 
 void Editor::addClient(const Account& user)
 {
+
+    int siteId = user.getSiteId();
+
+    if(m_offlineUsers.removeAll(user)==0)
+        assignRandomColor(siteId);
+
+    QColor color(assignedColor.value(siteId));
+
     // 1. Add user to the map of remote users
-    int siteId = user.getSiteId();    
+    //int siteId = user.getSiteId();
     QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);        
-    remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;");
+    //remoteLabel->setStyleSheet("color:"+user.getColor().name()+";background-color:transparent;");
+    remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;");
     remoteLabel->setFont(font);
     remoteLabel->lower();    
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
     // 2. If user's not a new contributor, remove him/her from list of offline users
-    m_offlineUsers.removeAll(user);
+    //m_offlineUsers.removeAll(user);
 
     // 3. Draw the remote cursor at position 0
     QTextCursor& remoteCursor = m_onlineUsers[siteId].cursor;
@@ -477,7 +522,6 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QTextCharFormat fmt=cursor.charFormat();  
     bold = (fmt.fontWeight() == QFont::Bold);
 
-    qDebug() << "Font family:" << fmt.fontFamily();
     symbol.setStyle(fmt.fontFamily(), fmt.fontPointSize(), bold, fmt.fontItalic(),
                     fmt.fontUnderline(), (int)m_textEdit->alignment());
 }
