@@ -31,7 +31,7 @@ void setItem(QColor color,QListWidgetItem* item){
 
 }
 
-Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline) :
+Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
@@ -88,6 +88,10 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         emit cursorPositionChanged(pos);
     });
 
+    profile = new Profile(this);
+    profile->setImagePic(main_account->getImage());
+    profile->setUsername(main_account->getName());
+    //profile->show();
 }
 
 /*bool Editor::eventFilter(QObject *target, QEvent *event){

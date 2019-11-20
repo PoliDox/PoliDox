@@ -9,7 +9,7 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 {        
     m_siteId = p_account.getSiteId();
     m_crdt = new CrdtClient(m_siteId);
-    m_editor = new Editor(this, nullptr, contributorsOnline, contributorsOffline);
+    m_editor = new Editor(this, nullptr, contributorsOnline, contributorsOffline, &p_account);
 
     connect(m_editor, &Editor::textChanged, this, &ClientController::onTextChanged);
 

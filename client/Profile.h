@@ -12,8 +12,10 @@ class Profile : public QDialog
     Q_OBJECT
 
 public:
-    explicit Profile(QWidget *parent = nullptr);
+    Profile(QWidget *parent = nullptr);
     ~Profile();
+    void setUsername(const QString& username);
+    void setImagePic(const QPixmap& imagePic);
 
 private:
     Ui::Profile *ui;
