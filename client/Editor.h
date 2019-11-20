@@ -120,8 +120,6 @@ private:
 
     QMap<int,QString> assignedColor;
 
-protected:
-    //bool eventFilter(QObject *target, QEvent *event) override;
 
 };
 

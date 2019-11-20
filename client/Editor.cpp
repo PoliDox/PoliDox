@@ -114,22 +114,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
 }
 
-/*bool Editor::eventFilter(QObject *target, QEvent *event){
-
-    if(event->type()==QEvent::MouseButtonPress){
-        QMouseEvent* mouse_event=static_cast<QMouseEvent*>(event);
-        if(mouse_event->button()==Qt::LeftButton)
-            std::cout << "Mouse left event captured!" << std::endl;
-        else
-            std::cout << "Mouse right event captured!" << std::endl;
-
-        return true;
-    }
-
-    QMainWindow::eventFilter(target,event);
-
-}*/
-
 Editor::~Editor()
 {
     delete ui;
@@ -309,6 +293,8 @@ void Editor::addOfflineUser(const Account& account)
     // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
     QListWidgetItem* item= new QListWidgetItem(account.getName());
     //setItem(account.getColor(),item);
+    QColor color(assignedColor.value(account.getSiteId()));
+    setItem(color,item);
     ui->offlineList->addItem(item);
 }
 
