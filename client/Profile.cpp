@@ -20,5 +20,5 @@ void Profile::setUsername(const QString& username){
 
 void Profile::setImagePic(const QPixmap &imagePic){
     QIcon profile_pic(imagePic);
-    ui->image_pic->setPixmap(profile_pic.pixmap(QSize(10,10)));
+    ui->image_pic->setPixmap(profile_pic.pixmap(QSize(100,100)));
 }

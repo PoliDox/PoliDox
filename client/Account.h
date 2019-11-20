@@ -17,7 +17,7 @@ private:
     int siteId;
     QString name;
     QByteArray image;
-    int color;   
+    int color;
 
 public:
     Account() = default;

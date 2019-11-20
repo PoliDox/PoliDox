@@ -49,7 +49,7 @@ QJsonObject Account::toJson() const {
     QJsonObject accountJSON;
     accountJSON.insert("siteId", siteId);
     accountJSON.insert("name", name);
-    accountJSON.insert("color", color);    
+    accountJSON.insert("color", color);
     accountJSON.insert("image", QLatin1String(image));
     return accountJSON;
 }
