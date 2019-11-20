@@ -79,7 +79,7 @@ private slots:
     void onFontFamilyChanged(const QFont& font);
     void onCharFormatChanged(const QTextCharFormat & f);
 
-    void on_actionLeftAllignmet_triggered();
+    void on_actionAlignLeft_triggered();
     void on_actionAlignCenter_triggered();
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered(); 
@@ -97,9 +97,11 @@ private:
     void addOnlineUser(const Account& account);
     void addOfflineUser(const Account& account);
     void addChar(const Char& p_char, QTextCursor& p_cursor);
+    void updateAlignment();
 
     ClientController *controller;
     bool handlingOperation;
+    bool changingFormat;
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
     QTextCursor *m_localCursor;

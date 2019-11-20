@@ -32,7 +32,7 @@ void setItem(QColor color,QListWidgetItem* item){
 }
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
-    QMainWindow(parent), controller(p_controller), handlingOperation(false), ui(new Ui::Editor)
+    QMainWindow(parent), controller(p_controller), handlingOperation(false), changingFormat(false), ui(new Ui::Editor)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -249,9 +249,12 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     QTextCharFormat fmt;
     tStyle style = p_char.getStyle();
 
+    fmt.setFontFamily(style.font_family);
     fmt.setFontPointSize(style.font_size);
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
+    else
+        fmt.setFontWeight(QFont::Normal);
 
     fmt.setFontItalic(style.is_italic);
     fmt.setFontUnderline(style.is_underline);
@@ -263,6 +266,20 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     m_textEdit->mergeCurrentCharFormat(fmt);
 
     p_cursor.insertText(QString(p_char.getValue()));
+}
+
+void Editor::updateAlignment()
+{
+    Qt::Alignment a = m_textEdit->alignment();
+    if (a & Qt::AlignLeft)
+
+        ui->actionAlignLeft->setChecked(true);
+    else if (a & Qt::AlignHCenter)
+        ui->actionAlignCenter->setChecked(true);
+    else if (a & Qt::AlignRight)
+        ui->actionAlignRight->setChecked(true);
+    else if (a & Qt::AlignJustify)
+        ui->actionJustify->setChecked(true);
 }
 
 void Editor::removeClient(const Account& account){
@@ -308,8 +325,14 @@ void Editor::initRichTextToolBar(){
     this->ui->textRichToolBar->addWidget(m_font);
     this->ui->textRichToolBar->addWidget(m_fontSize);
 
-    connect(m_font, &QFontComboBox::currentFontChanged, this, &Editor::onFontFamilyChanged);
-    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Editor::onFontSizeChanged);
+    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
+        if (!changingFormat)
+            onFontFamilyChanged(font);
+    });
+    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
+        if (!changingFormat)
+            onFontSizeChanged(i);
+    });
     connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
 
     QAction* separator1=this->ui->toolBar_2->actions().at(0);
@@ -365,20 +388,6 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
 
     updateCursors();
     handlingOperation = false;
-}
-
-void Editor::updateCursors()
-{
-    for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
-        User& user = it.value();
-        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
-        //qDebug() << "cursor height:" << remoteCoord.bottom()-remoteCoord.top();
-        //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
-        int height = remoteCoord.bottom()-remoteCoord.top();
-        user.label->resize(100, height);
-        user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
-        user.label->setVisible(true);
-    }
 }
 
 void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
@@ -455,17 +464,14 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QTextCursor cursor(m_textDoc);
     cursor.setPosition(index); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
 
-    QTextCharFormat fmt=cursor.charFormat();
-
-    if(fmt.fontWeight() == 50)
-        bold=false;
-    else
-        bold=true;
+    QTextCharFormat fmt=cursor.charFormat();  
+    bold = (fmt.fontWeight() == QFont::Bold);
 
     symbol.setStyle(fmt.fontFamily(), fmt.fontPointSize(), bold, fmt.fontItalic(),
                     fmt.fontUnderline(), (int)m_textEdit->alignment());
 }
 
+// TODO: not used, delete?
 void Editor::resetActionToggle(int pos,bool selection){
 
     QTextCursor cursor(m_textDoc);
@@ -494,6 +500,20 @@ void Editor::resetActionToggle(int pos,bool selection){
 
 }
 
+void Editor::updateCursors()
+{
+    for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
+        User& user = it.value();
+        QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
+        //qDebug() << "cursor height:" << remoteCoord.bottom()-remoteCoord.top();
+        //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
+        int height = remoteCoord.bottom()-remoteCoord.top();
+        user.label->resize(100, height);
+        user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
+        user.label->setVisible(true);
+    }
+}
+
 void Editor::moveCursor(int pos, int siteId)
 {
     User& user = m_onlineUsers[siteId];
@@ -503,6 +523,40 @@ void Editor::moveCursor(int pos, int siteId)
     user.label->resize(100, height);
     user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
     user.label->setVisible(true);
+}
+
+void Editor::onCharFormatChanged(const QTextCharFormat &f)
+{
+    changingFormat = true;
+    qDebug() << "Char format changed";
+    ui->actionBold->setChecked(f.font().bold());
+    ui->actionItalic->setChecked(f.font().italic());
+    ui->actionUnderlined->setChecked(f.font().underline());
+    m_font->setCurrentIndex(m_font->findText(QFontInfo(f.font()).family()));
+    m_fontSize->setValue(f.font().pointSize());
+    changingFormat = false;
+}
+
+
+void Editor::onFontSizeChanged(int i){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFontPointSize(i);    
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+}
+
+void Editor::onFontFamilyChanged(const QFont& font){
+
+    QTextCursor cursor = m_textEdit->textCursor();
+    QTextCharFormat fmt;
+
+    fmt.setFontFamily(font.family());    
+    cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
 }
 
 void Editor::closeEvent(QCloseEvent *event)
@@ -571,7 +625,6 @@ void Editor::on_actionRedo_triggered()
 
 void Editor::on_actionBold_triggered()
 {
-
     QTextCharFormat fmt;
     fmt.setFontWeight(this->ui->textRichToolBar->actions().at(0)->isChecked() ? QFont::Bold : QFont::Normal);
 
@@ -609,41 +662,14 @@ void Editor::on_actionUnderlined_triggered()
 
 }
 
-void Editor::onFontSizeChanged(int i){
-
-    m_textEdit->setFontPointSize(i);
-
-}
-
-void Editor::onFontFamilyChanged(const QFont& font){
-
-    QTextCursor cursor = m_textEdit->textCursor();
-    QTextCharFormat fmt;
-
-    fmt.setFont(font);
-    cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);
-
-}
-
-void Editor::onCharFormatChanged(const QTextCharFormat &f)
+void Editor::on_actionAlignLeft_triggered()
 {
-    ui->actionBold->setChecked(f.font().bold());
-    ui->actionItalic->setChecked(f.font().italic());
-    ui->actionUnderlined->setChecked(f.font().underline());
-    m_font->setCurrentFont(f.font());
-    m_fontSize->setValue(f.font().pointSize());
-}
-
-void Editor::on_actionLeftAllignmet_triggered()
-{
-    QAction* center=this->ui->textRichToolBar->actions().at(5);
-    QAction* right=this->ui->textRichToolBar->actions().at(6);
-
-    if(center->isChecked())
-        center->setChecked(false);
-    else if(right->isChecked())
-        right->setChecked(false);
+    QAction* center = ui->textRichToolBar->actions().at(5);
+    QAction* right = ui->textRichToolBar->actions().at(6);
+    QAction* justify = ui->textRichToolBar->actions().at(7);
+    center->setChecked(false);
+    right->setChecked(false);
+    justify->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignLeft);
 }
@@ -652,11 +678,10 @@ void Editor::on_actionAlignCenter_triggered()
 {
     QAction* left=this->ui->textRichToolBar->actions().at(4);
     QAction* right=this->ui->textRichToolBar->actions().at(6);
-
-    if(left->isChecked())
-        left->setChecked(false);
-    else if(right->isChecked())
-        right->setChecked(false);
+    QAction* justify = ui->textRichToolBar->actions().at(7);
+    left->setChecked(false);
+    right->setChecked(false);
+    justify->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignCenter);
 }
@@ -666,11 +691,10 @@ void Editor::on_actionAlignRight_triggered()
 {
     QAction* left=this->ui->textRichToolBar->actions().at(4);
     QAction* center=this->ui->textRichToolBar->actions().at(5);
-
-    if(left->isChecked())
-        left->setChecked(false);
-    else if(center->isChecked())
-        center->setChecked(false);
+    QAction* justify = ui->textRichToolBar->actions().at(7);
+    left->setChecked(false);
+    center->setChecked(false);
+    justify->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignRight);
 }
@@ -679,17 +703,12 @@ void Editor::on_actionJustify_triggered()
 {
     QAction* left=this->ui->textRichToolBar->actions().at(4);
     QAction* center=this->ui->textRichToolBar->actions().at(5);
-    QAction* right=this->ui->textRichToolBar->actions().at(6);
-
-    if(left->isChecked())
-        left->setChecked(false);
-    else if(center->isChecked())
-        center->setChecked(false);
-    else if(right->isChecked())
-        right->setChecked(false);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);    
+    left->setChecked(false);
+    center->setChecked(false);
+    right->setChecked(false);
 
     m_textEdit->setAlignment(Qt::AlignJustify);
-
 }
 
 /* Handler di gestione dell'apertura di un nuovo file */

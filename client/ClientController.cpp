@@ -101,7 +101,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     // No switch case for strings in C++ :((
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
-        //qDebug() << "REMOTE ISNERT:" << _JSONstring.toUtf8().constData();
+        //qDebug() << "REMOTE INSERT:" << _JSONstring.toUtf8().constData();
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
@@ -177,7 +177,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         QChar qchar = m_editor->at(position+i);
         char _char;
         if (qchar == QChar::ParagraphSeparator) {
-            qDebug() << "ParagraphSeparator";
+            //qDebug() << "ParagraphSeparator";
             _char = '\n';
         } else {
             _char =  qchar.toLatin1();
@@ -186,7 +186,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         Char symbol(_char,m_crdt->getSiteId());
 
         m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert
-        m_editor->resetActionToggle(position,_SELECTION);
+        //m_editor->resetActionToggle(position,_SELECTION);
         m_crdt->localInsert(position+i, symbol);
     }
 
