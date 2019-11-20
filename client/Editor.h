@@ -13,6 +13,7 @@
 #include "Styler.h"
 #include "ClientController.h"
 #include "ShowUriDialog.h"
+#include "Profile.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -39,7 +40,7 @@ class Editor : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, const QList<Account>& contributorsOnline = {}, const QList<Account>& contributorsOffline = {});
+    explicit Editor(ClientController *p_controller, QWidget *parent = nullptr, const QList<Account>& contributorsOnline = {}, const QList<Account>& contributorsOffline = {}, const Account* main_account = nullptr);
     ~Editor() override;
 
     void init(const QVector<Char>& p_text);
@@ -113,6 +114,7 @@ private:
     // TODO Orribile: spostare in editor.ui
     QFontComboBox* m_font;
     QSpinBox* m_fontSize;
+    Profile *profile;
 
 protected:
     //bool eventFilter(QObject *target, QEvent *event) override;
