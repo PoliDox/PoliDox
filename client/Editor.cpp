@@ -113,6 +113,10 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         emit cursorPositionChanged(pos);
     });
 
+    profile = new Profile(this);
+    profile->setImagePic(main_account->getImage());
+    profile->setUsername(main_account->getName());
+    profile->show();
 }
 
 Editor::~Editor()

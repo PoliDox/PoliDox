@@ -17,6 +17,11 @@ public:
     void setUsername(const QString& username);
     void setImagePic(const QPixmap& imagePic);
 
+private slots:
+    void on_changePassword_clicked();
+
+    void on_changeImage_clicked();
+
 private:
     Ui::Profile *ui;
 };
