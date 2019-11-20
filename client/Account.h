@@ -2,6 +2,7 @@
 #define ACCOUNT_H
 
 #include <QString>
+#include <QJsonArray>
 #include <QByteArray>
 #include <QJsonObject>
 #include <QColor>
@@ -28,6 +29,7 @@ public:
     QColor getColor() const;
     QJsonObject toJson() const;
     static Account fromJson(const QJsonObject& accountJSON);
+    static Account fromJson(const QJsonObject& accountJSON, bool isFromDb);
     static int generateColor();
     bool operator < (const Account& other) const;
     bool operator == (const Account& other) const;

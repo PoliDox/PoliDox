@@ -2,6 +2,7 @@
 #define DATABASEMANAGER_H
 
 #include <iostream>
+#include <sstream>
 
 #include <QSqlDatabase>
 #include <QtSql>
@@ -35,11 +36,12 @@ private:
     void incrementCounterOfCollection(QString nameCollection);
     int getCounterOfCollection(QString nameCollection);
     void insertNewElemInCounterCollection(QString nameDocument, int initialValue);
+    QByteArray getImage(bsoncxx::document::view queryResult);
 
 public:
     DatabaseManager();
     int registerUser(QString& name, QString& password, QByteArray& image);
-    int checkPassword(QString& name, QString& password);
+    int checkPassword(QString& name, QString& password, QByteArray& imageToReturn);
     bool insertNewDocument(QString& documentName, QString& uri);
     QString getUri(QString& documentName);
     QString getDocument(QString& uriOfDocument);

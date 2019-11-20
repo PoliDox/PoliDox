@@ -90,20 +90,23 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
-    std::vector<unsigned char> imageVector(image.begin(), image.end());
+/*  serve trasformala ad unsigned char?? per ora forse no */
+/*    std::vector<unsigned char> imageVector(image.begin(), image.end());
     auto array_builder = bsoncxx::builder::basic::array{};
     for (unsigned char element : imageVector) {
         array_builder.append(element);
+    } */
+    auto array_builder = bsoncxx::builder::basic::array{};
+    for(signed char elem : image){
+        array_builder.append(elem);
     }
 
-    //ATTENZIONE: per ora, qui sotto, l'inserimento dell'immagine è commentato
-    //            discommentare e testare!!!
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value userToInsert =
         elementBuilder << "_id"      << name.toUtf8().constData()
                        << "password" << hashedPsw.toUtf8().constData()
                        << "siteId"   << siteId
-                       //<< "image"    << array_builder
+                       << "image"    << array_builder
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view userToInsertView = userToInsert.view();
 
@@ -119,9 +122,28 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 }
 
 
-//TODO: - oltre al siteId, ritornare anche l'immagine
+QByteArray DatabaseManager::getImage(bsoncxx::document::view queryResult){
+    QString userDocument = QString::fromStdString(bsoncxx::to_json(queryResult));
+    QJsonDocument stringDocJSON = QJsonDocument::fromJson(userDocument.toUtf8());
+    if (stringDocJSON.isNull()) {
+        // TODO: print some debug
+        throw "DatabaseManager::getImage  error";       //TODO: da sistemare
+    }
+    QJsonObject userObjJson = stringDocJSON.object();
+
+    QJsonArray imageObjJSON = userObjJson["image"].toArray();
+    QByteArray imageToReturn;
+    for(auto elem : imageObjJSON){
+        char appo = (char)elem.toInt();     //TODO: da rivedere!! se funziona in tutti i casi, potrebbero verificarsi casi in cui taglia qualcosa e perdo informazione?
+        imageToReturn.push_back(appo);
+    }
+
+    return imageToReturn;
+}
+
+
 //it returns the id of the account, -1 otherwise
-int DatabaseManager::checkPassword(QString& name, QString& password){
+int DatabaseManager::checkPassword(QString& name, QString& password, QByteArray& imageToReturn){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
@@ -136,8 +158,12 @@ int DatabaseManager::checkPassword(QString& name, QString& password){
     bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = userCollection.find_one(userToCheckView);
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
+
         bsoncxx::document::element element = a["siteId"];
         int siteIdToReturn = element.get_int32().value;
+
+        imageToReturn = getImage(a);
+
         return siteIdToReturn;
     }
     else{
@@ -406,7 +432,7 @@ Account DatabaseManager::getAccount(int siteId){
         int color = Account::generateColor();
         QJsonObject accountObjJson = stringDocJSON.object();
         accountObjJson.insert("color", color);
-        Account accountToReturn = Account::fromJson(accountObjJson);
+        Account accountToReturn = Account::fromJson(accountObjJson, true);
         return accountToReturn;
     }
     else {

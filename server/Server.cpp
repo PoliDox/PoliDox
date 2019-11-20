@@ -84,9 +84,9 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
             return;
         }
 
+        QByteArray imageToReturn;
         int result = -1;
-        result = this->dbOperations->checkPassword(name, password);
-        qDebug() << "Authentication result: " << result;
+        result = this->dbOperations->checkPassword(name, password,  imageToReturn);
 
         if(result < 0){
             QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, QString("auth"), loggedAccount, nameDocuments);
@@ -96,7 +96,7 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
 
         loginSuccess = true;
         //in case of success, result will contain siteId and [image(TODO!!)]
-        loggedAccount = new Account(result, name, ""); //TODO : inserire anche l'immagine
+        loggedAccount = new Account(result, name, imageToReturn); //TODO : inserire anche l'immagine
         this->socket2account[signalSender] = loggedAccount;
 
         nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
@@ -230,7 +230,7 @@ int Server::getDigits(std::string s) {
     for ( auto it = s.rbegin(); it != s.rend(); ++it ) {
         runningLength += prevLength;
         //if digits is a 7 digit number then appending a 3 digit number would overflow an int
-        digits += (long long int)*it * pow(10, runningLength);
+        digits += (long long int)*it * pow(10, runningLength);          //TODO: si può togliere questo warning 'old style cast' ?
         //we have to work out the length of the current digit
         //so we know how much we need to shift by next time
         int dLength = 0;

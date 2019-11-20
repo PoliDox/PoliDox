@@ -56,16 +56,35 @@ QJsonObject Account::toJson() const {
 
 
 Account Account::fromJson(const QJsonObject& accountJSON) {
+    return Account::fromJson(accountJSON, false);
+}
+
+
+Account Account::fromJson(const QJsonObject& accountJSON, bool isFromDb) {
     int l_siteId = accountJSON["siteId"].toInt();
     QString l_name = accountJSON["name"].toString();     //TODO: nel caso in cui questa funzione sia chiamata dal db, non esisterà il campo name
                                                          //       nel JSON, vedere se questo potrebbe generare errore oppure no!!
     if(l_name == "")
         l_name = accountJSON["_id"].toString(); //non cancellare, serve per la conversione dal db  =)
+
     int l_color = accountJSON["color"].toInt();
-    QByteArray l_image = accountJSON["image"].toString().toLatin1();
-    qDebug() << "ACCOUNT " << accountJSON ;
+
+    QByteArray l_image;
+    if(!isFromDb){
+        l_image = accountJSON["image"].toString().toLatin1();
+    }
+    else {
+        QJsonArray imageObjJSON = accountJSON["image"].toArray();
+        for(auto elem : imageObjJSON){
+            char appo = (char)elem.toInt();     //TODO: da rivedere!! se funziona in tutti i casi, potrebbero verificarsi casi in cui taglia qualcosa e perdo informazione?
+            l_image.push_back(appo);
+        }
+    }
+
+    qDebug() << "[Account::fromJson] ACCOUNT.image: " << l_image ;
     return Account(l_siteId, l_name, l_image, l_color);
 }
+
 
 int Account::generateColor()
 {
