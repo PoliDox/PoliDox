@@ -144,9 +144,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 void ClientController::onTextChanged(int position, int charsRemoved, int charsAdded)
 {
 
-    qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;
-
-    //TODO check if the previous character of position is bold/italic/underlined. If not, disable QToolbar icon.
+    qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;    
 
     if (charsAdded > 1 && position == 0 &&
             m_editor->at(0) != QChar::ParagraphSeparator) {
@@ -157,8 +155,16 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         }
         charsRemoved--;
     }
+    // Replace 'if' above with this:
+    /*
+    if (charsRemoved > m_crdt->getTextSize()) {
+        charsAdded--;
+        charsRemoved--;
+    }
+    */
 
-    bool _SELECTION= charsAdded==charsRemoved;
+
+    //bool _SELECTION= charsAdded==charsRemoved;
 
     // It could happen that some chars were removed and some others were added at the same time
 

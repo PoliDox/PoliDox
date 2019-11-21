@@ -21,36 +21,6 @@
 #include <iostream>
 #include <QMetaObject>
 
-void setItem(QColor color,QListWidgetItem* item){
-
-    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-    item->setCheckState(Qt::Unchecked);
-    color.setAlpha(80);
-    item->setBackgroundColor(color);
-
-}
-
-void Editor::assignRandomColor(int siteID){
-
-    QColor color;
-    QList<QString> colors=assignedColor.values();
-
-
-    while(1){
-
-        color=QColor(rand()%255,rand()%255,rand()%255);
-
-        auto HIT=std::find(colors.begin(),colors.end(),color.name());
-
-        if(HIT==colors.end())
-            break;
-
-    }
-
-    assignedColor.insert(siteID,color.name());
-}
-
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
     QMainWindow(parent), controller(p_controller), handlingOperation(false), changingFormat(false), ui(new Ui::Editor)
 {
@@ -108,7 +78,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
-        qDebug() << "Cursor position is now" << pos; // THAT'S SO WRONG!
+        //qDebug() << "Cursor position is now" << pos;
 
         emit cursorPositionChanged(pos);
     });
@@ -226,6 +196,31 @@ void Editor::initRichTextToolBar(){
     delete separator1;
     delete separator2;
 
+}
+
+void Editor::setItem(QColor color,QListWidgetItem* item){
+
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+    item->setCheckState(Qt::Unchecked);
+    color.setAlpha(80);
+    item->setBackgroundColor(color);
+
+}
+
+void Editor::assignRandomColor(int siteID){
+
+    QColor color;
+    QList<QString> colors=assignedColor.values();
+
+    while(1){
+        color=QColor(rand()%255,rand()%255,rand()%255);
+        auto HIT=std::find(colors.begin(),colors.end(),color.name());
+        if(HIT==colors.end())
+            break;
+
+    }
+    assignedColor.insert(siteID,color.name());
 }
 
 void Editor::highlightUser(QListWidgetItem *item) {

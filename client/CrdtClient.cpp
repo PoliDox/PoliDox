@@ -305,7 +305,13 @@ void CrdtClient::localDelete(unsigned int position){
 
 }
 
+int CrdtClient::getTextSize()
+{
+    // TODO
+    // Remember to include \n
+}
 
+/*
 void CrdtClient::printDebugChars(){
     std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
         std::for_each(row.begin(), row.end(), [](Char val){
@@ -315,9 +321,10 @@ void CrdtClient::printDebugChars(){
             }
             std::cout << "]" << std::endl;
 
-            /*std::for_each(val.getFractionalPosition().begin(), val.getFractionalPosition().end(), [](auto i){
-                qDebug() << i;
-            });*/
+            //std::for_each(val.getFractionalPosition().begin(), val.getFractionalPosition().end(), [](auto i){
+            //    qDebug() << i;
+            //});
         });
     });
 }
+*/

@@ -23,7 +23,8 @@ public:
     CrdtClient(double siteId);
     void localInsert(unsigned int position, Char symbolToInsert);
     void localDelete(unsigned int index);
-    void printDebugChars();
+    int getTextSize();
+    //void printDebugChars();
     double getSiteId() const;
     void setSiteId(double siteId);
     std::vector<int> getUserPositions(int siteId);

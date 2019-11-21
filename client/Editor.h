@@ -102,6 +102,7 @@ private:
     void addChar(const Char& p_char, QTextCursor& p_cursor);
     void updateAlignment();
     void assignRandomColor(int siteID);
+    void setItem(QColor color, QListWidgetItem* item); // Technically not a member function
 
     ClientController *controller;
     bool handlingOperation;
