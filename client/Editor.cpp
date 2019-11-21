@@ -575,7 +575,7 @@ void Editor::moveCursor(int pos, int siteId)
 void Editor::onCharFormatChanged(const QTextCharFormat &f)
 {
     changingFormat = true;
-    qDebug() << "Char format changed";
+    //qDebug() << "Char format changed";
     ui->actionBold->setChecked(f.font().bold());
     ui->actionItalic->setChecked(f.font().italic());
     ui->actionUnderlined->setChecked(f.font().underline());

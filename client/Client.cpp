@@ -74,8 +74,11 @@ void Client::onMessageReceived(const QString &p_msg)
     if (l_header == "loginRepl") {
         QString replCode = _JSONobj["response"].toString();
 
-        if (replCode != "ok") {
+        if (replCode == "fail auth") {
             QMessageBox::warning(&loginWindow, "Login", "Username or password are incorrect");
+            return;
+        } else if (replCode == "fail log") {
+            QMessageBox::warning(&loginWindow, "Login", "User is already logged");
             return;
         }
 
