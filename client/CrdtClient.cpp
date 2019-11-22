@@ -305,12 +305,6 @@ void CrdtClient::localDelete(unsigned int position){
 
 }
 
-int CrdtClient::getTextSize()
-{
-    // TODO
-    // Remember to include \n
-}
-
 /*
 void CrdtClient::printDebugChars(){
     std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){

@@ -45,6 +45,7 @@ public:
 
     void init(const QVector<Char>& p_text);
     QChar at(int pos);
+    int textSize();
     void addClient(const Account& user);
     void removeClient(const Account& account);
     void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);

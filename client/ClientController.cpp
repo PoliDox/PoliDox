@@ -146,6 +146,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
 
     qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;    
 
+    /*
     if (charsAdded > 1 && position == 0 &&
             m_editor->at(0) != QChar::ParagraphSeparator) {
         // When copying to the beginning everything is deleted and copied anew
@@ -155,13 +156,13 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         }
         charsRemoved--;
     }
-    // Replace 'if' above with this:
-    /*
-    if (charsRemoved > m_crdt->getTextSize()) {
+    */
+    if (charsAdded > m_editor->textSize()) {
+        qDebug() << "Adjusting chars added and removed";
         charsAdded--;
         charsRemoved--;
     }
-    */
+
 
 
     //bool _SELECTION= charsAdded==charsRemoved;

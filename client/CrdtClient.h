@@ -23,7 +23,6 @@ public:
     CrdtClient(double siteId);
     void localInsert(unsigned int position, Char symbolToInsert);
     void localDelete(unsigned int index);
-    int getTextSize();
     //void printDebugChars();
     double getSiteId() const;
     void setSiteId(double siteId);

@@ -386,6 +386,11 @@ QChar Editor::at(int pos)
     return m_textDoc->characterAt(pos);
 }
 
+int Editor::textSize()
+{
+    return m_textDoc->toPlainText().size();
+}
+
 void Editor::addClient(const Account& user)
 {
 
