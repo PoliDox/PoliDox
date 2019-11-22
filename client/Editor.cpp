@@ -50,11 +50,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     int TLines = ui->textEdit->document()->blockCount();
     ui->statusbar->showMessage(QString("Line:1 Col:1 TotLines:%3").arg(TLines));
 
-    profile = new Profile(this);
-    profile->setImagePic(main_account->getImage());
-    profile->setUsername(main_account->getName());
-    //profile->show();
-
 
     // Connect signals
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
@@ -86,7 +81,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile = new Profile(this);
     profile->setImagePic(main_account->getImage());
     profile->setUsername(main_account->getName());
-    profile->show();
 
     QWidget* empty1 = new QWidget();
     empty1->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -101,6 +95,9 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     QWidget* empty2 = new QWidget();
     empty2->setFixedSize(1,1);
     ui->toolBar_2->addWidget(empty2);
+
+    connect(account,&QAction::triggered,this,&Editor::on_actionAccount_triggered);
+
 }
 
 Editor::~Editor()
@@ -214,7 +211,7 @@ void Editor::assignRandomColor(int siteID){
     QList<QString> colors=assignedColor.values();
 
     while(1){
-        color=QColor(rand()%255,rand()%255,rand()%255);
+        color=QColor(rand()%220,rand()%220,rand()%220);
         auto HIT=std::find(colors.begin(),colors.end(),color.name());
         if(HIT==colors.end())
             break;
@@ -630,7 +627,7 @@ void Editor::on_actionSave_as_triggered()
     printer.setOutputFileName(fileName);
 
     QTextDocument doc;
-    doc.setHtml(m_textEdit->toPlainText());
+    doc.setHtml(m_textEdit->toHtml());
     doc.setPageSize(printer.pageRect().size()); // hide the page number
     doc.print(&printer);
 
@@ -787,7 +784,7 @@ void Editor::on_actionURI_triggered()
     this->m_showUriDialog->show();
 }
 
-void Editor::on_actionAccount_triggered()
+void Editor::on_actionAccount_triggered(bool checked)
 {
-
+    profile->show();
 }
