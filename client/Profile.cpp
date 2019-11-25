@@ -7,6 +7,8 @@ Profile::Profile(QWidget *parent) :
     ui(new Ui::Profile)
 {
     ui->setupUi(this);
+    this->ChangeImgDialog = new ChangeImg(this);
+    this->ChangePwdDialog = new ChangePwd(this);
 }
 
 Profile::~Profile()
@@ -24,10 +26,10 @@ void Profile::setImagePic(const QPixmap &imagePic){
 
 void Profile::on_changePassword_clicked()
 {
-    //todo
+    this->ChangePwdDialog->show();
 }
 
 void Profile::on_changeImage_clicked()
 {
-    //todo
+    this->ChangeImgDialog->show();
 }

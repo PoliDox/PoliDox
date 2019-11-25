@@ -90,7 +90,7 @@ private slots:
     void highlightUser(QListWidgetItem * item);
 
 
-    void on_actionAccount_triggered();
+    void on_actionAccount_triggered(bool);
 
 private:
     void createActions();

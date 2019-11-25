@@ -106,6 +106,8 @@ void ServerController::createCrdt(QList<Char>& orderedInserts){
 // The ServerController has to update the his crdt on the
 // base of the operation(insert/delete)
 void ServerController::handleRemoteOperation(const QString& messageReceivedByClient){
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+
     QJsonDocument requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
     if (requestDocJSON.isNull()) {
         // TODO: print some debug
@@ -143,9 +145,25 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     } else if (header == "cursorMove") {
         // Do Nothing
 
-    } else if (header == "closedEditorReq") {
-        QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+    } else if(header == "changeImgReq"){
+        QString nameAccount = requestObjJSON["nameAccount"].toString();
+        QByteArray newImage = requestObjJSON["image"].toString().toLatin1();
 
+        bool result = this->server->getDb()->changeImage(nameAccount, newImage);
+
+        QByteArray sendMsgToClient = ServerMessageFactory::createChangeImageReply(result);
+        signalSender->sendTextMessage(sendMsgToClient);
+
+    } else if(header == "changePwdReq"){
+        QString nameAccount = requestObjJSON["nameAccount"].toString();
+        QString newPassword = requestObjJSON["password"].toString();
+
+        bool result = this->server->getDb()->changePassword(nameAccount, newPassword);
+
+        QByteArray sendMsgToClient = ServerMessageFactory::createChangePasswordReply(result);
+        signalSender->sendTextMessage(sendMsgToClient);
+
+    } else if (header == "closedEditorReq") {
         bool destroyServContr = false;
         this->socketsOnDocument.removeOne(signalSender);
         if(this->socketsOnDocument.size() == 0){

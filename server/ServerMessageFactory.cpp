@@ -91,6 +91,38 @@ QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, doub
 }
 
 
+QByteArray ServerMessageFactory::createChangeImageReply(bool response){
+    QJsonObject objToReturn;
+    QString responseString;
+    if(response)
+        responseString = "ok";
+    else
+        responseString = "fail";
+
+    objToReturn.insert("action","changeImgRepl");
+    objToReturn.insert("response",responseString);
+
+    QJsonDocument docOfObj(objToReturn);
+    return docOfObj.toJson(QJsonDocument::Indented);
+}
+
+
+QByteArray ServerMessageFactory::createChangePasswordReply(bool response){
+    QJsonObject objToReturn;
+    QString responseString;
+    if(response)
+        responseString = "ok";
+    else
+        responseString = "fail";
+
+    objToReturn.insert("action","changePwdRepl");
+    objToReturn.insert("response",responseString);
+
+    QJsonDocument docOfObj(objToReturn);
+    return docOfObj.toJson(QJsonDocument::Indented);
+}
+
+
 //used only for response == false
 QByteArray ServerMessageFactory::createOpenFileReply(bool response, QString typeError) {
     if(response)

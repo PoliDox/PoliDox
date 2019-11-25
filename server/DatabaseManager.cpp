@@ -90,23 +90,17 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
-/*  serve trasformala ad unsigned char?? per ora forse no */
-/*    std::vector<unsigned char> imageVector(image.begin(), image.end());
-    auto array_builder = bsoncxx::builder::basic::array{};
-    for (unsigned char element : imageVector) {
-        array_builder.append(element);
-    } */
-    auto array_builder = bsoncxx::builder::basic::array{};
-    for(signed char elem : image){
-        array_builder.append(elem);
-    }
+    std::vector<unsigned char> imageVector(image.begin(), image.end());
+    bsoncxx::types::b_binary img {bsoncxx::binary_sub_type::k_binary,
+                                  uint32_t(imageVector.size()),
+                                  imageVector.data()};
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value userToInsert =
         elementBuilder << "_id"      << name.toUtf8().constData()
                        << "password" << hashedPsw.toUtf8().constData()
                        << "siteId"   << siteId
-                       << "image"    << array_builder
+                       << "image"    << img
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view userToInsertView = userToInsert.view();
 
@@ -122,20 +116,53 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 }
 
 
-QByteArray DatabaseManager::getImage(bsoncxx::document::view queryResult){
-    QString userDocument = QString::fromStdString(bsoncxx::to_json(queryResult));
-    QJsonDocument stringDocJSON = QJsonDocument::fromJson(userDocument.toUtf8());
-    if (stringDocJSON.isNull()) {
-        // TODO: print some debug
-        throw "DatabaseManager::getImage  error";       //TODO: da sistemare
-    }
-    QJsonObject userObjJson = stringDocJSON.object();
+bool DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
+    mongocxx::collection userCollection = (*this->db)["user"];
 
-    QJsonArray imageObjJSON = userObjJson["image"].toArray();
+    std::vector<unsigned char> imageVector(newImage.begin(), newImage.end());
+    bsoncxx::types::b_binary img {bsoncxx::binary_sub_type::k_binary,
+                                  uint32_t(imageVector.size()),
+                                  imageVector.data()};
+
+    userCollection.update_one(bsoncxx::builder::stream::document{}
+                                << "_id" << nameAccount.toUtf8().constData()
+                                << bsoncxx::builder::stream::finalize,
+                              bsoncxx::builder::stream::document{}
+                                << "$set" << bsoncxx::builder::stream::open_document
+                                << "image" << img
+                                << bsoncxx::builder::stream::close_document
+                                << bsoncxx::builder::stream::finalize);
+
+    return true;        //TODO: da sistemare, gestire l'eccezione e il valore di ritorno false
+}
+
+
+bool DatabaseManager::changePassword(QString& nameAccount, QString& password){
+    mongocxx::collection userCollection = (*this->db)["user"];
+
+    QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
+
+    userCollection.update_one(bsoncxx::builder::stream::document{}
+                                << "_id" << nameAccount.toUtf8().constData()
+                                << bsoncxx::builder::stream::finalize,
+                              bsoncxx::builder::stream::document{}
+                                << "$set" << bsoncxx::builder::stream::open_document
+                                << "password" << hashedPsw.toUtf8().constData()
+                                << bsoncxx::builder::stream::close_document
+                                << bsoncxx::builder::stream::finalize);
+
+    return true;        //TODO: da sistemare, gestire l'eccezione e il valore di ritorno false
+}
+
+
+QByteArray DatabaseManager::getImage(bsoncxx::document::view queryResult){
+    bsoncxx::document::element imageElement = queryResult["image"];
+
+    long size = imageElement.length();
+    uint8_t *appo = const_cast<uint8_t*>(imageElement.get_binary().bytes);
     QByteArray imageToReturn;
-    for(auto elem : imageObjJSON){
-        char appo = (char)elem.toInt();     //TODO: da rivedere!! se funziona in tutti i casi, potrebbero verificarsi casi in cui taglia qualcosa e perdo informazione?
-        imageToReturn.push_back(appo);
+    for (int i=0; i<size; i++) {
+        imageToReturn.append(static_cast<char>(appo[i]));
     }
 
     return imageToReturn;
@@ -293,7 +320,7 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
                             << "bold"       << bold
                             << "italic"     << italic
                             << "underline"  << underline
-                            << "alignment"  << (int)0       // TODO: ALIGNMENT
+                            << "alignment"  << alignment
                             << bsoncxx::builder::stream::close_document
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view symbolToInsertView = symbolToInsert.view();
