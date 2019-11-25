@@ -171,7 +171,7 @@ void Editor::initRichTextToolBar(){
     m_font = new QFontComboBox(this->ui->textRichToolBar);
     m_fontSize = new QSpinBox(this->ui->textRichToolBar);
 
-    m_textEdit->setFont(QFont("DejaVu Sans")); // If you change it, change it also in addChar!
+    m_textEdit->setFont(QFont(DEFAULT_FONT)); // If you change it, change it also in addChar!
     m_font->setFont(m_textEdit->currentFont());
     m_textEdit->setFontPointSize(20);
     m_fontSize->setValue(m_textEdit->fontPointSize());
@@ -313,7 +313,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     tStyle style = p_char.getStyle();
 
     if (style.font_family == "")
-        fmt.setFontFamily("DejaVu Sans");
+        fmt.setFontFamily(DEFAULT_FONT);
     else
         fmt.setFontFamily(style.font_family);
 
