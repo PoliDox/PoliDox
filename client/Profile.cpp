@@ -33,7 +33,6 @@ void Profile::on_changePassword_clicked()
 
 void Profile::on_changeImage_clicked()
 {
-    //qui fare l'upload dell'immagine
     QFileDialog file_selection(ui->image_pic);
     file_selection.setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
 
