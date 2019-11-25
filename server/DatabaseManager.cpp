@@ -90,17 +90,7 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
-/*  serve trasformala ad unsigned char?? per ora forse no */
     std::vector<unsigned char> imageVector(image.begin(), image.end());
-/*    auto array_builder = bsoncxx::builder::basic::array{};
-    for (unsigned char element : imageVector) {
-        array_builder.append(element);
-    }*/
-/*    auto array_builder = bsoncxx::builder::basic::array{};
-    for(signed char elem : image){
-        array_builder.append(elem);
-    }*/
-
     bsoncxx::types::b_binary img {bsoncxx::binary_sub_type::k_binary,
                                   uint32_t(imageVector.size()),
                                   imageVector.data()};
@@ -123,6 +113,45 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 
     this->incrementCounterOfCollection("user");
     return siteId;
+}
+
+
+bool DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
+    mongocxx::collection userCollection = (*this->db)["user"];
+
+    std::vector<unsigned char> imageVector(newImage.begin(), newImage.end());
+    bsoncxx::types::b_binary img {bsoncxx::binary_sub_type::k_binary,
+                                  uint32_t(imageVector.size()),
+                                  imageVector.data()};
+
+    userCollection.update_one(bsoncxx::builder::stream::document{}
+                                << "_id" << nameAccount.toUtf8().constData()
+                                << bsoncxx::builder::stream::finalize,
+                              bsoncxx::builder::stream::document{}
+                                << "$set" << bsoncxx::builder::stream::open_document
+                                << "image" << img
+                                << bsoncxx::builder::stream::close_document
+                                << bsoncxx::builder::stream::finalize);
+
+    return true;        //TODO: da sistemare, gestire l'eccezione e il valore di ritorno false
+}
+
+
+bool DatabaseManager::changePassword(QString& nameAccount, QString& password){
+    mongocxx::collection userCollection = (*this->db)["user"];
+
+    QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
+
+    userCollection.update_one(bsoncxx::builder::stream::document{}
+                                << "_id" << nameAccount.toUtf8().constData()
+                                << bsoncxx::builder::stream::finalize,
+                              bsoncxx::builder::stream::document{}
+                                << "$set" << bsoncxx::builder::stream::open_document
+                                << "password" << hashedPsw.toUtf8().constData()
+                                << bsoncxx::builder::stream::close_document
+                                << bsoncxx::builder::stream::finalize);
+
+    return true;        //TODO: da sistemare, gestire l'eccezione e il valore di ritorno false
 }
 
 
