@@ -7,6 +7,8 @@ Profile::Profile(QWidget *parent) :
     ui(new Ui::Profile)
 {
     ui->setupUi(this);
+    this->ChangeImgDialog = new ChangeImg(this);
+    this->ChangePwdDialog = new ChangePwd(this);
 }
 
 Profile::~Profile()

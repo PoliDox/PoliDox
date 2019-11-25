@@ -2,6 +2,8 @@
 #define PROFILE_H
 
 #include <QDialog>
+#include <Changepwd.h>
+#include <Changeimg.h>
 
 namespace Ui {
 class Profile;
@@ -24,6 +26,9 @@ private slots:
 
 private:
     Ui::Profile *ui;
+    ChangePwd *ChangePwdDialog;
+    ChangeImg *ChangeImgDialog;
+
 };
 
 #endif // PROFILE_H

@@ -9,6 +9,8 @@ INSTALLS += target
 
 HEADERS += \
     CRDT.h \
+    Changeimg.h \
+    Changepwd.h \
     ClientController.h \
     CrdtClient.h \
     CrdtClient.h \
@@ -27,6 +29,8 @@ HEADERS += \
 
 SOURCES += \
     CRDT.cpp \
+    Changeimg.cpp \
+    Changepwd.cpp \
     ClientController.cpp \
     CrdtClient.cpp \
     Editor.cpp \
@@ -49,6 +53,8 @@ DISTFILES += \
     images/open_file.png
 
 FORMS += \
+    changeimg.ui \
+    changepwd.ui \
     editor.ui \
     listfiles.ui \
     newfiledialog.ui \
