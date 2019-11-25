@@ -26,10 +26,10 @@ void Profile::setImagePic(const QPixmap &imagePic){
 
 void Profile::on_changePassword_clicked()
 {
-    //todo
+    this->ChangePwdDialog->show();
 }
 
 void Profile::on_changeImage_clicked()
 {
-    //todo
+    this->ChangeImgDialog->show();
 }

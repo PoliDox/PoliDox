@@ -15,6 +15,13 @@ public:
     explicit ChangePwd(QWidget *parent = nullptr);
     ~ChangePwd();
 
+private slots:
+
+
+    void on_buttonBox_accepted();
+
+    void on_buttonBox_rejected();
+
 private:
     Ui::ChangePwd *ui;
 };
