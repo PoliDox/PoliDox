@@ -11,6 +11,7 @@ Profile::Profile(QWidget *parent) :
 {
     ui->setupUi(this);
     this->changePwdDialog = new ChangePwd(this);
+    setWindowTitle("PoliDox");
 }
 
 Profile::~Profile()
