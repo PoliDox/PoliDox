@@ -25,7 +25,7 @@ private slots:
 
 private:
     Ui::Profile *ui;
-    ChangePwd *ChangePwdDialog;
+    ChangePwd *changePwdDialog;
 
 };
 

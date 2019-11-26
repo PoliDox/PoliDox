@@ -12,6 +12,7 @@
 class ClientController;
 
 /* modella un'istanza di un editor condiviso */
+// TODO: CRDT deve ereditare da QObject, no doppia ereditarietà!
 class CrdtClient : public QObject, public CRDT {
     Q_OBJECT
 

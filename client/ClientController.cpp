@@ -42,8 +42,8 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 
 ClientController::~ClientController()
 {
-    delete m_crdt;
-    delete m_editor;
+    m_crdt->deleteLater();
+    m_editor->deleteLater();
 }
 
 
@@ -72,11 +72,7 @@ QVector<int> ClientController::getUserChars(int p_siteId)
 /* ______________________________________________________________________________________
    SOCKETsignal connected to CLIENTcontroller lambda in order to catch messages forwarded
    by server.
-   //TODO   prima di richiamare la remoteInsert implementare il non rinvio del messaggio
-            al mittente.
-   //TODO   avere un booleano all'interno di Char in modo da manetere le azioni sul JSON
-            interne alla classe Char?
-   ______________________________________________________________________________________     */
+   ______________________________________________________________________________________ */
 void ClientController::onTextMessageReceived(const QString &_JSONstring)
 {
     //std::cout<< "Message received" << std::endl;
@@ -87,18 +83,12 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
      _JSONdoc = QJsonDocument::fromJson(_JSONstring.toUtf8());
 
     if (_JSONdoc.isNull()) {
-        // TODO: print some debug
+        qWarning() << "Json is NULL";
         return;
     }
 
-
     _JSONobj = _JSONdoc.object();
 
-    // No try-catch here because we cannot handle it here anyway
-
-    //try {
-
-    // No switch case for strings in C++ :((
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
         //qDebug() << "REMOTE INSERT:" << _JSONstring.toUtf8().constData();
@@ -133,11 +123,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
-    }
-
-    //} catch (std::string _excp) {
-        //TODO manage exception
-    //}
+    }   
 
 }
 
@@ -163,13 +149,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         charsRemoved--;
     }
 
-
-
-    //bool _SELECTION= charsAdded==charsRemoved;
-
     // It could happen that some chars were removed and some others were added at the same time
-
-
     for (int i = 0; i < charsRemoved; i++) {
         m_crdt->localDelete(position);
 
@@ -192,8 +172,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
 
         Char symbol(_char,m_crdt->getSiteId());
 
-        m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert
-        //m_editor->resetActionToggle(position,_SELECTION);
+        m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert        
         m_crdt->localInsert(position+i, symbol);
     }
 

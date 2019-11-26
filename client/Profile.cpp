@@ -10,12 +10,13 @@ Profile::Profile(QWidget *parent) :
     ui(new Ui::Profile)
 {
     ui->setupUi(this);
-    this->ChangePwdDialog = new ChangePwd(this);
+    this->changePwdDialog = new ChangePwd(this);
 }
 
 Profile::~Profile()
 {
     delete ui;
+    delete changePwdDialog;
 }
 
 void Profile::setUsername(const QString& username){
@@ -28,7 +29,7 @@ void Profile::setImagePic(const QPixmap &imagePic){
 
 void Profile::on_changePassword_clicked()
 {
-    this->ChangePwdDialog->show();
+    this->changePwdDialog->show();
 }
 
 void Profile::on_changeImage_clicked()

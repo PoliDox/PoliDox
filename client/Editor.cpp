@@ -38,7 +38,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     m_localCursor = new QTextCursor(m_textDoc);        
     m_textEdit->setTextCursor(*m_localCursor);
 
-    m_showUriDialog = new ShowUriDialog();
+    m_showUriDialog = new ShowUriDialog(this);
     QString uri = controller->getUri();
     m_showUriDialog->setUri(uri);
 
@@ -101,7 +101,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 }
 
 Editor::~Editor()
-{
+{    
+    // All other objects are destroyed with the widget tree
     delete ui;
 }
 
@@ -165,10 +166,10 @@ void Editor::initContributorsLists(){
 
 void Editor::initRichTextToolBar(){
 
-    m_font = new QFontComboBox(this->ui->textRichToolBar);
-    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
+    m_font = new QFontComboBox(ui->textRichToolBar);
+    m_fontSize = new QSpinBox(ui->textRichToolBar);
 
-    m_textEdit->setFont(QFont(DEFAULT_FONT)); // If you change it, change it also in addChar!
+    m_textEdit->setFont(QFont(DEFAULT_FONT));
     m_font->setFont(m_textEdit->currentFont());
     m_textEdit->setFontPointSize(20);
     m_fontSize->setValue(m_textEdit->fontPointSize());

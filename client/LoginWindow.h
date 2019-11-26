@@ -43,7 +43,6 @@ private slots:
 
 private:
     Ui::LoginWindow *ui;
-    Editor *editor;
     ListFiles *lf;
     NewFileDialog *nfd;
     InsertUriDialog *uriDialog;

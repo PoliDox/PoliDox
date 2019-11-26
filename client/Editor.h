@@ -112,14 +112,11 @@ private:
     bool changingFormat;
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
-    QTextCursor *m_localCursor;
-    // Maps siteIds to a struct identifying a remote user
-    // N.B. You can use it to iterate over all Accounts!    
-    QMap<int, User> m_onlineUsers;
+    QTextCursor *m_localCursor;    
+    QMap<int, User> m_onlineUsers; // maps siteIds to a struct identifying a remote user
     QList<Account> m_offlineUsers;
     ShowUriDialog *m_showUriDialog;
     Ui::Editor *ui;
-    // TODO Orribile: spostare in editor.ui
     QFontComboBox* m_font;
     QSpinBox* m_fontSize;
     Profile *profile;

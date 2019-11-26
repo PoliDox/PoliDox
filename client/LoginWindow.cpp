@@ -32,7 +32,7 @@ LoginWindow::LoginWindow(QWidget *parent) :
     this->ui->lineEdit_password->setStyleSheet( "background-color:transparent");
     setWindowTitle("PoliDox");
 
-    lf = new ListFiles();
+    lf = new ListFiles(); // TODO: never used, delete?
     nfd = new NewFileDialog(this);
     uriDialog = new InsertUriDialog(this);
 
@@ -49,13 +49,11 @@ LoginWindow::LoginWindow(QWidget *parent) :
 LoginWindow::~LoginWindow()
 {
     delete ui;
+    delete nfd;
+    delete uriDialog;
 }
 
-void LoginWindow::setEditor(Editor *editor){
-    this->editor = editor;
-}
-
-/* METODO SPOSTATO IN LISTFILES */
+/* METODO SPOSTATO IN LISTFILES */ // ??
 void LoginWindow::displayFiles(const QList<QString> p_files)
 {
     // TODO: replace "SignIn" and "Register" button with a box including all available files
