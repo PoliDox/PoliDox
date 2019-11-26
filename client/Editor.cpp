@@ -98,6 +98,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(account,&QAction::triggered,this,&Editor::on_actionAccount_triggered);
 
+    connect(profile, &Profile::ChangeImage, this, &Editor::ChangeImgEditor);
+
 }
 
 Editor::~Editor()

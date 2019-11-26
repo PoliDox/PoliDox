@@ -56,5 +56,5 @@ void Profile::on_changeImage_clicked()
         QMessageBox::information(this, "PoliDox", "Image correctly updated");
     }
 
-    //TODO:inviare il messaggio al server con la nuova immagine
+    emit ChangeImage(pix);
 }

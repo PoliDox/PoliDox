@@ -1,5 +1,6 @@
 #include "ClientMessageFactory.h"
 #include <QBuffer>
+#include "qdebug.h"
 
 QByteArray ClientMessageFactory::createInsertMessage(const Char& p_char, int p_siteId)
 {
@@ -69,7 +70,7 @@ QByteArray ClientMessageFactory::createLoginMessage(const QString &p_user, const
     return l_doc.toJson(QJsonDocument::Indented);
 }
 
-QByteArray ClientMessageFactory::createOpenFileMessage(const QString &p_filename, const QString& p_uri)
+QByteArray ClientMessageFactory::createOpenFileMessage(const QString &p_filename, const QString &p_uri)
 {
     QJsonObject l_obj;
     l_obj.insert("action", "openFileReq");
@@ -93,6 +94,21 @@ QByteArray ClientMessageFactory::createNewFileMessage(const QString &p_filename)
 QByteArray ClientMessageFactory::createCloseEditorMessage(){
     QJsonObject l_obj;
     l_obj.insert("action", "closedEditorReq");
+
+    QJsonDocument l_doc(l_obj);
+    return l_doc.toJson(QJsonDocument::Indented);
+}
+
+QByteArray ClientMessageFactory::createImgUpdate(const QString &p_user, const QPixmap &p_pic){
+    QJsonObject l_obj;
+    l_obj.insert("action", "changeImgReq");
+    l_obj.insert("nameAccount", p_user);
+    // insert image
+    QBuffer buffer;
+    buffer.open(QIODevice::WriteOnly);
+    p_pic.save(&buffer, "PNG");
+    auto const encoded = buffer.data().toBase64();
+    l_obj.insert("newImg", QLatin1String(encoded));
 
     QJsonDocument l_doc(l_obj);
     return l_doc.toJson(QJsonDocument::Indented);

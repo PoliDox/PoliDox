@@ -27,6 +27,9 @@ private:
     Ui::Profile *ui;
     ChangePwd *changePwdDialog;
 
+signals:
+    void ChangeImage(QPixmap);
+
 };
 
 #endif // PROFILE_H

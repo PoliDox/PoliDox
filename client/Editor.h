@@ -61,6 +61,7 @@ signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
     void cursorPositionChanged(int position);
     void quit_editor();
+    void ChangeImgEditor(QPixmap pix);
 
 private slots:
     void on_actionNew_triggered();

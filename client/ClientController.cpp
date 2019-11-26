@@ -36,6 +36,11 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 
     connect(m_editor, &Editor::quit_editor, this, &ClientController::docClosed);
 
+    connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap Pix){
+        QByteArray jsonString = ClientMessageFactory::createImgUpdate(p_account.getName(), Pix);
+        m_socket->sendTextMessage(jsonString);
+    });
+
     m_editor->show();
 }
 
