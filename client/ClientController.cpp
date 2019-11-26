@@ -1,6 +1,7 @@
 #include "ClientController.h"
 
 #include <QLabel>
+#include <QMessageBox>
 #include "ClientMessageFactory.h"
 
 
@@ -130,6 +131,14 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
         m_editor->removeClient(offlineUser);
+
+    } else if (l_header == "changePwdRepl") {
+        QString response = _JSONobj["response"].toString();
+        if ( response == "ok" ) {
+            QMessageBox::information(m_editor, "PoliDox", "Password correctly updated");
+        } else {
+            QMessageBox::warning(m_editor, "PoliDox", "Password update failed");
+        }
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
