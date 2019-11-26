@@ -1,6 +1,5 @@
 #include "ClientMessageFactory.h"
 #include <QBuffer>
-#include "qdebug.h"
 
 QByteArray ClientMessageFactory::createInsertMessage(const Char& p_char, int p_siteId)
 {

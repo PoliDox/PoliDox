@@ -1,5 +1,4 @@
 #include "DatabaseManager.h"
-#include "qdebug.h"
 
 
 void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
@@ -123,8 +122,6 @@ bool DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
     bsoncxx::types::b_binary img {bsoncxx::binary_sub_type::k_binary,
                                   uint32_t(imageVector.size()),
                                   imageVector.data()};
-    qDebug() << "QUI";
-    qDebug() << newImage;
 
     userCollection.update_one(bsoncxx::builder::stream::document{}
                                 << "_id" << nameAccount.toUtf8().constData()
