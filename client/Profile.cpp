@@ -12,6 +12,9 @@ Profile::Profile(QWidget *parent) :
     ui->setupUi(this);
     this->changePwdDialog = new ChangePwd(this);
     setWindowTitle("PoliDox");
+
+    connect(changePwdDialog, &ChangePwd::PwdUpdate, this, &Profile::ChangePassword);
+
 }
 
 Profile::~Profile()
@@ -54,7 +57,7 @@ void Profile::on_changeImage_clicked()
 
     if(filePath.size()>0){
         ui->image_pic->setPixmap(pix.scaled(200, 200));
-        QMessageBox::information(this, "PoliDox", "Image correctly updated");
+        QMessageBox::information(this, "PoliDox", "Image correctly updated");       //todo: gestire i MessageBox leggendo il messaggio di ritorno dal server
     }
 
     emit ChangeImage(pix);

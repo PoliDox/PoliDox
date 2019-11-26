@@ -41,6 +41,11 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
         m_socket->sendTextMessage(jsonString);
     });
 
+    connect(m_editor, &Editor::ChangePwdEditor, this, [&](QString Pwd){
+        QByteArray jsonString = ClientMessageFactory::createPwdUpdate(p_account.getName(), Pwd);
+        m_socket->sendTextMessage(jsonString);
+    });
+
     m_editor->show();
 }
 
