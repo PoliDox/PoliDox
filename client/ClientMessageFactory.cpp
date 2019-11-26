@@ -112,3 +112,13 @@ QByteArray ClientMessageFactory::createImgUpdate(const QString &p_user, const QP
     QJsonDocument l_doc(l_obj);
     return l_doc.toJson(QJsonDocument::Indented);
 }
+
+QByteArray ClientMessageFactory::createPwdUpdate(const QString& p_user, const QString& p_pwd){
+    QJsonObject l_obj;
+    l_obj.insert("action", "changePwdReq");
+    l_obj.insert("nameAccount", p_user);
+    l_obj.insert("newPwd", p_pwd);
+
+    QJsonDocument l_doc(l_obj);
+    return l_doc.toJson(QJsonDocument::Indented);
+}

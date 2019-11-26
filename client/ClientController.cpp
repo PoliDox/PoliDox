@@ -1,6 +1,7 @@
 #include "ClientController.h"
 
 #include <QLabel>
+#include <QMessageBox>
 #include "ClientMessageFactory.h"
 
 
@@ -38,6 +39,11 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 
     connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap Pix){
         QByteArray jsonString = ClientMessageFactory::createImgUpdate(p_account.getName(), Pix);
+        m_socket->sendTextMessage(jsonString);
+    });
+
+    connect(m_editor, &Editor::ChangePwdEditor, this, [&](QString Pwd){
+        QByteArray jsonString = ClientMessageFactory::createPwdUpdate(p_account.getName(), Pwd);
         m_socket->sendTextMessage(jsonString);
     });
 
@@ -125,6 +131,14 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account offlineUser = Account::fromJson(accountObj);
         m_editor->removeClient(offlineUser);
+
+    } else if (l_header == "changePwdRepl") {
+        QString response = _JSONobj["response"].toString();
+        if ( response == "ok" ) {
+            QMessageBox::information(m_editor, "PoliDox", "Password correctly updated");
+        } else {
+            QMessageBox::warning(m_editor, "PoliDox", "Password update failed");
+        }
 
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();

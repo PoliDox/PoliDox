@@ -20,7 +20,6 @@ public:
 
 private slots:
     void on_changePassword_clicked();
-
     void on_changeImage_clicked();
 
 private:
@@ -29,6 +28,7 @@ private:
 
 signals:
     void ChangeImage(QPixmap);
+    void ChangePassword(QString);
 
 };
 

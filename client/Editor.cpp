@@ -100,6 +100,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(profile, &Profile::ChangeImage, this, &Editor::ChangeImgEditor);
 
+    connect(profile, &Profile::ChangePassword, this, &Editor::ChangePwdEditor);
+
 }
 
 Editor::~Editor()
