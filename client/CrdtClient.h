@@ -12,7 +12,7 @@
 class ClientController;
 
 /* modella un'istanza di un editor condiviso */
-class CrdtClient : public QObject, public CRDT {
+class CrdtClient : public CRDT {
     Q_OBJECT
 
 private:    
@@ -32,6 +32,5 @@ signals:
     void onLocalInsert(Char& symbol);
     void onLocalDelete(Char& symbol);
 };
-
 
 #endif // CLIENTCRDT_H

@@ -30,7 +30,7 @@ char Char::getValue() const {
 
 
 int Char::getSiteId(){
-    return siteId;
+    return this->siteId;
 }
 
 
@@ -51,7 +51,6 @@ QJsonObject Char::toJson() const {
     }
     charJSON.insert("position",fractPosJSON);
 
-    // TODO: What about a tStyle::toJson function?
     QJsonObject styleJSON;
     styleJSON.insert("fontFamily", style.font_family);
     styleJSON.insert("fontSize", style.font_size);

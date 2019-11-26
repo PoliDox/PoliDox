@@ -38,7 +38,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     m_localCursor = new QTextCursor(m_textDoc);        
     m_textEdit->setTextCursor(*m_localCursor);
 
-    m_showUriDialog = new ShowUriDialog();
+    m_showUriDialog = new ShowUriDialog(this);
     QString uri = controller->getUri();
     m_showUriDialog->setUri(uri);
 
@@ -98,10 +98,13 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(account,&QAction::triggered,this,&Editor::on_actionAccount_triggered);
 
+    connect(profile, &Profile::ChangeImage, this, &Editor::ChangeImgEditor);
+
 }
 
 Editor::~Editor()
-{
+{    
+    // All other objects are destroyed with the widget tree
     delete ui;
 }
 
@@ -165,31 +168,33 @@ void Editor::initContributorsLists(){
 
 void Editor::initRichTextToolBar(){
 
-    m_font = new QFontComboBox(this->ui->textRichToolBar);
-    m_fontSize = new QSpinBox(this->ui->textRichToolBar);
+    QFontComboBox *font = new QFontComboBox(ui->textRichToolBar);
+    QSpinBox *fontSize = new QSpinBox(ui->textRichToolBar);
+    font->setObjectName("font");
+    fontSize->setObjectName("font_size");
 
-    m_textEdit->setFont(QFont("DejaVu Sans")); // If you change it, change it also in addChar!
-    m_font->setFont(m_textEdit->currentFont());
+    m_textEdit->setFont(QFont(DEFAULT_FONT));
+    font->setFont(m_textEdit->currentFont());
     m_textEdit->setFontPointSize(20);
-    m_fontSize->setValue(m_textEdit->fontPointSize());
+    fontSize->setValue(m_textEdit->fontPointSize());
 
-    this->ui->textRichToolBar->addWidget(m_font);
-    this->ui->textRichToolBar->addWidget(m_fontSize);
+    this->ui->textRichToolBar->addWidget(font);
+    this->ui->textRichToolBar->addWidget(fontSize);
 
-    connect(m_font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
-        // Alternative: connect to onFontFamilyChanged here and disconnect-reconnect in onCharFormatChanged
+    connect(font, &QFontComboBox::currentFontChanged, this, [&](const QFont& font){
         if (!changingFormat)
             onFontFamilyChanged(font);
     });
-    connect(m_fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
-        // Alternative: connect to onFontSizeChanged here and disconnect-reconnect in onCharFormatChanged
+
+    connect(fontSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [&](int i) {
         if (!changingFormat)
             onFontSizeChanged(i);
     });
+
     connect(m_textEdit, &QTextEdit::currentCharFormatChanged, this, &Editor::onCharFormatChanged);
 
-    QAction* separator1=this->ui->toolBar_2->actions().at(0);
-    QAction* separator2=this->ui->textRichToolBar->actions().at(0);
+    QAction* separator1 = this->ui->toolBar_2->actions().at(0);
+    QAction* separator2 = this->ui->textRichToolBar->actions().at(0);
     delete separator1;
     delete separator2;
 
@@ -310,7 +315,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     tStyle style = p_char.getStyle();
 
     if (style.font_family == "")
-        fmt.setFontFamily("DejaVu Sans");
+        fmt.setFontFamily(DEFAULT_FONT);
     else
         fmt.setFontFamily(style.font_family);
 
@@ -576,8 +581,10 @@ void Editor::onCharFormatChanged(const QTextCharFormat &f)
     ui->actionBold->setChecked(f.font().bold());
     ui->actionItalic->setChecked(f.font().italic());
     ui->actionUnderlined->setChecked(f.font().underline());
-    m_font->setCurrentIndex(m_font->findText(QFontInfo(f.font()).family()));
-    m_fontSize->setValue(f.font().pointSize());
+    QFontComboBox *font=static_cast<QFontComboBox*>(ui->textRichToolBar->findChild<QFontComboBox*>("font"));
+    QSpinBox *fontSize=static_cast<QSpinBox*>(ui->textRichToolBar->findChild<QSpinBox*>("font_size"));
+    font->setCurrentIndex(font->findText(QFontInfo(f.font()).family()));
+    fontSize->setValue(f.font().pointSize());
     changingFormat = false;
 }
 

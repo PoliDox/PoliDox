@@ -24,10 +24,10 @@ public:
 
 private:
     Editor *m_editor;
-    CrdtClient *m_crdt; // TODO: use smart-pointer
+    CrdtClient *m_crdt;
     QWebSocket *m_socket;
     Account m_account;
-    int m_siteId; // TODO: redundant wrt m_account, delete?
+    int m_siteId; // equivalent to m_account.getSiteId()
     QString m_filename;
     QString m_uri;
 

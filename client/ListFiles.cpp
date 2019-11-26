@@ -11,10 +11,11 @@ ListFiles::ListFiles(QWidget *parent) :
     setWindowTitle("PoliDox");
     nfd = new NewFileDialog();
 
+    /*
     connect(nfd, &NewFileDialog::startNewFileEditor, this, [&](QString filename){
         createNewEditor_fromNew(filename);
     });
-
+    */
 }
 
 ListFiles::~ListFiles()
