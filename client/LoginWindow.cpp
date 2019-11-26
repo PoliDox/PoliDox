@@ -366,5 +366,4 @@ void LoginWindow::upload_clicked(bool checked){
 
     }
 
-
 }
