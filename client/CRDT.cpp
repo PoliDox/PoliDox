@@ -207,6 +207,8 @@ int CRDT::remoteInsert(Char& symbol){
             insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
 
             if(symbol.getValue() == '\n'){
+                // when find a '\n' as last character of the editor, insert
+                // a new line(that is a new vector) below the line where '\n' is
                 _NEWLINE=true;
                 std::vector<Char>_NEWROW;
                 inserRowAtEnd(_NEWROW);
