@@ -56,6 +56,14 @@ Client::Client()
 
 }
 
+Client::~Client()
+{
+    if (m_document != nullptr) {
+        // editor is open
+        delete m_document;
+    }
+}
+
 
 void Client::onMessageReceived(const QString &p_msg)
 {
@@ -64,7 +72,7 @@ void Client::onMessageReceived(const QString &p_msg)
      _JSONdoc = QJsonDocument::fromJson(p_msg.toUtf8());
 
     if (_JSONdoc.isNull()) {
-        // TODO: print some debug
+        qWarning() << "Json is NULL";
         return;
     }
 
@@ -74,8 +82,11 @@ void Client::onMessageReceived(const QString &p_msg)
     if (l_header == "loginRepl") {
         QString replCode = _JSONobj["response"].toString();
 
-        if (replCode != "ok") {
+        if (replCode == "fail auth") {
             QMessageBox::warning(&loginWindow, "Login", "Username or password are incorrect");
+            return;
+        } else if (replCode == "fail log") {
+            QMessageBox::warning(&loginWindow, "Login", "User is already logged");
             return;
         }
 
@@ -125,7 +136,6 @@ void Client::onMessageReceived(const QString &p_msg)
             connect(m_document, &ClientController::docClosed, this, &Client::onDocClosed);
 
         } else if (replCode == "fail create") {
-            // TODO: chiedere a fede: i filenames sono unici a livello di sistema o a livello account?
             QMessageBox::warning(&loginWindow, "New file", "Couldn't create file: filename is already used");
         } else if (replCode == "fail uri") {
             QMessageBox::warning(&loginWindow, "Open file", "Couldn't open file: Uri is invalid");

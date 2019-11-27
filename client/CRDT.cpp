@@ -192,23 +192,33 @@ int CRDT::remoteInsert(Char& symbol){
     }
     else // se non ho trovato nulla, row e index non hanno significato, li setto dopo!
         {
-             char _LASTCHAR=((this->_symbols.end()-1)->end()-1)->getValue();
+            char _LASTCHAR;
+            auto lastRowInMatrix = (this->_symbols.end()-1);
+            if(lastRowInMatrix->size() == 0){
+                //i'm the first element of the row
+                _LASTCHAR = ((this->_symbols.end()-2)->end()-1)->getValue();
+            }
+            else {
+                _LASTCHAR = ((this->_symbols.end()-1)->end()-1)->getValue();
+            }
+
             _NOTFOUND=true;
 
-            if(_LASTCHAR=='\n'){
+            insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
+
+            if(symbol.getValue() == '\n'){
+                // when find a '\n' as last character of the editor, insert
+                // a new line(that is a new vector) below the line where '\n' is
                 _NEWLINE=true;
-                std::vector<Char>_NEWROW(1,symbol);
+                std::vector<Char>_NEWROW;
                 inserRowAtEnd(_NEWROW);
+
+                _row=this->_symbols.size()-1;
+                _index=0;
             }
-            else{
-                insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
-            }
+
         }
 
-    if(_NOTFOUND && _NEWLINE){
-       _row=this->_symbols.size()-1;
-       _index=0;
-    }
 
 
     _LINEARpos=_toLinear(_row,_index);

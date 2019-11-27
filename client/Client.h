@@ -23,6 +23,7 @@ private:
 
 public:
     Client();
+    ~Client();
 
 public slots:
     void onMessageReceived(const QString& p_msg);

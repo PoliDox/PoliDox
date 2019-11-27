@@ -24,9 +24,6 @@ private:
     QString newFileName;
 
 signals:
-    // TODO: never used, to delete?
-    void startNewFileEditor(QString newfilename);
-
     void getFileName(QString newfilename);
 };
 

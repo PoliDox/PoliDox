@@ -17,6 +17,8 @@ public:
     static QByteArray createLoginMessage(const QString& p_user, const QString& p_passw);
     static QByteArray createOpenFileMessage(const QString& p_filename, const QString& p_uri = QString());
     static QByteArray createNewFileMessage(const QString& p_filename);
+    static QByteArray createImgUpdate(const QString& p_user, const QPixmap& p_pic);
+    static QByteArray createPwdUpdate(const QString& p_user, const QString& p_pwd);
     static QByteArray createCloseEditorMessage();
 
 };

@@ -41,6 +41,8 @@ private:
 public:
     DatabaseManager();
     int registerUser(QString& name, QString& password, QByteArray& image);
+    bool changeImage(QString& nameAccount, QByteArray& newImage);
+    bool changePassword(QString& nameAccount, QString& password);
     int checkPassword(QString& name, QString& password, QByteArray& imageToReturn);
     bool insertNewDocument(QString& documentName, QString& uri);
     QString getUri(QString& documentName);

@@ -71,4 +71,22 @@ CLOSED EDITOR REMOTE		//to notify other clients connected on that document that 
 "account" = { ... }         //the account who has just quitted the document
 
 
+CHANGE IMAGE REQUEST
+"action" = "changeImgReq"
+"nameAccount" = ...     //Account.getName()  => it's enough because name is unique globally
+"newImg" = ...
+
+CHANGE IMAGE REPLY
+"action" = "changeImgRepl"
+"response" = "ok" / "fail"     //if fail, old image will remain
+
+CHANGE PASSWORD REQUEST
+"action" = "changePwdReq"
+"nameAccount" = ...
+"newPwd" = ...
+
+CHANGE PASSWORD REPLY
+"action" = "changePwdRepl"
+"response" = "ok" / "fail"
+
 NEW REMOTE FILE        // ???

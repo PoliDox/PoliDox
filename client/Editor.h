@@ -36,6 +36,8 @@ enum EditOp
     DELETE_OP
 };
 
+#define DEFAULT_FONT "DejaVu Sans"
+
 class Editor : public QMainWindow
 {
     Q_OBJECT
@@ -45,6 +47,7 @@ public:
 
     void init(const QVector<Char>& p_text);
     QChar at(int pos);
+    int textSize();
     void addClient(const Account& user);
     void removeClient(const Account& account);
     void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
@@ -58,6 +61,8 @@ signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
     void cursorPositionChanged(int position);
     void quit_editor();
+    void ChangeImgEditor(QPixmap pix);
+    void ChangePwdEditor(QString pwd);
 
 private slots:
     void on_actionNew_triggered();
@@ -70,24 +75,20 @@ private slots:
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();
     void on_actionURI_triggered();
-
     void on_actionBold_triggered();
     void on_actionItalic_triggered();
     void on_actionUnderlined_triggered();
-
-    void onFontSizeChanged(int i);
-    void onFontFamilyChanged(const QFont& font);
-    void onCharFormatChanged(const QTextCharFormat & f);
-
     void on_actionAlignLeft_triggered();
     void on_actionAlignCenter_triggered();
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered(); 
+    void on_actionAccount_triggered(bool);
 
+    void onFontSizeChanged(int i);
+    void onFontFamilyChanged(const QFont& font);
+    void onCharFormatChanged(const QTextCharFormat & f);
     void highlightUser(QListWidgetItem * item);
 
-
-    void on_actionAccount_triggered(bool checked);
 
 private:
     void createActions();
@@ -102,27 +103,24 @@ private:
     void addChar(const Char& p_char, QTextCursor& p_cursor);
     void updateAlignment();
     void assignRandomColor(int siteID);
+    void setItem(QColor color, QListWidgetItem* item); // Technically not a member function
 
     ClientController *controller;
-    bool handlingOperation;
-    bool changingFormat;
+
     QTextEdit *m_textEdit;
     QTextDocument *m_textDoc;
-    QTextCursor *m_localCursor;
-    // Maps siteIds to a struct identifying a remote user
-    // N.B. You can use it to iterate over all Accounts!    
-    QMap<int, User> m_onlineUsers;
-    QList<Account> m_offlineUsers;
-    ShowUriDialog *m_showUriDialog;
-    Ui::Editor *ui;
-    // TODO Orribile: spostare in editor.ui
-    QFontComboBox* m_font;
-    QSpinBox* m_fontSize;
-    Profile *profile;
+    QTextCursor *m_localCursor;    
 
+    QMap<int, User> m_onlineUsers; // maps siteIds to a struct identifying a remote user
     QMap<int,QString> assignedColor;
+    QList<Account> m_offlineUsers;
 
+    ShowUriDialog *m_showUriDialog;
+    Profile *profile;
+    Ui::Editor *ui;
 
+    bool handlingOperation;
+    bool changingFormat;
 };
 
 #endif // EDITOR_H

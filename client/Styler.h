@@ -1,7 +1,7 @@
 #ifndef STYLER_H
 #define STYLER_H
 
-
+// NEVER USED: delete?
 class Styler
 {
 public:
