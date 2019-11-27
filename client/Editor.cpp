@@ -800,3 +800,7 @@ void Editor::on_actionAccount_triggered(bool checked)
 {
     profile->show();
 }
+
+void Editor::setNewImage(const QPixmap& Pix){
+    profile->setImagePic(Pix);
+}

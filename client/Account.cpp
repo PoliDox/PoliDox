@@ -1,6 +1,7 @@
 #include "Account.h"
 #include <QDebug>
 #include <cstdlib>
+#include <QBuffer>
 
 Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image)
     : siteId(p_siteId), name(p_name), image(p_image)
@@ -64,9 +65,14 @@ bool Account::operator < (const Account& other) const {
     return this->siteId < other.siteId;
 }
 
-
 bool Account::operator == (const Account& other) const {
     return this->siteId == other.siteId;
 }
 
-
+void Account::setImage(QPixmap Pix){
+    QBuffer buffer;
+    buffer.open(QIODevice::WriteOnly);
+    Pix.save(&buffer, "PNG");
+    auto const encoded = buffer.data().toBase64();
+    this->image = QLatin1String(encoded).latin1();
+}

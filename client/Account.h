@@ -25,6 +25,7 @@ public:
     int getSiteId() const;
     QString getName() const;
     QPixmap getImage() const;
+    void setImage(QPixmap Pix);
     QJsonObject toJson() const;    
     static Account fromJson(const QJsonObject& accountJSON, bool isFromDb = false);
     bool operator < (const Account& other) const;
