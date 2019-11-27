@@ -322,14 +322,15 @@ void CRDT::fromDatabase(const QList<Char>& crdtJsonFormatted){
     this->_symbols = std::vector<std::vector<Char>>(1);
 
     unsigned long rowIndex = 0;
-    for(Char elem : crdtJsonFormatted){
-       this->_symbols[rowIndex].push_back(elem);
 
-       if(elem.getValue() == '\n'){
+    for(int i=0; i < crdtJsonFormatted.size(); i++) {
+       Char elem = crdtJsonFormatted.at(i);
+       this->_symbols[rowIndex].push_back(elem);        
+       if(elem.getValue() == '\n' && i != crdtJsonFormatted.size()-1){
            rowIndex++;
            //add a new row to the matrix
            this->_symbols.push_back(std::vector<Char>());
-       }
+       }       
     }
 }
 

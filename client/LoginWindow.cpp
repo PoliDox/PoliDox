@@ -194,20 +194,20 @@ void LoginWindow::createRegistrationForm(){
     usr_form->setPlaceholderText("Insert your username");
     pwd_form->setPlaceholderText("Insert your password");
 
-    QPushButton* submit=new QPushButton("Submit",ui->groupBox);
-    QPushButton* cancel=new QPushButton("Cancel");
+    QPushButton* submit = new QPushButton("Submit", ui->groupBox);
+    QPushButton* cancel = new QPushButton("Cancel", ui->groupBox);
 
 
     submit->setObjectName("submit");
     cancel->setObjectName("cancel");
 
-    QLabel* img_label=new QLabel("Profile pic",ui->groupBox);
-    QLabel* img_path=new QLabel(ui->groupBox);
-    QPushButton* img_selection=new QPushButton("upload file",ui->groupBox);
-    QLabel* img_show=new QLabel(ui->groupBox);
-    QLabel* img_warning=new QLabel(ui->groupBox);
+    QLabel* img_label = new QLabel("Profile pic", ui->groupBox);
+    QLabel* img_path = new QLabel(ui->groupBox);
+    QPushButton* img_selection = new QPushButton("upload file", ui->groupBox);
+    QLabel* img_show = new QLabel(ui->groupBox);
+    QLabel* img_warning = new QLabel(ui->groupBox);
 
-    connect(img_selection,&QPushButton::clicked,this,&LoginWindow::upload_clicked);
+    connect(img_selection, &QPushButton::clicked, this, &LoginWindow::upload_clicked);
 
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     img_path->setStyleSheet("background-color:transparent;"); //border: 1px solid #8d918d
@@ -223,9 +223,7 @@ void LoginWindow::createRegistrationForm(){
     img_show->setObjectName("img_show");
     img_warning->setObjectName("img_warning");
 
-
     QGridLayout* grid_layout = static_cast<QGridLayout*>(ui->groupBox->layout());
-
 
     usr->setFixedSize(200,30);
     pwd->setFixedSize(200,30);
@@ -249,7 +247,8 @@ void LoginWindow::createRegistrationForm(){
     grid_layout->addWidget(img_selection,7,0,nullptr);
     grid_layout->addWidget(img_path,8,0,nullptr);
 
-    QSpacerItem* spacer= new QSpacerItem(1,10, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    // TODO: how do we delete it?
+    QSpacerItem* spacer = new QSpacerItem(1,10, QSizePolicy::Expanding, QSizePolicy::Minimum);
     grid_layout->addItem(spacer,9,0);
 
     grid_layout->addWidget(submit,10,0,nullptr);
