@@ -57,6 +57,7 @@ public:
     void moveCursor(int pos, int siteId);
     void closeEvent(QCloseEvent *event) override;
     void setNewImage(const QPixmap& Pix);
+    Profile *getProfilePtr();
 
 signals:
     void textChanged(int position, int charsRemoved, int charsAdded);

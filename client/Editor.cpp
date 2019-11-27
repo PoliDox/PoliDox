@@ -804,3 +804,7 @@ void Editor::on_actionAccount_triggered(bool checked)
 void Editor::setNewImage(const QPixmap& Pix){
     profile->setImagePic(Pix);
 }
+
+Profile *Editor::getProfilePtr(){
+    return this->profile;
+}

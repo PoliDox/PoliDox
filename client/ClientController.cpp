@@ -136,18 +136,18 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "changePwdRepl") {
         QString response = _JSONobj["response"].toString();
         if ( response == "ok" ) {
-            QMessageBox::information(m_editor, "PoliDox", "Password correctly updated");
+            QMessageBox::information(m_editor->getProfilePtr(), "PoliDox", "Password correctly updated");
         } else {
-            QMessageBox::warning(m_editor, "PoliDox", "Password update failed");
+            QMessageBox::warning(m_editor->getProfilePtr(), "PoliDox", "Password update failed");
         }
     } else if (l_header == "changeImgRepl") {
         QString response = _JSONobj["response"].toString();
         if ( response == "ok") {
             m_account.setImage(Pix);
             m_editor->setNewImage(Pix);
-            QMessageBox::information(m_editor, "PoliDox", "Image correctly updated");
+            QMessageBox::information(m_editor->getProfilePtr(), "PoliDox", "Image correctly updated");
         } else {
-            QMessageBox::warning(m_editor, "PoliDox", "Image update failed");
+            QMessageBox::warning(m_editor->getProfilePtr(), "PoliDox", "Image update failed");
         }
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
