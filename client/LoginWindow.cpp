@@ -215,7 +215,7 @@ void LoginWindow::createRegistrationForm(){
     //img_show->setStyleSheet("border: 1px solid #8d918d");
     img_warning->setStyleSheet("color:red");
 
-    img_warning->setText("Image size must be lower than 10MB");
+    img_warning->setText("Image size must be smaller than 2MB");
 
     img_label->setObjectName("img_label");
     img_selection->setObjectName("img_selection");
@@ -231,10 +231,16 @@ void LoginWindow::createRegistrationForm(){
     submit->setFixedSize(100,30);
     img_selection->setFixedSize(100,30);
     img_path->setFixedSize(300,30);
-    //img_show->setFixedSize(100,100);
 
     QPixmap noPic("://images/images/no-pic.png");
-    img_show->setPixmap(noPic.scaled(100,100));
+
+    #ifdef Q_OS_LINUX
+        img_show->setFixedSize(50,50);
+        img_show->setPixmap(noPic.scaled(50,50));
+    #else
+        img_show->setFixedSize(100,100);
+        img_show->setPixmap(noPic.scaled(100,100));
+    #endif
 
     grid_layout->setHorizontalSpacing(0);
     grid_layout->setVerticalSpacing(5);
@@ -361,7 +367,16 @@ void LoginWindow::upload_clicked(bool checked){
         img_path->setText(filePath);
 
         QLabel* img_show=ui->groupBox->findChild<QLabel*>("img_show");
-        img_show->setStyleSheet("border-image: url("+filePath+") 0 0 0 0 stretch stretch;");
+
+        QPixmap noPic(filePath);
+
+        #ifdef Q_OS_LINUX
+            img_show->setPixmap(noPic.scaled(50,50));
+        #else
+            img_show->setPixmap(noPic.scaled(100,100));
+        #endif
+
+
 
     }
 
