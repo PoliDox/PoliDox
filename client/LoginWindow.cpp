@@ -212,7 +212,7 @@ void LoginWindow::createRegistrationForm(){
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     img_path->setStyleSheet("background-color:transparent;"); //border: 1px solid #8d918d
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
-    img_show->setStyleSheet("border: 1px solid #8d918d");
+    //img_show->setStyleSheet("border: 1px solid #8d918d");
     img_warning->setStyleSheet("color:red");
 
     img_warning->setText("Image size must be lower than 10MB");
@@ -231,8 +231,10 @@ void LoginWindow::createRegistrationForm(){
     submit->setFixedSize(100,30);
     img_selection->setFixedSize(100,30);
     img_path->setFixedSize(300,30);
-    img_show->setFixedSize(100,100);
+    //img_show->setFixedSize(100,100);
 
+    QPixmap noPic("://images/images/no-pic.png");
+    img_show->setPixmap(noPic.scaled(100,100));
 
     grid_layout->setHorizontalSpacing(0);
     grid_layout->setVerticalSpacing(5);

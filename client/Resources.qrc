@@ -30,5 +30,6 @@
         <file>images/online.png</file>
         <file>images/logo_small.png</file>
         <file>images/account.png</file>
+        <file>images/no-pic.png</file>
     </qresource>
 </RCC>
