@@ -215,7 +215,7 @@ void LoginWindow::createRegistrationForm(){
     //img_show->setStyleSheet("border: 1px solid #8d918d");
     img_warning->setStyleSheet("color:red");
 
-    img_warning->setText("Image size must be smaller than 2MB");
+    img_warning->setText("Image must be smaller than 2MB");
 
     img_label->setObjectName("img_label");
     img_selection->setObjectName("img_selection");
@@ -351,8 +351,8 @@ void LoginWindow::upload_clicked(bool checked){
     QLabel* img_warning=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_warning"));
 
     if(img.size()>10000000){
-        QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 10MB!");
-        img_warning->setText("Image size must be lower than 10MB");
+        QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 2MB!");
+        img_warning->setText("Image must be smaller than 2MB");
         return;
     }else{
 
