@@ -192,33 +192,23 @@ int CRDT::remoteInsert(Char& symbol){
     }
     else // se non ho trovato nulla, row e index non hanno significato, li setto dopo!
         {
-            char _LASTCHAR;
-            auto lastRowInMatrix = (this->_symbols.end()-1);
-            if(lastRowInMatrix->size() == 0){
-                //i'm the first element of the row
-                _LASTCHAR = ((this->_symbols.end()-2)->end()-1)->getValue();
-            }
-            else {
-                _LASTCHAR = ((this->_symbols.end()-1)->end()-1)->getValue();
-            }
-
+             char _LASTCHAR=((this->_symbols.end()-1)->end()-1)->getValue();
             _NOTFOUND=true;
 
-            insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
-
-            if(symbol.getValue() == '\n'){
-                // when find a '\n' as last character of the editor, insert
-                // a new line(that is a new vector) below the line where '\n' is
+            if(_LASTCHAR=='\n'){
                 _NEWLINE=true;
-                std::vector<Char>_NEWROW;
+                std::vector<Char>_NEWROW(1,symbol);
                 inserRowAtEnd(_NEWROW);
-
-                _row=this->_symbols.size()-1;
-                _index=0;
             }
-
+            else{
+                insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
+            }
         }
 
+    if(_NOTFOUND && _NEWLINE){
+       _row=this->_symbols.size()-1;
+       _index=0;
+    }
 
 
     _LINEARpos=_toLinear(_row,_index);
@@ -332,14 +322,15 @@ void CRDT::fromDatabase(const QList<Char>& crdtJsonFormatted){
     this->_symbols = std::vector<std::vector<Char>>(1);
 
     unsigned long rowIndex = 0;
-    for(Char elem : crdtJsonFormatted){
-       this->_symbols[rowIndex].push_back(elem);
 
-       if(elem.getValue() == '\n'){
+    for(int i=0; i < crdtJsonFormatted.size(); i++) {
+       Char elem = crdtJsonFormatted.at(i);
+       this->_symbols[rowIndex].push_back(elem);        
+       if(elem.getValue() == '\n' && i != crdtJsonFormatted.size()-1){
            rowIndex++;
            //add a new row to the matrix
            this->_symbols.push_back(std::vector<Char>());
-       }
+       }       
     }
 }
 

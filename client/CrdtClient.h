@@ -16,7 +16,7 @@ class CrdtClient : public QObject, public CRDT{
     Q_OBJECT
 
 private:    
-    double siteId; // TODO: Perché è un double??
+    int siteId;
     void printSymbols();
 
 public:

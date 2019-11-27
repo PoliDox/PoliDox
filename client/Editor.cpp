@@ -83,7 +83,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     profile->setImagePic(main_account->getImage());
     profile->setUsername(main_account->getName());
 
-    QWidget* empty1 = new QWidget();
+    QWidget* empty1 = new QWidget(this);
     empty1->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
     ui->toolBar_2->addWidget(empty1);
 
@@ -93,9 +93,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     account->setIcon(accoutIcon);
     ui->toolBar_2->addAction(account);
 
-    connect(account,&QAction::triggered,this,&Editor::on_actionAccount_triggered);
+    QWidget* empty2 = new QWidget(this);
 
-    QWidget* empty2 = new QWidget();
     empty2->setFixedSize(1,1);
     ui->toolBar_2->addWidget(empty2);
 
@@ -110,6 +109,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 Editor::~Editor()
 {    
     // All other objects are destroyed with the widget tree
+    // TODO: QListWidgetItems are not deleted: should we do it here?
     delete ui;
 }
 
@@ -157,7 +157,7 @@ void Editor::initContributorsLists(){
 
     QColor color=QColor(assignedColor.value(you));
 
-    QListWidgetItem* item = new QListWidgetItem("You",ui->onlineList);
+    QListWidgetItem* item = new QListWidgetItem("You", ui->onlineList);
     //setItem(controller->getAccount().getColor(), item);
     setItem(color,item);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
@@ -286,7 +286,9 @@ void Editor::addOnlineUser(const Account& account){
     else if(items.size()==1)
          _dItem=items.at(0); //there should be always one item in this list
 
-    QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
+    //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
+    // TODO: How do we delete it?
+    QListWidgetItem* item= new QListWidgetItem(account.getName());
 
     QColor color(assignedColor.value(account.getSiteId()));
     setItem(color,item);
@@ -308,7 +310,7 @@ void Editor::addOnlineUser(const Account& account){
 void Editor::addOfflineUser(const Account& account)
 {    
     // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
-    QListWidgetItem* item= new QListWidgetItem(account.getName());
+    QListWidgetItem* item = new QListWidgetItem(account.getName());
     QColor color(assignedColor.value(account.getSiteId()));
     setItem(color,item);
     ui->offlineList->addItem(item);
