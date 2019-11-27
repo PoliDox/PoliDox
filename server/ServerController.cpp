@@ -147,7 +147,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
     } else if(header == "changeImgReq"){
         QString nameAccount = requestObjJSON["nameAccount"].toString();
-        QByteArray newImage = requestObjJSON["image"].toString().toLatin1();
+        QByteArray newImage = requestObjJSON["newImg"].toString().toLatin1();
 
         bool result = this->server->getDb()->changeImage(nameAccount, newImage);
 
@@ -156,7 +156,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
     } else if(header == "changePwdReq"){
         QString nameAccount = requestObjJSON["nameAccount"].toString();
-        QString newPassword = requestObjJSON["password"].toString();
+        QString newPassword = requestObjJSON["newPwd"].toString();
 
         bool result = this->server->getDb()->changePassword(nameAccount, newPassword);
 

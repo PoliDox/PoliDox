@@ -4,8 +4,7 @@
 #include "Char.h"
 #include <QObject>
 
-class CRDT : public QObject {
-    Q_OBJECT
+class CRDT {
 
 protected:
     std::vector<std::vector<Char>> _symbols;

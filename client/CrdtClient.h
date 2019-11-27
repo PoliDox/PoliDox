@@ -12,7 +12,7 @@
 class ClientController;
 
 /* modella un'istanza di un editor condiviso */
-class CrdtClient : public CRDT {
+class CrdtClient : public QObject, public CRDT{
     Q_OBJECT
 
 private:    

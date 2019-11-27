@@ -20,12 +20,15 @@ public:
 
 private slots:
     void on_changePassword_clicked();
-
     void on_changeImage_clicked();
 
 private:
     Ui::Profile *ui;
     ChangePwd *changePwdDialog;
+
+signals:
+    void ChangeImage(QPixmap);
+    void ChangePassword(QString);
 
 };
 

@@ -1,7 +1,6 @@
 #include "DatabaseManager.h"
 
 
-
 void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
