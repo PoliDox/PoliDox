@@ -770,24 +770,7 @@ void Editor::on_actionJustify_triggered()
 /* Handler di gestione dell'apertura di un nuovo file */
 void Editor::on_actionOpen_triggered()
 {
-    /* TODO: implementare l'apertura di un file già esistente qui */
-
-    //PROCEDURA PER L'APERTURA DI UN FILE IN LOCALE, NON E' IL NOSTRO CASO. NOI LO VOGLIAMO PRENDERE DAL SERVER.
-    //L'ho scritta perché le funzioni possono tornarci utili. Lasciamola commentata al momento
-    /*
-    QString fileName = QFileDialog::getOpenFileName(this, "Open the file");
-    QFile file(fileName);
-    curFile = fileName;
-    if(!file.open(QIODevice::ReadOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot open file : " + file.errorString());
-        return;
-    }
-    setWindowTitle(fileName);
-    QTextStream in(&file);
-    QString text = in.readAll();
-    m_textEdit->setText(text);
-    file.close();
-    */
+     on_actionQuit_triggered();
 }
 
 
