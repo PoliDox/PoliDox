@@ -37,6 +37,8 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 
     connect(m_editor, &Editor::quit_editor, this, &ClientController::docClosed);
 
+    connect(m_editor, &Editor::quit_editor_new_file, this, &ClientController::docClosedNewFile);
+
     connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap Pix){
         QByteArray jsonString = ClientMessageFactory::createImgUpdate(p_account.getName(), Pix);
         this->Pix = Pix;

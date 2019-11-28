@@ -135,6 +135,8 @@ void Client::onMessageReceived(const QString &p_msg)
 
             connect(m_document, &ClientController::docClosed, this, &Client::onDocClosed);
 
+            connect(m_document, &ClientController::docClosedNewFile, this, &Client::onDocClosedNewFile);
+
         } else if (replCode == "fail create") {
             QMessageBox::warning(&loginWindow, "New file", "Couldn't create file: filename is already used");
         } else if (replCode == "fail uri") {
@@ -166,4 +168,11 @@ void Client::onDocClosed()
     m_socket.sendTextMessage(jsonString);
 
     loginWindow.show();
+}
+
+void Client::onDocClosedNewFile()
+{
+    onDocClosed();
+    QListWidgetItem *NewFile = new QListWidgetItem("Create new file");
+    loginWindow.onClickedFile(NewFile);
 }

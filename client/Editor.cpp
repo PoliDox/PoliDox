@@ -22,7 +22,7 @@
 #include <QMetaObject>
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
-    QMainWindow(parent), controller(p_controller), handlingOperation(false), changingFormat(false), ui(new Ui::Editor)
+    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), changingFormat(false)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -623,7 +623,8 @@ void Editor::closeEvent(QCloseEvent *event)
 /* Handler di gestione per la creazione di un nuovo file */
 void Editor::on_actionNew_triggered()
 {
-    /* TODO: implementare la creazione di un nuovo file qui */
+    this->hide();
+    emit quit_editor_new_file();
 }
 
 /* Handler di gestione per il salvataggio ed esportazione del file in formato .PDF*/

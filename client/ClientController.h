@@ -38,6 +38,7 @@ public slots:
 
 signals:        
     void docClosed();
+    void docClosedNewFile();
 
 };
 

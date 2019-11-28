@@ -309,7 +309,6 @@ void LoginWindow::cleanRegistrationForm(){
 
     //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
 
-
 }
 
 void LoginWindow::onClickedFile(QListWidgetItem* item){

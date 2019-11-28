@@ -63,6 +63,7 @@ signals:
     void textChanged(int position, int charsRemoved, int charsAdded);
     void cursorPositionChanged(int position);
     void quit_editor();
+    void quit_editor_new_file();
     void ChangeImgEditor(QPixmap pix);
     void ChangePwdEditor(QString pwd);
 
