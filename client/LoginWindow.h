@@ -26,6 +26,7 @@ public:
 
     void displayFiles(const QList<QString> p_files);
     void registrationOk();
+    void onClickedFile(QListWidgetItem *item);
 
 signals:
     void authDataSubmitted(QString p_user, QString p_passw);
@@ -37,7 +38,6 @@ signals:
 private slots:
     void on_pushButton_login_clicked();
     void on_pushButton_register_clicked();
-    void onClickedFile(QListWidgetItem *item);
     void sendRegistrationData();
     void upload_clicked(bool checked);
 

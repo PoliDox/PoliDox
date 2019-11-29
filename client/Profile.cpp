@@ -50,14 +50,12 @@ void Profile::on_changeImage_clicked()
     QPixmap pix(filePath);
     QFile img(filePath);
 
-    if(img.size()>10000000){
-        QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 10MB!");
+    if (img.size() == 0) {
+        // Don't send message
         return;
-    }
-
-    if(filePath.size()>0){
-        ui->image_pic->setPixmap(pix.scaled(200, 200));
-        QMessageBox::information(this, "PoliDox", "Image correctly updated");       //todo: gestire i MessageBox leggendo il messaggio di ritorno dal server
+    } else if (img.size() > 2000000){
+        QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 2MB!");
+        return;
     }
 
     emit ChangeImage(pix);

@@ -46,6 +46,7 @@ SOURCES += \
     LoginWindow.cpp
 
 DISTFILES += \
+    images/exportpdf.png \
     images/filenew.png \
     images/new_file.png \
     images/open_file.png
