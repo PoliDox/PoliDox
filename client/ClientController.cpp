@@ -148,6 +148,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
             m_account.setImage(Pix);
             m_editor->setNewImage(Pix);
             QMessageBox::information(m_editor->getProfilePtr(), "PoliDox", "Image correctly updated");
+            m_editor->getProfilePtr()->raise();
         } else {
             QMessageBox::warning(m_editor->getProfilePtr(), "PoliDox", "Image update failed");
         }
