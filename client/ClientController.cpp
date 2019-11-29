@@ -56,8 +56,8 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 
 ClientController::~ClientController()
 {
-    m_crdt->deleteLater();
-    m_editor->deleteLater();
+    delete m_crdt;
+    delete m_editor;
 }
 
 

@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QApplication>
 
-Client::Client()
+Client::Client() : m_document(nullptr)
 {
     QString url = QString("ws://") + SERVER_IP + QString(":") + QString::number(PORT_NUMBER);
     m_socket.open(QUrl(url));
@@ -60,7 +60,7 @@ Client::~Client()
 {
     if (m_document != nullptr) {
         // editor is open
-        delete m_document;
+        //delete m_document;
     }
 }
 
@@ -161,7 +161,7 @@ void Client::onMessageReceived(const QString &p_msg)
 
 void Client::onDocClosed()
 {    
-    m_document->deleteLater();
+    m_document->deleteLater(); // not delete: there could be a message for the client in the event queue
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
     QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
