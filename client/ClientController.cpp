@@ -192,12 +192,12 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
             m_editor->resetBackgroundColor(position);
         /************************************************************************************************/
         QChar qchar = m_editor->at(position+i);
-        char _char;
+        ushort _char;
         if (qchar == QChar::ParagraphSeparator) {
             //qDebug() << "ParagraphSeparator";
             _char = '\n';
         } else {
-            _char =  qchar.toLatin1();
+            _char =  qchar.unicode();
         }
 
         Char symbol(_char,m_crdt->getSiteId());
