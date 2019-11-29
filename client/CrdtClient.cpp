@@ -12,14 +12,15 @@
 #define MAXNUM 100
 #define DEBUG_OUTPUT
 
+CrdtClient::CrdtClient(int p_siteId) : siteId(p_siteId)
+{ }
 
-
-double CrdtClient::getSiteId() const {
+int CrdtClient::getSiteId() const {
     return this->siteId;
 }
 
 
-void CrdtClient::setSiteId(double siteID) {
+void CrdtClient::setSiteId(int siteID) {
     this->siteId = siteID;
 }
 
@@ -40,17 +41,9 @@ std::vector<int> CrdtClient::getUserPositions(int siteId)
     return result;
 }
 
-
-CrdtClient::CrdtClient(double siteId) {
-    //TODO il vettore di simboli inizialmente è vuoto??
-    this->siteId = siteId;
-}
-
 bool existsPositionInVector(unsigned int position, std::vector<int> vector) {
-    if(position < vector.size())
-        return true;
 
-        return false;
+    return position < vector.size();
 }
 
 /* assumo che sia preceding che following
@@ -59,8 +52,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
     std::vector<int> middle;
 
-     unsigned int i=0,
-                  j=0;
+     unsigned int i=0, j=0;
 
 
     unsigned long moreSmallVector, precedingSize=preceding.size(), followingSize=following.size();

@@ -2,12 +2,12 @@
 #include <iostream>
 
 
-Char::Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition)
-    : value(p_value), siteId(p_siteId), fractionalPosition(p_fractionalPosition)
+Char::Char(ushort p_value, int p_siteId, std::vector<int>& p_fractionalPosition)
+    : value(p_value), fractionalPosition(p_fractionalPosition), siteId(p_siteId)
 {}
 
 
-Char::Char(char p_value, int p_siteId) : value(p_value), siteId(p_siteId)
+Char::Char(ushort p_value, int p_siteId) : value(p_value), siteId(p_siteId)
 {}
 
 
@@ -24,7 +24,7 @@ std::vector<int> Char::getFractionalPosition() {
 }
 
 
-char Char::getValue() const {
+ushort Char::getValue() const {
     return this->value;
 }
 
@@ -65,7 +65,7 @@ QJsonObject Char::toJson() const {
 
 
 Char Char::fromJson(const QJsonObject& charJSON){
-    char value = charJSON["value"].toString().at(0).toLatin1();
+    ushort value = charJSON["value"].toString().at(0).unicode();
     int siteId = charJSON["siteId"].toInt();
     QJsonArray fractionalPositionObjJSON = charJSON["position"].toArray();
 

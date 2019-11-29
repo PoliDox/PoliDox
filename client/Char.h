@@ -27,18 +27,18 @@ typedef struct Style {
 class Char {
 
 private:
-    char value;
+    ushort value;
     std::vector<int> fractionalPosition;
     int siteId;  // NON CANCELLARE: serve per spostare i cursori nelle operazioni remote
     tStyle style;
 
 public:
-    Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition);
-    Char(char p_value, int p_siteId);
+    Char(ushort p_value, int p_siteId, std::vector<int>& p_fractionalPosition);
+    Char(ushort p_value, int p_siteId);
     Char() = default;
     std::vector<int> getFractionalPosition();
     void setFractionalPosition(std::vector<int>& fractionalPosition);
-    char getValue() const;
+    ushort getValue() const;
     bool operator < (const Char& other) const;
     ~Char();
     int getSiteId();
