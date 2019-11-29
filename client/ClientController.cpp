@@ -37,8 +37,11 @@ ClientController::ClientController(QWebSocket *p_socket, const Account& p_accoun
 
     connect(m_editor, &Editor::quit_editor, this, &ClientController::docClosed);
 
+    connect(m_editor, &Editor::quit_editor_new_file, this, &ClientController::docClosedNewFile);
+
     connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap Pix){
         QByteArray jsonString = ClientMessageFactory::createImgUpdate(p_account.getName(), Pix);
+        this->Pix = Pix;
         m_socket->sendTextMessage(jsonString);
     });
 
@@ -135,11 +138,19 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "changePwdRepl") {
         QString response = _JSONobj["response"].toString();
         if ( response == "ok" ) {
-            QMessageBox::information(m_editor, "PoliDox", "Password correctly updated");
+            QMessageBox::information(m_editor->getProfilePtr(), "PoliDox", "Password correctly updated");
         } else {
-            QMessageBox::warning(m_editor, "PoliDox", "Password update failed");
+            QMessageBox::warning(m_editor->getProfilePtr(), "PoliDox", "Password update failed");
         }
-
+    } else if (l_header == "changeImgRepl") {
+        QString response = _JSONobj["response"].toString();
+        if ( response == "ok") {
+            m_account.setImage(Pix);
+            m_editor->setNewImage(Pix);
+            QMessageBox::information(m_editor->getProfilePtr(), "PoliDox", "Image correctly updated");
+        } else {
+            QMessageBox::warning(m_editor->getProfilePtr(), "PoliDox", "Image update failed");
+        }
     } else {
         qWarning() << "Unknown message received: " << _JSONobj["action"].toString();
     }   

@@ -30,6 +30,7 @@ private:
     int m_siteId; // equivalent to m_account.getSiteId()
     QString m_filename;
     QString m_uri;
+    QPixmap Pix;
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);
@@ -37,6 +38,7 @@ public slots:
 
 signals:        
     void docClosed();
+    void docClosedNewFile();
 
 };
 
