@@ -199,6 +199,18 @@
      </item>
      <item>
       <widget class="QLabel" name="Username_label">
+       <property name="font">
+        <font>
+         <family>Courier</family>
+         <pointsize>16</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color:transparent;
+color:#003879;</string>
+       </property>
        <property name="text">
         <string>Username:</string>
        </property>
