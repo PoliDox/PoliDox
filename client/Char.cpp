@@ -3,7 +3,7 @@
 
 
 Char::Char(char p_value, int p_siteId, std::vector<int>& p_fractionalPosition)
-    : value(p_value), siteId(p_siteId), fractionalPosition(p_fractionalPosition)
+    : value(p_value), fractionalPosition(p_fractionalPosition), siteId(p_siteId)
 {}
 
 

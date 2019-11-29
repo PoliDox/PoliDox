@@ -617,6 +617,7 @@ void Editor::onFontFamilyChanged(const QFont& font){
 
 void Editor::closeEvent(QCloseEvent *event)
 {
+    Q_UNUSED(event);
     on_actionQuit_triggered();
 }
 
@@ -782,6 +783,7 @@ void Editor::on_actionURI_triggered()
 
 void Editor::on_actionAccount_triggered(bool checked)
 {
+    Q_UNUSED(checked);
     profile->show();
 }
 

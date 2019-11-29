@@ -20,12 +20,12 @@ private:
     void printSymbols();
 
 public:
-    CrdtClient(double siteId);
+    CrdtClient(int p_siteId);
     void localInsert(unsigned int position, Char symbolToInsert);
     void localDelete(unsigned int index);
     //void printDebugChars();
-    double getSiteId() const;
-    void setSiteId(double siteId);
+    int getSiteId() const;
+    void setSiteId(int siteId);
     std::vector<int> getUserPositions(int siteId);
 
 signals:

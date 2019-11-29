@@ -329,6 +329,7 @@ void LoginWindow::onClickedFile(QListWidgetItem* item){
 
 void LoginWindow::upload_clicked(bool checked){
 
+    Q_UNUSED(checked);
     QFileDialog file_selection(ui->groupBox);
     file_selection.setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
 
