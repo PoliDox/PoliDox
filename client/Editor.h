@@ -75,8 +75,6 @@ private slots:
     void on_actionQuit_triggered();
     void on_actionPaste_triggered();
     void on_actionCut_triggered();
-    void on_actionUndo_triggered();
-    void on_actionRedo_triggered();
     void on_actionURI_triggered();
     void on_actionBold_triggered();
     void on_actionItalic_triggered();

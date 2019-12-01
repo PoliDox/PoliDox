@@ -672,16 +672,6 @@ void Editor::on_actionCut_triggered()
     m_textEdit->cut();
 }
 
-void Editor::on_actionUndo_triggered()
-{
-    m_textEdit->undo();
-}
-
-void Editor::on_actionRedo_triggered()
-{
-    m_textEdit->redo();
-}
-
 
 void Editor::on_actionBold_triggered()
 {
