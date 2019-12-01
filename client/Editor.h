@@ -91,6 +91,8 @@ private slots:
     void highlightUser(QListWidgetItem * item);
 
 
+    void on_actioncreators_triggered();
+
 private:
     void createActions();
     void createStatusBar();

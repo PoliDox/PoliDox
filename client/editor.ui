@@ -481,7 +481,7 @@
      <normaloff>:/images/images/logo_small.png</normaloff>:/images/images/logo_small.png</iconset>
    </property>
    <property name="text">
-    <string>creators</string>
+    <string>Creators</string>
    </property>
   </action>
  </widget>

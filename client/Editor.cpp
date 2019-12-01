@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include "ui_editor.h"
+#include "Creators.h"
 #include <QDebug>
 #include <QChar>
 #include <QMenu>
@@ -786,4 +787,10 @@ void Editor::setNewImage(const QPixmap& Pix){
 
 Profile *Editor::getProfilePtr(){
     return this->profile;
+}
+
+void Editor::on_actioncreators_triggered()
+{
+    Creators *creators = new Creators(this);
+    creators->show();
 }
