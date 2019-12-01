@@ -476,6 +476,10 @@
    </property>
   </action>
   <action name="actioncreators">
+   <property name="icon">
+    <iconset resource="Resources.qrc">
+     <normaloff>:/images/images/logo_small.png</normaloff>:/images/images/logo_small.png</iconset>
+   </property>
    <property name="text">
     <string>creators</string>
    </property>
