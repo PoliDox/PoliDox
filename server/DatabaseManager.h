@@ -21,6 +21,7 @@
 #include "Char.h"
 
 
+
 class DatabaseManager {
 
 private:
