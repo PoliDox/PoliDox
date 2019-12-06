@@ -2,8 +2,6 @@
 #include <QDebug>
 
 
-//QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol);
-//m_socket.sendTextMessage(jsonString);
 
 QByteArray ServerMessageFactory::createNewClientMessage(const Account *account) {
     QJsonObject l_obj;
@@ -72,7 +70,7 @@ QByteArray ServerMessageFactory::createClosedEditorRemote(const Account *account
 }
 
 
-QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, double siteIdOfRegisteredUser){
+QByteArray ServerMessageFactory::createRegistrationUserReply(bool response, int siteIdOfRegisteredUser){
     QJsonObject objToReturn;
     QString responseString;
     if(response)

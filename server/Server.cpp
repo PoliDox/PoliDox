@@ -35,7 +35,7 @@ Account* Server::getAccount(QWebSocket *socketOfAccont){
 
 Server::~Server() {
     m_pWebSocketServer->close();
-
+    qDebug() << "qui";
     //TODO: vedere bene cosa altro distruggere?? ad esempio
     //      tutti gli altri elementi dinamici nella
     //      mappa socket2account ???
@@ -95,7 +95,7 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         }
 
         loginSuccess = true;
-        //in case of success, result will contain siteId and [image(TODO!!)]
+
         loggedAccount = new Account(result, name, imageToReturn); //TODO : inserire anche l'immagine
         this->socket2account[signalSender] = loggedAccount;
 
@@ -110,6 +110,14 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
     else if (header == "registerUser"){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
+
+        if(requestObjJSON["image"].toString() == ""){
+            // if the user does not provide an image, reject registration
+            QByteArray sendMsgToClient = ServerMessageFactory::createRegistrationUserReply(false, -1);
+            signalSender->sendTextMessage(sendMsgToClient);
+            return;
+        }
+
         // N.B. l'immagine viene salvata nel DB in base64
         QByteArray image = requestObjJSON["image"].toString().toLatin1();
 

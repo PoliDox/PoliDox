@@ -117,7 +117,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 
     QString header = requestObjJSON["action"].toString();
     if (header == "insert") {
-        //todo: rifattorizzare
+        // evaluate if refactor this part
         QJsonObject charJson = requestObjJSON["char"].toObject();
         Char charObj = Char::fromJson(charJson);
         tStyle charStyle = charObj.getStyle();
@@ -126,15 +126,16 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         int siteId = charObj.getSiteId();
 
         this->crdt->remoteInsert(charObj);
-        //TODO: rifattorizzare il metodo qui sotto, passargli il Char anziché tutto questo
+
+        // evaluate if pass a Char to this function instead of these attributes
         this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
                                             charStyle.font_family, charStyle.font_size, charStyle.is_bold,
                                             charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
     } else if (header == "delete") {
-        //todo: rifattorizzare
+        // evaluate if refactor this part
         QJsonObject charJson = requestObjJSON["char"].toObject();
         Char charObj = Char::fromJson(charJson);
-        tStyle charStyle = charObj.getStyle(); // TODO: Delete if unuseful
+        tStyle charStyle = charObj.getStyle();   // is it useful?
         QString charValue(charObj.getValue());
         std::vector<int> fractPos(charObj.getFractionalPosition());
         int siteId = charObj.getSiteId();
@@ -223,11 +224,11 @@ void ServerController::disconnectAccount(){
     }
 
     this->server->removeSocket2AccountPair(signalSender);
-    //il distruttore lo chiama già la remove oppure no??
+
     signalSender->deleteLater();
-    delete (accountToDisconnect);       //TODO: controlllare il distruttore
+    delete (accountToDisconnect);
     if(destroyServContr)
-        delete (this);                  //TODO: controlllare il distruttore
+        delete (this);
 }
 
 

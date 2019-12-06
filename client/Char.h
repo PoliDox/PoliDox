@@ -11,7 +11,7 @@
 #include <QJsonDocument>
 #include <iostream>
 
-//TODO: ATTENZIONE, DEFINIRE COSTRUTTORE DI COPIA E OPERATORE DI ASSEGNAZIONE!!!
+
 
 typedef struct Style {
     // DON'T CHANGE THE ORDER without changing fromJson()
@@ -29,7 +29,7 @@ class Char {
 private:
     ushort value;
     std::vector<int> fractionalPosition;
-    int siteId;  // NON CANCELLARE: serve per spostare i cursori nelle operazioni remote
+    int siteId;  // DO NOT DELETE: it is used to move the cursors in remote operations
     tStyle style;
 
 public:

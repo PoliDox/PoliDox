@@ -14,15 +14,12 @@
 #include <mongocxx/uri.hpp>
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
+#include <mongocxx/exception/query_exception.hpp>
+#include <mongocxx/exception/bulk_write_exception.hpp>
 #include "Account.h"
 
 #include "Char.h"
-
-//TODO: - gestire eccezioni e controllare tipi di ritorno
-//      - vedere mongodb autenticazione sicura  al db e chiavi primarie/autoincrement/foreign key/join
-//      - fare un unico metodo generateBuilder in cui gli si passa un array di campi e uno di valori
-//      - in realtà la macra Q_OBJECT non serve, da togliere!!
-
+#include "DbConnectionException.h"
 
 
 class DatabaseManager {
@@ -48,9 +45,9 @@ public:
     QString getUri(QString& documentName);
     QString getDocument(QString& uriOfDocument);
     bool insertNewPermission(QString& nameDocument, int siteId);
-    bool insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
+    void insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
                       QString& family, int size, bool bold, bool italic, bool underline, int alignment);
-    bool deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
+    void deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition);
     QList<Char> getAllInserts(QString& nameDocument);
     QList<QString> getAllDocuments(int siteId);
     QList<int> getAllAccounts(QString& nameDocument);
