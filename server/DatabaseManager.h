@@ -19,7 +19,6 @@
 #include "Account.h"
 
 #include "Char.h"
-#include "DbConnectionException.h"
 
 
 class DatabaseManager {

@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <cstdlib>
 #include <QBuffer>
+#include <iostream>
 
 Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image)
     : siteId(p_siteId), name(p_name), image(p_image)
@@ -51,7 +52,7 @@ Account Account::fromJson(const QJsonObject& accountJSON, bool isFromDb) {
     else {
         QJsonArray imageObjJSON = accountJSON["image"].toArray();
         for(auto elem : imageObjJSON){
-            char appo = (char)elem.toInt();
+            char appo = static_cast<char>(elem.toInt());
             l_image.push_back(appo);
         }
     }

@@ -7,7 +7,7 @@ ChangePwd::ChangePwd(QWidget *parent) :
     ui(new Ui::ChangePwd)
 {
     ui->setupUi(this);
-    setWindowTitle("PoliDox");
+    setWindowTitle("Change Password");
 }
 
 ChangePwd::~ChangePwd()
