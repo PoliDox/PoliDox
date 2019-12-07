@@ -145,16 +145,22 @@ void LoginWindow::sendRegistrationData(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
     QLineEdit* pwd_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("pwd_line"));
+    QLabel* file_path=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_path"));
+
 
     QString username=user_linedit->text();
     QString password=pwd_linedit->text();
+    QString imagePath=file_path->text();
 
     if ( password.size() == 0 ){
         QMessageBox::warning(this, "PoliDox", "Username and password cannot be empty");
-    } else {
-        // If no image is provided we submit the default image
-        QLabel* file_path=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_path"));
-        emit signupDataSubmitted(username, password, QPixmap(file_path->text()));
+    } else {        
+        if (imagePath.size() == 0) {
+            // If no image is provided we use the default image
+            imagePath = QString("://images/images/no-pic.png");
+        }
+        QPixmap image(imagePath);
+        emit signupDataSubmitted(username, password, image);
     }
 
 }
@@ -358,14 +364,14 @@ void LoginWindow::upload_clicked(bool checked){
     QFile img(filePath);
     QLabel* img_warning=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_warning"));
 
-    if(img.size()>10000000){
+    if(img.size()>2000000){
         QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 2MB!");
         img_warning->setText("Image must be smaller than 2MB");
         return;
-    }else{
 
+    } else {
         img_warning->setStyleSheet("color:green");
-        img_warning->setText("File respect dimension costraint");
+        img_warning->setText("File respects dimension costraint");
 
     }
 
