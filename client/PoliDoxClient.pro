@@ -22,7 +22,6 @@ HEADERS += \
     Client.h \
     NewFileDialog.h \
     Profile.h \
-    Styler.h \
     InsertUriDialog.h \
     ShowUriDialog.h \
     LoginWindow.h
@@ -38,7 +37,6 @@ SOURCES += \
     Account.cpp \
     NewFileDialog.cpp \
     Profile.cpp \
-    Styler.cpp \
     main.cpp \
     Char.cpp \
     ClientMessageFactory.cpp \

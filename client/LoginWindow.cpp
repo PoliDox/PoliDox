@@ -53,6 +53,14 @@ LoginWindow::~LoginWindow()
     delete uriDialog;
 }
 
+
+void LoginWindow::closeEvent(QCloseEvent *event)
+{
+    Q_UNUSED(event);
+    QApplication::quit();
+}
+
+
 /* METODO SPOSTATO IN LISTFILES */ // ??
 void LoginWindow::displayFiles(const QList<QString> p_files)
 {

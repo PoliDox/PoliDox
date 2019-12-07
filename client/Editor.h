@@ -10,7 +10,6 @@
 #include <QSpinBox>
 #include <QFontComboBox>
 #include "Account.h"
-#include "Styler.h"
 #include "ClientController.h"
 #include "ShowUriDialog.h"
 #include "Profile.h"
