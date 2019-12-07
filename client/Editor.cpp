@@ -427,6 +427,7 @@ void Editor::addClient(const Account& user)
     remoteLabel->resize(100, height);
     remoteLabel->move(curCoord.left()-1, curCoord.top()-4);
     remoteLabel->setVisible(true);
+    remoteLabel->raise(); /* FIXED BUG HIDDEN LABEL */
 
     addOnlineUser(user);
 }
