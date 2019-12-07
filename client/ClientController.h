@@ -1,4 +1,4 @@
-    #ifndef CLIENTCONTROLLER_H
+#ifndef CLIENTCONTROLLER_H
 #define CLIENTCONTROLLER_H
 
 #include <QObject>

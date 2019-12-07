@@ -1,6 +1,7 @@
 #include "DatabaseManager.h"
 
 
+
 void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
     mongocxx::collection countersCollection = (*this->db)["counter"];
 
@@ -18,7 +19,12 @@ void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view incrementSequenceView = incrementSequence.view();
 
-    countersCollection.update_one(collToincrementView, incrementSequenceView);
+    try{
+        countersCollection.update_one(collToincrementView, incrementSequenceView);
+    } catch (mongocxx::query_exception e){
+        qDebug() << "[ERROR][DatabaseManager::incrementCounterOfCollection] update_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -34,9 +40,9 @@ void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, int
 
     try {
         countersCollection.insert_one(elemToInsertView);
-    } catch (std::exception e) {
-        //caso elemento con "_id" già presente
-        //TODO: gestire l'eccezione. ritornare un valore di errore ?
+    } catch (mongocxx::operation_exception e) {
+        qDebug() << "[ERROR][DatabaseManager::insertNewElemInCounterCollection] insert_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_FAILURE);
     }
 
 }
@@ -51,7 +57,14 @@ int DatabaseManager::getCounterOfCollection(QString nameCollection){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view collToRetrieveView = collToRetrieve.view();
 
-    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = countersCollection.find_one(collToRetrieveView);
+    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult;
+    try{
+        queryResult= countersCollection.find_one(collToRetrieveView);
+    } catch (mongocxx::query_exception e){
+        qDebug() << "[ERROR][DatabaseManager::getCounterOfCollection] find_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_FAILURE);
+    }
+
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element element = a["sequentialCounter"];
@@ -67,10 +80,6 @@ int DatabaseManager::getCounterOfCollection(QString nameCollection){
 }
 
 
-//TODO: - inserire fra i parametri nome utente e psw con cui accedere al db
-//      - gestire eccezione in caso di mancata connessione
-//      - implementare come singleton
-//Alla creazione dell'istanza viene creata la connessione con il db
 DatabaseManager::DatabaseManager() {
     this->instance = new mongocxx::instance {};                         //this should be done only once.
     this->uri = new mongocxx::uri("mongodb://localhost:27017");
@@ -79,8 +88,6 @@ DatabaseManager::DatabaseManager() {
 }
 
 
-//TODO: - sistemare il blocco catch
-//      - inserire l'immagine
 // - Returns siteId if the registration success, -1 otherwise
 int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& image){
     mongocxx::collection userCollection = (*this->db)["user"];
@@ -105,9 +112,12 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 
     try {
         userCollection.insert_one(userToInsertView);
-    } catch (std::exception e) {
-        //caso utente con "name" già presente
+    } catch (mongocxx::bulk_write_exception e) {
         return -1;
+    }
+    catch (mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::registerUser] insert_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_FAILURE);
     }
 
     this->incrementCounterOfCollection("user");
@@ -123,16 +133,25 @@ bool DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
                                   uint32_t(imageVector.size()),
                                   imageVector.data()};
 
-    userCollection.update_one(bsoncxx::builder::stream::document{}
-                                << "_id" << nameAccount.toUtf8().constData()
-                                << bsoncxx::builder::stream::finalize,
-                              bsoncxx::builder::stream::document{}
-                                << "$set" << bsoncxx::builder::stream::open_document
-                                << "image" << img
-                                << bsoncxx::builder::stream::close_document
-                                << bsoncxx::builder::stream::finalize);
+    try {
+        userCollection.update_one(bsoncxx::builder::stream::document{}
+                                    << "_id" << nameAccount.toUtf8().constData()
+                                    << bsoncxx::builder::stream::finalize,
+                                  bsoncxx::builder::stream::document{}
+                                    << "$set" << bsoncxx::builder::stream::open_document
+                                    << "image" << img
+                                    << bsoncxx::builder::stream::close_document
+                                    << bsoncxx::builder::stream::finalize);
+    } catch (mongocxx::bulk_write_exception e){
+        //image update went wrong, due to an excessive size of the image
+        return false;
+    }
+    catch (mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::changeImage] update_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_FAILURE);
+    }
 
-    return true;        //TODO: da sistemare, gestire l'eccezione e il valore di ritorno false
+    return true;
 }
 
 
@@ -141,16 +160,24 @@ bool DatabaseManager::changePassword(QString& nameAccount, QString& password){
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
 
-    userCollection.update_one(bsoncxx::builder::stream::document{}
-                                << "_id" << nameAccount.toUtf8().constData()
-                                << bsoncxx::builder::stream::finalize,
-                              bsoncxx::builder::stream::document{}
-                                << "$set" << bsoncxx::builder::stream::open_document
-                                << "password" << hashedPsw.toUtf8().constData()
-                                << bsoncxx::builder::stream::close_document
-                                << bsoncxx::builder::stream::finalize);
+    try{
+        userCollection.update_one(bsoncxx::builder::stream::document{}
+                                    << "_id" << nameAccount.toUtf8().constData()
+                                    << bsoncxx::builder::stream::finalize,
+                                  bsoncxx::builder::stream::document{}
+                                    << "$set" << bsoncxx::builder::stream::open_document
+                                    << "password" << hashedPsw.toUtf8().constData()
+                                    << bsoncxx::builder::stream::close_document
+                                    << bsoncxx::builder::stream::finalize);
+    } catch (mongocxx::bulk_write_exception e){
+        return false;
+    }
+    catch (mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::changePassword] update_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_FAILURE);
+    }
 
-    return true;        //TODO: da sistemare, gestire l'eccezione e il valore di ritorno false
+    return true;
 }
 
 
@@ -159,6 +186,7 @@ QByteArray DatabaseManager::getImage(bsoncxx::document::view queryResult){
 
     long size = imageElement.length();
     uint8_t *appo = const_cast<uint8_t*>(imageElement.get_binary().bytes);
+
     QByteArray imageToReturn;
     for (int i=0; i<size; i++) {
         imageToReturn.append(static_cast<char>(appo[i]));
@@ -181,7 +209,14 @@ int DatabaseManager::checkPassword(QString& name, QString& password, QByteArray&
                         << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view userToCheckView = userToCheck.view();
 
-    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = userCollection.find_one(userToCheckView);
+    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult;
+    try{
+        queryResult = userCollection.find_one(userToCheckView);
+    } catch (mongocxx::query_exception e){
+        qDebug() << "[ERROR][DatabaseManager::checkPassword] find_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
+    }
+
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
 
@@ -198,8 +233,7 @@ int DatabaseManager::checkPassword(QString& name, QString& password, QByteArray&
 }
 
 
-//TODO: - sistemare bene l'eccezione
-// documentName is unique
+// documentName is unique globally
 bool DatabaseManager::insertNewDocument(QString& documentName, QString& uri){
     mongocxx::collection documentCollection = (*this->db)["document"];
 
@@ -212,10 +246,15 @@ bool DatabaseManager::insertNewDocument(QString& documentName, QString& uri){
 
     try {
         documentCollection.insert_one(docToInsertView);
-    } catch (std::exception e) {
-        //fail, there is alredy a document with that name
+    } catch (mongocxx::bulk_write_exception e) {
+        // fail, there is already a document with that name
         return false;
     }
+    catch (mongocxx::query_exception e){
+        qDebug() << "[ERROR][DatabaseManager::insertNewDocument] insert_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
+    }
+
     return true;
 }
 
@@ -234,11 +273,16 @@ bool DatabaseManager::insertNewPermission(QString& nameDocument, int siteId){
 
     try {
         documentPermCollection.insert_one(permToInsertView);
-    } catch (std::exception e) {
+    } catch (mongocxx::bulk_write_exception e) {
         // in case of fail, it means that the user still has the permission
         // for that  document, so we can simply ignore the exception
         return false;
     }
+    catch (mongocxx::query_exception e){
+        qDebug() << "[ERROR][DatabaseManager::insertNewPermission] insert_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
+    }
+
     return true;
 }
 
@@ -252,7 +296,15 @@ QString DatabaseManager::getUri(QString& documentName){
                         << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view documentToGetView = documentToGet.view();
 
-    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = documentCollection.find_one(documentToGetView);
+    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult;
+
+    try{
+        queryResult= documentCollection.find_one(documentToGetView);
+    } catch (mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::getUri] find_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
+    }
+
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element uri = a["uri"];
@@ -261,7 +313,10 @@ QString DatabaseManager::getUri(QString& documentName){
         return appo;
     }
     else {
-        throw "DatabaseManager::getUri exception";
+        // do nothing, I will arrive here only if the documentName
+        // does not exist in db. But this will never happen, because
+        // the name is passed via code, starting from the exiting files.
+        return QString("");     //this line could be omitted
     }
 }
 
@@ -277,7 +332,14 @@ QString DatabaseManager::getDocument(QString& uriOfDocument){
                         << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view documentToGetView = documentToGet.view();
 
-    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = documentCollection.find_one(documentToGetView);
+    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult;
+    try{
+        queryResult = documentCollection.find_one(documentToGetView);
+    } catch(mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::getDocument] find_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
+    }
+
     if(queryResult){
         bsoncxx::document::view a = (*queryResult).view();
         bsoncxx::document::element nameDocument = a["_id"];
@@ -286,16 +348,13 @@ QString DatabaseManager::getDocument(QString& uriOfDocument){
         return appo;
     }
     else {
+        // the find_one query found nothing
         return QString("");
     }
 }
 
 
-
-//TODO: - sistemare il valore di ritorno
-//      - implementare il vincolo di integrità su nameDocument
-//      - anziché passargli tutti questi attributi, passargli un char e chiamare poi qui dentro il toJson
-bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
+void DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition,
                                    QString& family, int size, bool bold, bool italic, bool underline, int alignment) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
@@ -326,21 +385,18 @@ bool DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
 
     try {
         insertCollection.insert_one(symbolToInsertView);
-    } catch (std::exception e) {
-        //in quale caso potrebbe fallire?
-        return false;
+    } catch (mongocxx::query_exception e) {
+        qDebug() << "[ERROR][DatabaseManager::insertSymbol] insert_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
     }
 
     this->incrementCounterOfCollection("insert");
-    return true;
 }
 
 
-//TODO: - sistemare il valore di ritorno, gestire
-//        eventuale eccezione alzata dalla delete_one
 //A symbol is uniquely identified by his fractional position and belonging document,
 //so "symbol parameter" is useful, we pass it only for sake of completeness
-bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition){
+void DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int siteIdOfSymbol, std::vector<int>& fractionalPosition){
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
     auto array_builder = bsoncxx::builder::basic::array{};
@@ -359,11 +415,11 @@ bool DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int s
 
     try {
         insertCollection.delete_one(symbolToDeleteView);
-    } catch (std::exception e) {
-        //in quale caso potrebbe fallire?
-        return false;
+    } catch (mongocxx::query_exception e) {
+        qDebug() << "[ERROR][DatabaseManager::deleteSymbol] delete_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
     }
-    return true;
+
 }
 
 
@@ -377,21 +433,27 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view insertsToRetrieveView = insertsToRetrieve.view();
 
-    mongocxx::cursor resultIterator = insertCollection.find(insertsToRetrieveView);
+    // notice that the only instruction that should be included in try-catch
+    // is insertCollection.find, but we do in this way because of scope problems.
+    // Despite everything, we are sure that this is the only method that can raise
+    // the below type of exception in catch().
+    try{
+        mongocxx::cursor resultIterator = insertCollection.find(insertsToRetrieveView);
 
-    //(.1)Save them in local before ordering
-    for (auto elem : resultIterator) {
-        QString insert = QString::fromStdString(bsoncxx::to_json(elem));
-        QJsonDocument stringDocJSON = QJsonDocument::fromJson(insert.toUtf8());
-        if (stringDocJSON.isNull()) {
-            // TODO: print some debug
-            throw "DatabaseManager::getAllInserts  error";       //TODO: da sistemare
+        //(.1)Save them in local before ordering
+        for (auto elem : resultIterator) {
+            QString insert = QString::fromStdString(bsoncxx::to_json(elem));
+            QJsonDocument stringDocJSON = QJsonDocument::fromJson(insert.toUtf8());
+
+            QJsonObject insertObjJson = stringDocJSON.object();
+
+            Char charToInsert = Char::fromJson(insertObjJson);
+
+            orderedChars.push_back(charToInsert);
         }
-        QJsonObject insertObjJson = stringDocJSON.object();
-
-        Char charToInsert = Char::fromJson(insertObjJson);
-
-        orderedChars.push_back(charToInsert);
+    } catch (mongocxx::query_exception) {
+        qDebug() << "[ERROR][DatabaseManager::getAllInserts] find error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
     }
 
     //(.2)Now ordering.
@@ -412,11 +474,21 @@ QList<int> DatabaseManager::getAllAccounts(QString& nameDocument){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view accountsToRetrieveView = accountsToRetrieve.view();
 
-    mongocxx::cursor resultIterator = documentCollection.find(accountsToRetrieveView);
-    for(auto elem : resultIterator) {
-        bsoncxx::document::element siteIdAccount = elem["_id"]["siteId"];
-        int siteId = siteIdAccount.get_int32().value;
-        siteIdAccounts.append(siteId);
+    // notice that the only instruction that should be included in try-catch
+    // is insertCollection.find, but we do in this way because of scope problems.
+    // Despite everything, we are sure that this is the only method that can raise
+    // the below type of exception in catch().
+    try{
+        mongocxx::cursor resultIterator = documentCollection.find(accountsToRetrieveView);
+
+        for(auto elem : resultIterator) {
+            bsoncxx::document::element siteIdAccount = elem["_id"]["siteId"];
+            int siteId = siteIdAccount.get_int32().value;
+            siteIdAccounts.append(siteId);
+        }
+    } catch (mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::getAllAccounts] find error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
     }
 
     return siteIdAccounts;
@@ -434,7 +506,6 @@ QList<Account> DatabaseManager::getAllAccounts(QList<int>& siteIdAccounts){
 }
 
 
-
 Account DatabaseManager::getAccount(int siteId){
     mongocxx::collection userCollection = (*this->db)["user"];
 
@@ -444,24 +515,22 @@ Account DatabaseManager::getAccount(int siteId){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view accountToRetrieveView = accountToRetrieve.view();
 
-    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult = userCollection.find_one(accountToRetrieveView);
-    if(queryResult){
-        bsoncxx::document::view a = (*queryResult).view();
-
-        QString accountString = QString::fromStdString(bsoncxx::to_json(a));
-        QJsonDocument stringDocJSON = QJsonDocument::fromJson(accountString.toUtf8());
-        if (stringDocJSON.isNull()) {
-            // TODO: print some debug
-            throw "DatabaseManager::getAccount(int)  error";
-        }
-
-        QJsonObject accountObjJson = stringDocJSON.object();
-        Account accountToReturn = Account::fromJson(accountObjJson, true);
-        return accountToReturn;
+    bsoncxx::stdx::optional<bsoncxx::document::value> queryResult;
+    try{
+        queryResult = userCollection.find_one(accountToRetrieveView);
+    } catch (mongocxx::query_exception){
+        qDebug() << "[ERROR][DatabaseManager::getAccount] find_one error, connection to db failed.\nServer closed.";
+        exit(EXIT_SUCCESS);
     }
-    else {
-        throw "DatabaseManager::getAccount(int) query result error";       //TODO: da sistemare
-    }
+
+    bsoncxx::document::view a = (*queryResult).view();
+
+    QString accountString = QString::fromStdString(bsoncxx::to_json(a));
+    QJsonDocument stringDocJSON = QJsonDocument::fromJson(accountString.toUtf8());
+
+    QJsonObject accountObjJson = stringDocJSON.object();
+    Account accountToReturn = Account::fromJson(accountObjJson, true);
+    return accountToReturn;
 }
 
 

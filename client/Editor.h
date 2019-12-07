@@ -10,7 +10,6 @@
 #include <QSpinBox>
 #include <QFontComboBox>
 #include "Account.h"
-#include "Styler.h"
 #include "ClientController.h"
 #include "ShowUriDialog.h"
 #include "Profile.h"
@@ -75,8 +74,6 @@ private slots:
     void on_actionQuit_triggered();
     void on_actionPaste_triggered();
     void on_actionCut_triggered();
-    void on_actionUndo_triggered();
-    void on_actionRedo_triggered();
     void on_actionURI_triggered();
     void on_actionBold_triggered();
     void on_actionItalic_triggered();
@@ -92,6 +89,8 @@ private slots:
     void onCharFormatChanged(const QTextCharFormat & f);
     void highlightUser(QListWidgetItem * item);
 
+
+    void on_actioncreators_triggered();
 
 private:
     void createActions();

@@ -35,17 +35,11 @@ Account* Server::getAccount(QWebSocket *socketOfAccont){
 
 Server::~Server() {
     m_pWebSocketServer->close();
-
-    //TODO: vedere bene cosa altro distruggere?? ad esempio
-    //      tutti gli altri elementi dinamici nella
-    //      mappa socket2account ???
+    // what else?
 }
 
 
 //TODO: - codice copiato da ClientController::onTextMessageReceived, RIFATTORIZZARE!!!
-//      - nella creazione dell'account, inserire anche l'immagine
-//        quindi checkPassword deve ritornare anche l'immagine oltre che il siteId
-//      - inserire anche l'immagine nel valore di ritorno di checkPassword
 //- To handle requests by not logged account.
 //- The only valid actions can be "registerUser","loginReq"
 //- Note that "genericRequestString" is a String type but interally
@@ -56,10 +50,6 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
     QJsonDocument requestDocJSON;
 
     requestDocJSON = QJsonDocument::fromJson(genericRequestString.toUtf8());
-    if (requestDocJSON.isNull()) {
-        // TODO: print some debug
-        return;
-    }
     requestObjJSON = requestDocJSON.object();
 
     // No switch case for strings in C++ :((
@@ -95,8 +85,8 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         }
 
         loginSuccess = true;
-        //in case of success, result will contain siteId and [image(TODO!!)]
-        loggedAccount = new Account(result, name, imageToReturn); //TODO : inserire anche l'immagine
+
+        loggedAccount = new Account(result, name, imageToReturn);
         this->socket2account[signalSender] = loggedAccount;
 
         nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
@@ -110,6 +100,14 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
     else if (header == "registerUser"){
         QString name = requestObjJSON["name"].toString();
         QString password = requestObjJSON["password"].toString();
+
+        if(requestObjJSON["image"].toString() == ""){
+            // if the user does not provide an image, reject registration
+            QByteArray sendMsgToClient = ServerMessageFactory::createRegistrationUserReply(false, -1);
+            signalSender->sendTextMessage(sendMsgToClient);
+            return;
+        }
+
         // N.B. l'immagine viene salvata nel DB in base64
         QByteArray image = requestObjJSON["image"].toString().toLatin1();
 
@@ -143,10 +141,6 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
     requestDocJSON = QJsonDocument::fromJson(genericRequestString.toUtf8());
-    if (requestDocJSON.isNull()) {
-        // TODO: print some debug
-        return;
-    }
     requestObjJSON = requestDocJSON.object();
 
     ServerController *fileServContr = nullptr;
@@ -242,7 +236,6 @@ int Server::getDigits(std::string s) {
 }
 
 
-//TODO
 QString Server::generateUri(QString nameAccount, QString& nameDocument){
     std::string uri("file://");
     int accountHashed = this->getDigits(nameAccount.toUtf8().constData());

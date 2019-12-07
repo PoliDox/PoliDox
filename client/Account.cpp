@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <cstdlib>
 #include <QBuffer>
+#include <iostream>
 
 Account::Account(int p_siteId, const QString& p_name, const QByteArray& p_image)
     : siteId(p_siteId), name(p_name), image(p_image)
@@ -42,7 +43,7 @@ Account Account::fromJson(const QJsonObject& accountJSON, bool isFromDb) {
     int l_siteId = accountJSON["siteId"].toInt();
     QString l_name = accountJSON["name"].toString();
     if(l_name == "")
-        l_name = accountJSON["_id"].toString(); //non cancellare, serve per la conversione dal db  =)
+        l_name = accountJSON["_id"].toString(); // do not delete: it is used for the conversion from db
 
     QByteArray l_image;
     if(!isFromDb){
@@ -51,12 +52,11 @@ Account Account::fromJson(const QJsonObject& accountJSON, bool isFromDb) {
     else {
         QJsonArray imageObjJSON = accountJSON["image"].toArray();
         for(auto elem : imageObjJSON){
-            char appo = (char)elem.toInt();     //TODO: da rivedere!! se funziona in tutti i casi, potrebbero verificarsi casi in cui taglia qualcosa e perdo informazione?
+            char appo = static_cast<char>(elem.toInt());
             l_image.push_back(appo);
         }
     }
 
-    //qDebug() << "[Account::fromJson] ACCOUNT.image: " << l_image ;
     return Account(l_siteId, l_name, l_image);
 }
 

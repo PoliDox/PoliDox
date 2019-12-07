@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include "ui_editor.h"
+#include "Creators.h"
 #include <QDebug>
 #include <QChar>
 #include <QMenu>
@@ -672,16 +673,6 @@ void Editor::on_actionCut_triggered()
     m_textEdit->cut();
 }
 
-void Editor::on_actionUndo_triggered()
-{
-    m_textEdit->undo();
-}
-
-void Editor::on_actionRedo_triggered()
-{
-    m_textEdit->redo();
-}
-
 
 void Editor::on_actionBold_triggered()
 {
@@ -796,4 +787,10 @@ void Editor::setNewImage(const QPixmap& Pix){
 
 Profile *Editor::getProfilePtr(){
     return this->profile;
+}
+
+void Editor::on_actioncreators_triggered()
+{
+    Creators *creators = new Creators(this);
+    creators->show();
 }

@@ -22,6 +22,8 @@ class LoginWindow : public QWidget
 public:
     explicit LoginWindow(QWidget *parent = nullptr);
     ~LoginWindow();
+    void closeEvent(QCloseEvent *event) override;
+
     void setEditor(Editor *);
 
     void displayFiles(const QList<QString> p_files);
