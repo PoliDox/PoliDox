@@ -447,6 +447,10 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     remCursor.setPosition(position);
     if (op == INSERT_OP){      
        addChar(symbol, remCursor);
+       /************************************************************************************************/
+       //This is needed to avoid that the character inserted copies the background of the previous character
+        resetBackgroundColor(position);
+       /************************************************************************************************/
     }
     else if (op == DELETE_OP)
        remCursor.deleteChar();
