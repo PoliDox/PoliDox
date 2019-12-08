@@ -416,7 +416,6 @@ void Editor::addClient(const Account& user)
     QColor color(assignedColor.value(siteId));
     remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;border: 1px solid transparent;border-left-color:"+color.name()+";");
     remoteLabel->setFont(font);
-    remoteLabel->lower();    
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
