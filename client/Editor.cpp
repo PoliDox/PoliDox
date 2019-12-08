@@ -412,9 +412,9 @@ void Editor::addClient(const Account& user)
 
     // 1. Add user to the map of remote users
     QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
-    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n|"), m_textEdit);
+    QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n"), m_textEdit);
     QColor color(assignedColor.value(siteId));
-    remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;");
+    remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;border: 1px solid transparent;border-left-color:"+color.name()+";");
     remoteLabel->setFont(font);
     remoteLabel->lower();    
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
@@ -433,7 +433,7 @@ void Editor::addClient(const Account& user)
     QFont new_font(l_font.family(),static_cast<int>((fmt.fontPointSize()/2)+3),QFont::Bold);
     remoteLabel->setFont(new_font);
 
-    remoteLabel->move(curCoord.left()-1, curCoord.top()-(remoteLabel->fontInfo().pointSize()/3));
+    remoteLabel->move(curCoord.left(), curCoord.top()-(remoteLabel->fontInfo().pointSize()/3));
     remoteLabel->setVisible(true);
     remoteLabel->raise(); /* FIXED BUG HIDDEN LABEL */
 
@@ -581,7 +581,7 @@ void Editor::updateCursors()
         //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
         int height = remoteCoord.bottom()-remoteCoord.top();
         user.label->resize(100, height);
-        user.label->move(remoteCoord.left()-1, remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
+        user.label->move(remoteCoord.left(), remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
         user.label->setVisible(true);
     }
 }
@@ -600,7 +600,7 @@ void Editor::moveCursor(int pos, int siteId)
     QFont new_font(l_font.family(),(static_cast<int>(fmt.fontPointSize()/2)+3),QFont::Bold);
     user.label->setFont(new_font);
 
-    user.label->move(remoteCoord.left()-1, remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
+    user.label->move(remoteCoord.left(), remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
     user.label->setVisible(true);
 }
 
