@@ -10,7 +10,7 @@
 
 
 #define MAXNUM 100
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 
 CrdtClient::CrdtClient(int p_siteId) : siteId(p_siteId)
 { }

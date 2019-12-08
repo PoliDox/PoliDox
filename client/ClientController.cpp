@@ -189,8 +189,10 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
     for (int i = 0; i < charsAdded; i++) {
         /************************************************************************************************/
         //This is needed to avoid that the character inserted copies the background of the previous character
-        if(i==0)
-            m_editor->resetBackgroundColor(position);
+        if(i==0){
+            QColor color=m_editor->userSelected(m_crdt->getSiteId());
+            m_editor->resetBackgroundColor(position,color);
+        }
         /************************************************************************************************/
         QChar qchar = m_editor->at(position+i);
         ushort _char;

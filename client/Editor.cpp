@@ -447,10 +447,10 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     remCursor.setPosition(position);
     if (op == INSERT_OP){      
        addChar(symbol, remCursor);
-       /************************************************************************************************/
+
        //This is needed to avoid that the character inserted copies the background of the previous character
-        resetBackgroundColor(position);
-       /************************************************************************************************/
+       QColor color=userSelected(siteId);
+       resetBackgroundColor(position, color);
     }
     else if (op == DELETE_OP)
        remCursor.deleteChar();
@@ -516,9 +516,9 @@ void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
 
 }
 
-void Editor::resetBackgroundColor(int pos){
+void Editor::resetBackgroundColor(int pos, const QColor& color){
     QTextCharFormat fmt;
-    fmt.setBackground(QColor("transparent"));
+    fmt.setBackground(color);
     QTextCursor cursor(m_textDoc);
     cursor.setPosition(pos, QTextCursor::MoveAnchor);
     cursor.setPosition(pos+1, QTextCursor::KeepAnchor);
@@ -640,6 +640,29 @@ void Editor::onFontFamilyChanged(const QFont& font){
     fmt.setFontFamily(font.family());    
     cursor.mergeCharFormat(fmt);
     m_textEdit->mergeCurrentCharFormat(fmt);
+
+}
+
+QColor Editor::userSelected(int siteId){
+
+
+    QList<QListWidgetItem*> items;
+
+    if(controller->getAccount().getSiteId()==siteId)
+        items = ui->onlineList->findItems("You", Qt::MatchFlag::MatchExactly);
+    else{
+        QString name=m_onlineUsers[siteId].account.getName();
+        items = ui->onlineList->findItems(name, Qt::MatchFlag::MatchExactly);
+    }
+
+    if(items.at(0)->checkState() == Qt::Checked){
+        QColor color(assignedColor[siteId]);
+        std::cout << color.name().toUtf8().constData() << std::endl;
+        color.setAlpha(80);
+        return color;
+    }
+    else
+        return QColor("transparent");
 
 }
 
