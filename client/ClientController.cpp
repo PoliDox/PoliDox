@@ -203,7 +203,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
 
         Char symbol(_char,m_crdt->getSiteId());
 
-        m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert        
+        m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert
         m_crdt->localInsert(position+i, symbol);
     }
 

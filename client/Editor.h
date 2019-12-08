@@ -35,7 +35,7 @@ enum EditOp
     DELETE_OP
 };
 
-#define DEFAULT_FONT "DejaVu Sans"
+#define DEFAULT_FONT "Lucida Grande"
 
 class Editor : public QMainWindow
 {

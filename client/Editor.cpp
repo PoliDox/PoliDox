@@ -16,6 +16,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QPrinter>
+#include <QLineEdit>
 
 #include <QPushButton>
 #include <QCheckBox>
@@ -182,7 +183,7 @@ void Editor::initRichTextToolBar(){
     m_textEdit->setFont(QFont(DEFAULT_FONT));
     font->setFont(m_textEdit->currentFont());
     m_textEdit->setFontPointSize(20);
-    fontSize->setValue(m_textEdit->fontPointSize());
+    fontSize->setValue(static_cast<int>(m_textEdit->fontPointSize()));
 
     this->ui->textRichToolBar->addWidget(font);
     this->ui->textRichToolBar->addWidget(fontSize);
@@ -277,7 +278,7 @@ void Editor::highlightUser(QListWidgetItem *item) {
 
 void Editor::addOnlineUser(const Account& account){
 
-    QListWidgetItem* _dItem;
+    QListWidgetItem* _dItem=nullptr;
     QList<QListWidgetItem*> items = ui->offlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
     if(items.size()==0)
@@ -337,7 +338,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     fmt.setFontItalic(style.is_italic);
     fmt.setFontUnderline(style.is_underline);
 
-    Qt::Alignment alignment = (Qt::Alignment) style.alignment;
+    Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
     m_textEdit->setAlignment(alignment);
 
     p_cursor.mergeCharFormat(fmt);
@@ -368,7 +369,7 @@ void Editor::removeClient(const Account& account){
     m_offlineUsers.append(account);
 
     // 2. Update view in editor
-    QListWidgetItem* _dItem;
+    QListWidgetItem* _dItem=nullptr;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
     if (items.size()==0)
@@ -425,7 +426,14 @@ void Editor::addClient(const Account& user)
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
     int height = curCoord.bottom()-curCoord.top();
     remoteLabel->resize(100, height);
-    remoteLabel->move(curCoord.left()-1, curCoord.top()-4);
+
+    /* update label dimension according to remote cursor position */
+    QFont l_font=remoteLabel->font();
+    QTextCharFormat fmt=remoteCursor.charFormat();
+    QFont new_font(l_font.family(),static_cast<int>((fmt.fontPointSize()/2)+3),QFont::Bold);
+    remoteLabel->setFont(new_font);
+
+    remoteLabel->move(curCoord.left()-1, curCoord.top()-(remoteLabel->fontInfo().pointSize()/3));
     remoteLabel->setVisible(true);
     remoteLabel->raise(); /* FIXED BUG HIDDEN LABEL */
 
@@ -525,8 +533,14 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QTextCharFormat fmt=cursor.charFormat();  
     bold = (fmt.fontWeight() == QFont::Bold);
 
-    symbol.setStyle(fmt.fontFamily(), fmt.fontPointSize(), bold, fmt.fontItalic(),
-                    fmt.fontUnderline(), (int)m_textEdit->alignment());
+    /* BUG? Can't take font name from cursor and related fmt, why? bypass this by taking the font name from the FontComboBox */
+    QFontComboBox *fontCombo=static_cast<QFontComboBox*>(ui->textRichToolBar->findChild<QFontComboBox*>("font"));
+    QString font_fam=fontCombo->lineEdit()->text();
+
+    symbol.setStyle(font_fam, static_cast<int>(fmt.fontPointSize()), bold, fmt.fontItalic(),
+                    fmt.fontUnderline(), static_cast<int>(m_textEdit->alignment()));
+
+    std::cout << "INDEX "<< index <<" FONT FAMILY"<< font_fam.toUtf8().constData() << std::endl;
 }
 
 // TODO: not used, delete?
@@ -567,7 +581,7 @@ void Editor::updateCursors()
         //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
         int height = remoteCoord.bottom()-remoteCoord.top();
         user.label->resize(100, height);
-        user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
+        user.label->move(remoteCoord.left()-1, remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
         user.label->setVisible(true);
     }
 }
@@ -579,7 +593,14 @@ void Editor::moveCursor(int pos, int siteId)
     QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
     int height = remoteCoord.bottom()-remoteCoord.top();
     user.label->resize(100, height);
-    user.label->move(remoteCoord.left()-1, remoteCoord.top()-4);
+
+    /* update label dimension according to remote cursor position */
+    QFont l_font=user.label->font();
+    QTextCharFormat fmt=user.cursor.charFormat();
+    QFont new_font(l_font.family(),(static_cast<int>(fmt.fontPointSize()/2)+3),QFont::Bold);
+    user.label->setFont(new_font);
+
+    user.label->move(remoteCoord.left()-1, remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
     user.label->setVisible(true);
 }
 
@@ -621,7 +642,7 @@ void Editor::onFontFamilyChanged(const QFont& font){
 
 void Editor::closeEvent(QCloseEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     on_actionQuit_triggered();
 }
 
@@ -777,7 +798,7 @@ void Editor::on_actionURI_triggered()
 
 void Editor::on_actionAccount_triggered(bool checked)
 {
-    Q_UNUSED(checked);
+    Q_UNUSED(checked)
     profile->show();
 
 }
