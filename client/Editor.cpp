@@ -414,9 +414,10 @@ void Editor::addClient(const Account& user)
     QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n"), m_textEdit);
     QColor color(assignedColor.value(siteId));
+    remoteLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
     remoteLabel->setStyleSheet("color:"+color.name()+";background-color:transparent;border: 1px solid transparent;border-left-color:"+color.name()+";");
     remoteLabel->setFont(font);
-    remoteLabel->lower();    
+    remoteLabel->lower();
     User newUser = { user, remoteLabel, QTextCursor(m_textDoc)};
     m_onlineUsers[siteId] = newUser;
 
