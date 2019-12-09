@@ -26,11 +26,13 @@ public:
     void notifyOtherClients(QWebSocket *newSocket);
     void createCrdt(QList<Char>& orderedInserts);
     CRDT* getCrdt();
-    void handleRemoteOperation(const QString& messageReceivedByClient);
-
+    ServerController(const ServerController& other) = delete;
+    ServerController(const ServerController&& other) = delete;
+    ~ServerController();
+    void replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket, QWebSocket *signalSender);
 
 public slots:
-    void replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket);
+    void handleRemoteOperation(const QString& messageReceivedByClient);
     void disconnectAccount();
 };
 

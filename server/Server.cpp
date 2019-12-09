@@ -33,13 +33,6 @@ Account* Server::getAccount(QWebSocket *socketOfAccont){
 }
 
 
-Server::~Server() {
-    m_pWebSocketServer->close();
-    // what else?
-}
-
-
-//TODO: - codice copiato da ClientController::onTextMessageReceived, RIFATTORIZZARE!!!
 //- To handle requests by not logged account.
 //- The only valid actions can be "registerUser","loginReq"
 //- Note that "genericRequestString" is a String type but interally
@@ -64,9 +57,11 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
 
         //check if account is already logged. If true, login is rejected
         bool alreadyLogged = false;
-        for(Account* account : this->socket2account.values())
-            if(account != nullptr && account->getName() == name)
+        for(Account* account : this->socket2account.values()){
+            if(account != nullptr && account->getName() == name){
                 alreadyLogged = true;
+            }
+        }
 
         if(alreadyLogged){
             QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, QString("log"), loggedAccount, nameDocuments);
@@ -76,7 +71,13 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
 
         QByteArray imageToReturn;
         int result = -1;
-        result = this->dbOperations->checkPassword(name, password,  imageToReturn);
+        try {
+            result = this->dbOperations->checkPassword(name, password,  imageToReturn);
+        } catch (mongocxx::query_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
         if(result < 0){
             QByteArray sendMsgToClient = ServerMessageFactory::createLoginReply(loginSuccess, QString("auth"), loggedAccount, nameDocuments);
@@ -89,7 +90,13 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         loggedAccount = new Account(result, name, imageToReturn);
         this->socket2account[signalSender] = loggedAccount;
 
-        nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
+        try{
+            nameDocuments = this->dbOperations->getAllDocuments(loggedAccount->getSiteId());
+        } catch (mongocxx::query_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleNotLoggedRequests);
         connect(signalSender, &QWebSocket::textMessageReceived, this, &Server::handleLoggedRequests);
@@ -112,7 +119,15 @@ void Server::handleNotLoggedRequests(const QString& genericRequestString){
         QByteArray image = requestObjJSON["image"].toString().toLatin1();
 
         bool registrationSuccess = false;
-        int siteId = this->dbOperations->registerUser(name, password, image);
+        int siteId = -1;
+        try{
+            siteId = this->dbOperations->registerUser(name, password, image);
+        } catch (mongocxx::query_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
+
         if(siteId >= 0)
             registrationSuccess = true;
 
@@ -153,7 +168,14 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
         if (nameDocument == "") {
             //is a uri request
-            nameDocument = this->dbOperations->getDocument(uri);
+            try {
+                nameDocument = this->dbOperations->getDocument(uri);
+            } catch (mongocxx::query_exception) {
+                QCoreApplication::removePostedEvents(nullptr);
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            };
+
             if(nameDocument == ""){
                 //the user has inserted an invalid uri
                 QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(false, QString("uri"));
@@ -162,15 +184,37 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
             }
             else{
                 Account* loggedAccount = this->socket2account[signalSender];
-                this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
-                isFromUri = true;
+                try {
+                    this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
+                } catch (mongocxx::query_exception) {
+                    QCoreApplication::removePostedEvents(nullptr);
+                    QCoreApplication::exit(EXIT_FAILURE);
+                    return;
+                };
+
+                    isFromUri = true;
             }
         }
 
         if( !(this->file2serverController.contains(nameDocument)) ){
-            QList<Char> orderedInserts = this->dbOperations->getAllInserts(nameDocument);
+            QList<Char> orderedInserts;
+            try{
+                orderedInserts = this->dbOperations->getAllInserts(nameDocument);
+            } catch (mongocxx::query_exception) {
+                QCoreApplication::removePostedEvents(nullptr);
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            };
+
             if(!isFromUri)
-                uri = dbOperations->getUri(nameDocument);
+                try{
+                    uri = dbOperations->getUri(nameDocument);
+                } catch (mongocxx::query_exception) {
+                QCoreApplication::removePostedEvents(nullptr);
+                QCoreApplication::exit(EXIT_FAILURE);
+                return;
+            };
+
             fileServContr = this->initializeServerController(nameDocument, uri, orderedInserts);
 
             this->file2serverController[nameDocument] = fileServContr;
@@ -195,14 +239,29 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
 
         Account* loggedAccount = this->socket2account[signalSender];
         QString uriOfDocument = this->generateUri(loggedAccount->getName(), nameDocument);
-        bool result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);   //false if there is already a document with that name
+
+        bool result = false;
+        try {
+            result = this->dbOperations->insertNewDocument(nameDocument, uriOfDocument);   //false if there is already a document with that name
+        } catch (mongocxx::operation_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
+
         if(!result){
             QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(false, QString("create"));
             signalSender->sendTextMessage(sendMsgToClient);
             return;
         }
 
-        this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
+        try{
+            this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
+        } catch (mongocxx::query_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
         QList<Char> emptyList;
         fileServContr = this->initializeServerController(nameDocument, uriOfDocument, emptyList);
@@ -224,7 +283,7 @@ int Server::getDigits(std::string s) {
     for ( auto it = s.rbegin(); it != s.rend(); ++it ) {
         runningLength += prevLength;
         //if digits is a 7 digit number then appending a 3 digit number would overflow an int
-        digits += (long long int)*it * pow(10, runningLength);          //TODO: si può togliere questo warning 'old style cast' ?
+        digits += (long long int)*it * pow(10, runningLength);
         //we have to work out the length of the current digit
         //so we know how much we need to shift by next time
         int dLength = 0;
@@ -249,16 +308,33 @@ QString Server::generateUri(QString nameAccount, QString& nameDocument){
 // if I arrive on this slot, is from a socket that in the
 // moment he quits he does not have a open file
 void Server::disconnectAccount(){
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
     Account *accountToDisconnect = this->socket2account[signalSender];
 
-    if(accountToDisconnect != nullptr)
+    if(accountToDisconnect != nullptr){
         this->socket2account.remove(signalSender);
+        delete (accountToDisconnect);
+    }
 
-    //il distruttore lo chiama già la remove oppure no??
-    signalSender->deleteLater();
-    if(accountToDisconnect != nullptr)
-        delete (accountToDisconnect);       //TODO: controlllare il distruttore
+    delete (signalSender);
+}
+
+
+Server::~Server() {
+    for(QWebSocket* elem : this->socket2account.keys()){
+        Account* accToDelete = this->socket2account[elem];
+        delete (accToDelete);
+        this->socket2account[elem] = nullptr;
+
+        disconnect(elem, &QWebSocket::disconnected, this, &Server::disconnectAccount);
+        delete (elem);
+    }
+
+    for(ServerController* elem : this->file2serverController)
+        delete (elem);
+
+    delete (this->dbOperations);
+    delete (this->m_pWebSocketServer);
 }
 
 

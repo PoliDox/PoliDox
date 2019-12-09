@@ -21,9 +21,9 @@ void DatabaseManager::incrementCounterOfCollection(QString nameCollection){
 
     try{
         countersCollection.update_one(collToincrementView, incrementSequenceView);
-    } catch (mongocxx::query_exception e){
-        qDebug() << "[ERROR][DatabaseManager::incrementCounterOfCollection] update_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_FAILURE);
+    } catch (mongocxx::operation_exception e){
+        qDebug() << "[ERROR][DatabaseManager::incrementCounterOfCollection] update_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 }
 
@@ -41,8 +41,8 @@ void DatabaseManager::insertNewElemInCounterCollection(QString nameDocument, int
     try {
         countersCollection.insert_one(elemToInsertView);
     } catch (mongocxx::operation_exception e) {
-        qDebug() << "[ERROR][DatabaseManager::insertNewElemInCounterCollection] insert_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_FAILURE);
+        qDebug() << "[ERROR][DatabaseManager::insertNewElemInCounterCollection] insert_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
 }
@@ -60,9 +60,9 @@ int DatabaseManager::getCounterOfCollection(QString nameCollection){
     bsoncxx::stdx::optional<bsoncxx::document::value> queryResult;
     try{
         queryResult= countersCollection.find_one(collToRetrieveView);
-    } catch (mongocxx::query_exception e){
-        qDebug() << "[ERROR][DatabaseManager::getCounterOfCollection] find_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_FAILURE);
+    } catch (mongocxx::operation_exception e){
+        qDebug() << "[ERROR][DatabaseManager::getCounterOfCollection] find_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     if(queryResult){
@@ -113,11 +113,11 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
     try {
         userCollection.insert_one(userToInsertView);
     } catch (mongocxx::bulk_write_exception e) {
+        // name already exists. name must be unique globally
         return -1;
-    }
-    catch (mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::registerUser] insert_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_FAILURE);
+    } catch (mongocxx::query_exception e){
+        qDebug() << "[ERROR][DatabaseManager::registerUser] insert_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     this->incrementCounterOfCollection("user");
@@ -125,7 +125,7 @@ int DatabaseManager::registerUser(QString& name, QString& password, QByteArray& 
 }
 
 
-bool DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
+void DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     std::vector<unsigned char> imageVector(newImage.begin(), newImage.end());
@@ -142,20 +142,15 @@ bool DatabaseManager::changeImage(QString& nameAccount, QByteArray& newImage){
                                     << "image" << img
                                     << bsoncxx::builder::stream::close_document
                                     << bsoncxx::builder::stream::finalize);
-    } catch (mongocxx::bulk_write_exception e){
-        //image update went wrong, due to an excessive size of the image
-        return false;
-    }
-    catch (mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::changeImage] update_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_FAILURE);
+    } catch (mongocxx::bulk_write_exception){
+        qDebug() << "[ERROR][DatabaseManager::changeImage] update_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
-    return true;
 }
 
 
-bool DatabaseManager::changePassword(QString& nameAccount, QString& password){
+void DatabaseManager::changePassword(QString& nameAccount, QString& password){
     mongocxx::collection userCollection = (*this->db)["user"];
 
     QString hashedPsw = QCryptographicHash::hash((password.toUtf8()), QCryptographicHash::Md5).toHex();
@@ -170,14 +165,10 @@ bool DatabaseManager::changePassword(QString& nameAccount, QString& password){
                                     << bsoncxx::builder::stream::close_document
                                     << bsoncxx::builder::stream::finalize);
     } catch (mongocxx::bulk_write_exception e){
-        return false;
-    }
-    catch (mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::changePassword] update_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_FAILURE);
+        qDebug() << "[ERROR][DatabaseManager::changePassword] update_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
-    return true;
 }
 
 
@@ -213,8 +204,8 @@ int DatabaseManager::checkPassword(QString& name, QString& password, QByteArray&
     try{
         queryResult = userCollection.find_one(userToCheckView);
     } catch (mongocxx::query_exception e){
-        qDebug() << "[ERROR][DatabaseManager::checkPassword] find_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::checkPassword] find_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     if(queryResult){
@@ -246,13 +237,15 @@ bool DatabaseManager::insertNewDocument(QString& documentName, QString& uri){
 
     try {
         documentCollection.insert_one(docToInsertView);
-    } catch (mongocxx::bulk_write_exception e) {
-        // fail, there is already a document with that name
-        return false;
-    }
-    catch (mongocxx::query_exception e){
-        qDebug() << "[ERROR][DatabaseManager::insertNewDocument] insert_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+    } catch (mongocxx::operation_exception e){
+        QString errString(e.what());
+        if(errString.contains("duplicate key error collection")){
+            // fail, there is already a document with that name
+            return false;
+        } else if(errString.contains("No suitable servers found")){
+            qDebug() << "[ERROR][DatabaseManager::insertNewDocument] insert_one error, connection to db failed. Server should shutdown.";
+            throw;
+        }
     }
 
     return true;
@@ -279,8 +272,8 @@ bool DatabaseManager::insertNewPermission(QString& nameDocument, int siteId){
         return false;
     }
     catch (mongocxx::query_exception e){
-        qDebug() << "[ERROR][DatabaseManager::insertNewPermission] insert_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::insertNewPermission] insert_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     return true;
@@ -301,8 +294,8 @@ QString DatabaseManager::getUri(QString& documentName){
     try{
         queryResult= documentCollection.find_one(documentToGetView);
     } catch (mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::getUri] find_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::getUri] find_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     if(queryResult){
@@ -316,6 +309,7 @@ QString DatabaseManager::getUri(QString& documentName){
         // do nothing, I will arrive here only if the documentName
         // does not exist in db. But this will never happen, because
         // the name is passed via code, starting from the exiting files.
+        // So it is not possible to have in this method a not existing documentName.
         return QString("");     //this line could be omitted
     }
 }
@@ -336,8 +330,8 @@ QString DatabaseManager::getDocument(QString& uriOfDocument){
     try{
         queryResult = documentCollection.find_one(documentToGetView);
     } catch(mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::getDocument] find_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::getDocument] find_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     if(queryResult){
@@ -382,12 +376,11 @@ void DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
 
     try {
         insertCollection.insert_one(symbolToInsertView);
-    } catch (mongocxx::query_exception e) {
-        qDebug() << "[ERROR][DatabaseManager::insertSymbol] insert_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+    } catch (mongocxx::bulk_write_exception e) {
+        qDebug() << "[ERROR][DatabaseManager::insertSymbol] insert_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
-    this->incrementCounterOfCollection("insert");
 }
 
 
@@ -412,9 +405,9 @@ void DatabaseManager::deleteSymbol(QString& nameDocument, QString& symbol, int s
 
     try {
         insertCollection.delete_one(symbolToDeleteView);
-    } catch (mongocxx::query_exception e) {
-        qDebug() << "[ERROR][DatabaseManager::deleteSymbol] delete_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+    } catch (mongocxx::bulk_write_exception e) {
+        qDebug() << "[ERROR][DatabaseManager::deleteSymbol] delete_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
 }
@@ -449,8 +442,8 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
             orderedChars.push_back(charToInsert);
         }
     } catch (mongocxx::query_exception) {
-        qDebug() << "[ERROR][DatabaseManager::getAllInserts] find error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::getAllInserts] find error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     //(.2)Now ordering.
@@ -484,8 +477,8 @@ QList<int> DatabaseManager::getAllAccounts(QString& nameDocument){
             siteIdAccounts.append(siteId);
         }
     } catch (mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::getAllAccounts] find error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::getAllAccounts] find error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     return siteIdAccounts;
@@ -516,8 +509,8 @@ Account DatabaseManager::getAccount(int siteId){
     try{
         queryResult = userCollection.find_one(accountToRetrieveView);
     } catch (mongocxx::query_exception){
-        qDebug() << "[ERROR][DatabaseManager::getAccount] find_one error, connection to db failed.\nServer closed.";
-        exit(EXIT_SUCCESS);
+        qDebug() << "[ERROR][DatabaseManager::getAccount] find_one error, connection to db failed. Server should shutdown.";
+        throw;
     }
 
     bsoncxx::document::view a = (*queryResult).view();
@@ -540,14 +533,20 @@ QList<QString> DatabaseManager::getAllDocuments(int siteId){
                        << bsoncxx::builder::stream::finalize;
     bsoncxx::document::view documentsToRetrieveView = documentsToRetrieve.view();
 
-    mongocxx::cursor resultIterator = documentCollection.find(documentsToRetrieveView);
-    for(auto elem : resultIterator) {
-        bsoncxx::document::element nameDocument = elem["_id"]["nameDocument"];
-        bsoncxx::stdx::string_view nameDocumentView = nameDocument.get_utf8().value;
-        QString appo = QString::fromStdString( nameDocumentView.to_string() );
+    try{
+        mongocxx::cursor resultIterator = documentCollection.find(documentsToRetrieveView);
 
-        nameDocuments.append(appo);
-    }
+        for(auto elem : resultIterator) {
+            bsoncxx::document::element nameDocument = elem["_id"]["nameDocument"];
+            bsoncxx::stdx::string_view nameDocumentView = nameDocument.get_utf8().value;
+            QString appo = QString::fromStdString( nameDocumentView.to_string() );
+
+            nameDocuments.append(appo);
+        }
+    } catch (mongocxx::query_exception) {
+        qDebug() << "[ERROR][DatabaseManager::getAllDocuments] find error, connection to db failed. Server should shutdown.";
+        throw;
+    };
 
     return nameDocuments;
 }
@@ -564,4 +563,3 @@ DatabaseManager::~DatabaseManager() {
     delete (this->db);
     delete (this->instance);
 }
-

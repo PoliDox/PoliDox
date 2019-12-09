@@ -33,6 +33,8 @@ public:
     void removeSocket2AccountPair(QWebSocket *socketOfAccount);
     void removeFile2ServcontrPair(QString filename);
     QString generateUri(QString nameAccount, QString& nameDocument);
+    Server(const Server& other) = delete ;
+    Server(const Server&& other) = delete ;
     virtual ~Server();
 
 /* ======================================================================
