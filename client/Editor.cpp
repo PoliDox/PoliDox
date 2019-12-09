@@ -26,7 +26,7 @@
 
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
-    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), changingFormat(false)
+    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), localOperation(false), changingFormat(false)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -60,12 +60,13 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         // otherwise we fall in an endless loop
         if (!handlingOperation) {
             // We call this asynchrounously, since cursor coordinates are not updated yet
+            localOperation = true;
             QMetaObject::invokeMethod(this, "updateCursors", Qt::QueuedConnection);
             emit textChanged(position, charsRemoved, charsAdded);
         }
     });
 
-    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){        
+    connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
         // TODO: Use connect below to update on click?
         int line = ui->textEdit->textCursor().blockNumber()+1;
         int pos = ui->textEdit->textCursor().columnNumber()+1;
@@ -77,9 +78,12 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
         //qDebug() << "Cursor position is now" << pos;
-
-        emit cursorPositionChanged(pos);
+        if (localOperation || handlingOperation)
+            localOperation = false;
+        else
+            emit cursorPositionChanged(pos);
     });
+
 
     profile = new Profile(this);
     profile->setImagePic(main_account->getImage());
