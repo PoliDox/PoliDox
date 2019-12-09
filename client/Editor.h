@@ -123,6 +123,7 @@ private:
     Ui::Editor *ui;
 
     bool handlingOperation;
+    bool localOperation;
     bool changingFormat;
 };
 
