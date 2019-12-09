@@ -47,8 +47,13 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <family>Arial</family>
+             </font>
+            </property>
             <property name="text">
-             <string>FILENAME</string>
+             <string>filename</string>
             </property>
            </widget>
           </item>
@@ -70,7 +75,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
         <property name="sizeConstraint">
          <enum>QLayout::SetNoConstraint</enum>
         </property>
@@ -91,11 +96,29 @@
           </item>
           <item>
            <widget class="QLabel" name="label_4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>16777215</height>
+              <height>15</height>
              </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>13</pointsize>
+             </font>
             </property>
             <property name="text">
              <string>Online users</string>
@@ -140,8 +163,13 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>16777215</height>
+              <height>15</height>
              </size>
+            </property>
+            <property name="font">
+             <font>
+              <family>Arial</family>
+             </font>
             </property>
             <property name="text">
              <string>Offline users</string>
