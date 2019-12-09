@@ -31,7 +31,6 @@ public:
     bool operator < (const Account& other) const;
     bool operator == (const Account& other) const;
 
-
 };
 
 #endif // ACCOUNT_H
