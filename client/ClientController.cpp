@@ -161,7 +161,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 void ClientController::onTextChanged(int position, int charsRemoved, int charsAdded)
 {
 
-    qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved;    
+    qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved << " at position: "<<position;
 
     /*
     if (charsAdded > 1 && position == 0 &&
@@ -174,11 +174,6 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         charsRemoved--;
     }
     */
-    if (charsAdded > m_editor->textSize()) {
-        qDebug() << "Adjusting chars added and removed";
-        charsAdded--;
-        charsRemoved--;
-    }
 
     // It could happen that some chars were removed and some others were added at the same time
     for (int i = 0; i < charsRemoved; i++) {
