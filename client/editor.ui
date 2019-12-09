@@ -77,26 +77,20 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="label">
             <property name="maximumSize">
              <size>
-              <width>80</width>
+              <width>10</width>
               <height>16777215</height>
              </size>
             </property>
             <property name="text">
-             <string>Online users</string>
+             <string>ICON</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QLabel" name="label_4">
             <property name="maximumSize">
              <size>
               <width>16777215</width>
@@ -104,7 +98,7 @@
              </size>
             </property>
             <property name="text">
-             <string>ICON</string>
+             <string>Online users</string>
             </property>
            </widget>
           </item>
@@ -123,19 +117,6 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLabel" name="label_5">
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Offline users</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_2">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -145,12 +126,25 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>10</width>
               <height>16777215</height>
              </size>
             </property>
             <property name="text">
              <string>ICON</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Offline users</string>
             </property>
            </widget>
           </item>
