@@ -36,7 +36,7 @@ enum EditOp
 };
 
 #define DEFAULT_FONT "Lucida Grande"
-#define DEFAULT_SIZE 20
+#define DEFAULT_SIZE 12
 
 class Editor : public QMainWindow
 {

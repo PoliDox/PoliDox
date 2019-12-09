@@ -433,7 +433,10 @@ void Editor::addClient(const Account& user)
     /* update label dimension according to remote cursor position */
     QFont l_font=remoteLabel->font();
     QTextCharFormat fmt=remoteCursor.charFormat();
-    QFont new_font(l_font.family(),static_cast<int>((DEFAULT_SIZE/2)+3),QFont::Bold);
+    int font_size=static_cast<int>(fmt.fontPointSize());
+    if(font_size==0)
+        font_size=DEFAULT_SIZE;
+    QFont new_font(l_font.family(),static_cast<int>((font_size/2)+3),QFont::Bold);
     remoteLabel->setFont(new_font);
 
     remoteLabel->move(curCoord.left(), curCoord.top()-(remoteLabel->fontInfo().pointSize()/3));
@@ -589,6 +592,16 @@ void Editor::updateCursors()
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
         int height = remoteCoord.bottom()-remoteCoord.top();
         user.label->resize(user.label->width(), height+5);
+
+        /* update label dimension according to remote cursor position */
+        QFont l_font=user.label->font();
+        QTextCharFormat fmt=user.cursor.charFormat();
+        int font_size=static_cast<int>(fmt.fontPointSize());
+        if(font_size==0)
+            font_size=DEFAULT_SIZE;
+        QFont new_font(l_font.family(),static_cast<int>((font_size/2)+3),QFont::Bold);
+        user.label->setFont(new_font);
+
         user.label->move(remoteCoord.left(), remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
         user.label->setVisible(true);
     }
@@ -605,7 +618,10 @@ void Editor::moveCursor(int pos, int siteId)
     /* update label dimension according to remote cursor position */
     QFont l_font=user.label->font();
     QTextCharFormat fmt=user.cursor.charFormat();
-    QFont new_font(l_font.family(),(static_cast<int>(fmt.fontPointSize()/2)+3),QFont::Bold);
+    int font_size=static_cast<int>(fmt.fontPointSize());
+    if(font_size==0)
+        font_size=DEFAULT_SIZE;
+    QFont new_font(l_font.family(),static_cast<int>((font_size/2)+3),QFont::Bold);
     user.label->setFont(new_font);
 
     user.label->move(remoteCoord.left(), remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
