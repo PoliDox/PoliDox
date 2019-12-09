@@ -26,7 +26,7 @@
 
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
-    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), localOperation(false), changingFormat(false)
+    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), changingFormat(false)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -58,9 +58,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     connect(m_textDoc, &QTextDocument::contentsChange, [&](int position, int charsRemoved, int charsAdded) {
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
-        if (!handlingOperation) {            
+        if (!handlingOperation) {
             // We call this asynchrounously, since cursor coordinates are not updated yet
-            localOperation = true;
             QMetaObject::invokeMethod(this, "updateCursors", Qt::QueuedConnection);
             emit textChanged(position, charsRemoved, charsAdded);
         }
@@ -78,10 +77,8 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
         //qDebug() << "Cursor position is now" << pos;
-        if (localOperation)
-            localOperation = false;
-        else
-            emit cursorPositionChanged(pos);
+
+        emit cursorPositionChanged(pos);
     });
 
     profile = new Profile(this);
@@ -185,8 +182,8 @@ void Editor::initRichTextToolBar(){
 
     m_textEdit->setFont(QFont(DEFAULT_FONT));
     font->setFont(m_textEdit->currentFont());
-    m_textEdit->setFontPointSize(20);
-    fontSize->setValue(static_cast<int>(m_textEdit->fontPointSize()));
+    m_textEdit->setFontPointSize(DEFAULT_SIZE);
+    fontSize->setValue(DEFAULT_SIZE);
 
     this->ui->textRichToolBar->addWidget(font);
     this->ui->textRichToolBar->addWidget(fontSize);
@@ -432,7 +429,7 @@ void Editor::addClient(const Account& user)
     /* update label dimension according to remote cursor position */
     QFont l_font=remoteLabel->font();
     QTextCharFormat fmt=remoteCursor.charFormat();
-    QFont new_font(l_font.family(),static_cast<int>((fmt.fontPointSize()/2)+3),QFont::Bold);
+    QFont new_font(l_font.family(),static_cast<int>((DEFAULT_SIZE/2)+3),QFont::Bold);
     remoteLabel->setFont(new_font);
 
     remoteLabel->move(curCoord.left(), curCoord.top()-(remoteLabel->fontInfo().pointSize()/3));
@@ -447,7 +444,6 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     handlingOperation = true;
     QTextCursor& remCursor = m_onlineUsers[siteId].cursor;
 
-    qDebug() << "Setting remote cursor at position" << position;
     remCursor.setPosition(position);
     if (op == INSERT_OP){      
        addChar(symbol, remCursor);
@@ -587,8 +583,6 @@ void Editor::updateCursors()
     for (auto it = m_onlineUsers.begin(); it != m_onlineUsers.end(); it++) {
         User& user = it.value();
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
-        //qDebug() << "cursor height:" << remoteCoord.bottom()-remoteCoord.top();
-        //qDebug() << "cursor width:" << remoteCoord.right()-remoteCoord.left();
         int height = remoteCoord.bottom()-remoteCoord.top();
         user.label->resize(user.label->width(), height+5);
         user.label->move(remoteCoord.left(), remoteCoord.top()-(user.label->fontInfo().pointSize()/3));
@@ -617,7 +611,6 @@ void Editor::moveCursor(int pos, int siteId)
 void Editor::onCharFormatChanged(const QTextCharFormat &f)
 {
     changingFormat = true;
-    //qDebug() << "Char format changed";
     ui->actionBold->setChecked(f.font().bold());
     ui->actionItalic->setChecked(f.font().italic());
     ui->actionUnderlined->setChecked(f.font().underline());
