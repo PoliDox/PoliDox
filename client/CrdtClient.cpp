@@ -9,7 +9,8 @@
 
 
 
-#define MAXNUM 100
+#define MAXNUM INT_MAX
+#define DIVISORE 2
 //#define DEBUG_OUTPUT
 
 CrdtClient::CrdtClient(int p_siteId) : siteId(p_siteId)
@@ -66,7 +67,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
         int difference = following[i] - preceding[i];
         if(difference > 1) {
-            int middleElement = (difference) / 2;
+            int middleElement = (difference) / DIVISORE;
             middleElement = middleElement + preceding[i];
             middle.push_back(middleElement);
             return middle;
@@ -79,7 +80,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
                 if( existsPositionInVector(i+1, preceding) ) {
                     for(j=i+1; j<precedingSize; j++) {
                         if (preceding[j] <= (MAXNUM - 2)) {
-                            int middleElement = (MAXNUM - preceding[j]) / 2;
+                            int middleElement = (MAXNUM - preceding[j]) / DIVISORE;
                             middleElement = middleElement + preceding[j];
                             middle.push_back(middleElement);
                             return middle;
@@ -126,7 +127,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
                     return middle;
                 }
                 else {
-                    int middleElement = following[i] / 2;
+                    int middleElement = following[i] / DIVISORE;
                     middle.push_back(middleElement);
                     return middle;
                 }
