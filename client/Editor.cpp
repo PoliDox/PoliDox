@@ -468,6 +468,7 @@ void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
     int start=0,
         lenght=0;
 
+
     if(userChars.size()>0){
 
         for(int i=1;i<=userChars.size();i++){
@@ -501,6 +502,11 @@ void Editor::highlightUserChars(int p_siteId, QColor p_color, bool p_checked)
     }
     else
         color=QColor("transparent");
+
+    /* remove selection when highlighting user chars*/
+    QTextCursor c = m_textEdit->textCursor();
+    c.clearSelection();
+    m_textEdit->setTextCursor(c);
 
     for (auto it = map.begin(); it != map.end(); ++it){
 
