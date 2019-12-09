@@ -350,11 +350,10 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     fmt.setFontItalic(style.is_italic);
     fmt.setFontUnderline(style.is_underline);
 
+    QTextBlockFormat textBlockFormat = p_cursor.blockFormat();
     Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
-    m_textEdit->setAlignment(alignment);
-
-    p_cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);
+    textBlockFormat.setAlignment(alignment);//or another alignment
+    p_cursor.mergeBlockFormat(textBlockFormat);
 
     p_cursor.insertText(QString(p_char.getValue()));
 }
@@ -446,7 +445,7 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     QTextCursor& remCursor = m_onlineUsers[siteId].cursor;
 
     remCursor.setPosition(position);
-    if (op == INSERT_OP){      
+    if (op == INSERT_OP){
        addChar(symbol, remCursor);
 
        //This is needed to avoid that the character inserted copies the background of the previous character
