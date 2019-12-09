@@ -85,6 +85,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
+        resetActionToggle(pos);
         //qDebug() << "Cursor position is now" << pos;
         if (localOperation || handlingOperation)
             localOperation = false;
@@ -550,31 +551,38 @@ void Editor::setCharacterStyle(int index, Char &symbol){
 }
 
 // TODO: not used, delete?
-void Editor::resetActionToggle(int pos,bool selection){
+void Editor::resetActionToggle(int pos){
 
-    QTextCursor cursor(m_textDoc);
-    cursor.setPosition(pos); /* se testo abc il cursore a pos=1 indica a, pos=2 indica b */
+    QTextCursor cursor=m_textEdit->textCursor();
 
     QTextCharFormat fmt=cursor.charFormat();
 
-    QAction* boldAction=this->ui->textRichToolBar->actions().at(0);
-    QAction* italicAction=this->ui->textRichToolBar->actions().at(1);
-    QAction* underlineAction=this->ui->textRichToolBar->actions().at(2);
+    QAction* left=this->ui->textRichToolBar->actions().at(4);
+    QAction* center=this->ui->textRichToolBar->actions().at(5);
+    QAction* right=this->ui->textRichToolBar->actions().at(6);
+    QAction* justify=this->ui->textRichToolBar->actions().at(7);
 
-    if(fmt.fontWeight()==QFont::Bold && boldAction->isChecked() && !selection)
-        boldAction->setChecked(false);
-    else if(fmt.fontWeight()==75)
-        boldAction->setChecked(true);
+    Qt::Alignment alignment=m_textEdit->alignment();
 
-    if(!fmt.fontItalic() && italicAction->isChecked() && !selection)
-        italicAction->setChecked(false);
-    else if(fmt.fontItalic())
-            italicAction->setChecked(true);
+    if(alignment != Qt::AlignLeft && left->isChecked() == true)
+        left->setChecked(false);
+    else  if(alignment != Qt::AlignCenter && center->isChecked() == true)
+        center->setChecked(false);
+    else if(alignment != Qt::AlignRight && right->isChecked() == true)
+        right->setChecked(false);
+    else if(alignment != Qt::AlignJustify && justify->isChecked() == true)
+        justify->setChecked(false);
 
-    if(!fmt.fontUnderline() && underlineAction->isChecked() && !selection)
-        underlineAction->setChecked(false);
-    else if(fmt.fontUnderline())
-        underlineAction->setChecked(true);
+    if(alignment == Qt::AlignLeft && left->isChecked() == false)
+        left->setChecked(true);
+    else  if(alignment == Qt::AlignCenter && center->isChecked() == false)
+        center->setChecked(true);
+    else if(alignment == Qt::AlignRight && right->isChecked() == false)
+        right->setChecked(true);
+    else if(alignment == Qt::AlignJustify && justify->isChecked() == false)
+        justify->setChecked(true);
+
+
 
 }
 
