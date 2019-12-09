@@ -105,7 +105,6 @@ private:
     void addOnlineUser(const Account& account);
     void addOfflineUser(const Account& account);
     void addChar(const Char& p_char, QTextCursor& p_cursor);
-    void updateAlignment();
     void assignRandomColor(int siteID);
     void setItem(QColor color, QListWidgetItem* item); // Technically not a member function
 
@@ -126,6 +125,7 @@ private:
     bool handlingOperation;
     bool localOperation;
     bool changingFormat;
+    bool alignFlag;
 };
 
 #endif // EDITOR_H

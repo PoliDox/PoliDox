@@ -26,7 +26,7 @@
 
 
 Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Account>& contributorsOnline, const QList<Account>& contributorsOffline, const Account* main_account) :
-    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), localOperation(false), changingFormat(false)
+    QMainWindow(parent), controller(p_controller), ui(new Ui::Editor), handlingOperation(false), localOperation(false), changingFormat(false), alignFlag(false)
 {
     ui->setupUi(this);
     ui->textEdit->setAcceptRichText(true);
@@ -59,6 +59,14 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
         // If text changes because of a remote modification we mustn't emit the signal again,
         // otherwise we fall in an endless loop
         if (!handlingOperation) {
+
+            if (charsAdded > this->textSize() || alignFlag) {
+                qDebug() << "Adjusting chars added and removed";
+                charsAdded--;
+                charsRemoved--;
+                alignFlag = false;
+            }
+
             // We call this asynchrounously, since cursor coordinates are not updated yet
             localOperation = true;
             QMetaObject::invokeMethod(this, "updateCursors", Qt::QueuedConnection);
@@ -342,27 +350,12 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     fmt.setFontItalic(style.is_italic);
     fmt.setFontUnderline(style.is_underline);
 
+    QTextBlockFormat textBlockFormat = p_cursor.blockFormat();
     Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
-    m_textEdit->setAlignment(alignment);
-
-    p_cursor.mergeCharFormat(fmt);
-    m_textEdit->mergeCurrentCharFormat(fmt);
+    textBlockFormat.setAlignment(alignment);//or another alignment
+    p_cursor.mergeBlockFormat(textBlockFormat);
 
     p_cursor.insertText(QString(p_char.getValue()));
-}
-
-void Editor::updateAlignment()
-{
-    Qt::Alignment a = m_textEdit->alignment();
-    if (a & Qt::AlignLeft)
-
-        ui->actionAlignLeft->setChecked(true);
-    else if (a & Qt::AlignHCenter)
-        ui->actionAlignCenter->setChecked(true);
-    else if (a & Qt::AlignRight)
-        ui->actionAlignRight->setChecked(true);
-    else if (a & Qt::AlignJustify)
-        ui->actionJustify->setChecked(true);
 }
 
 void Editor::removeClient(const Account& account){
@@ -452,7 +445,7 @@ void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int sit
     QTextCursor& remCursor = m_onlineUsers[siteId].cursor;
 
     remCursor.setPosition(position);
-    if (op == INSERT_OP){      
+    if (op == INSERT_OP){
        addChar(symbol, remCursor);
 
        //This is needed to avoid that the character inserted copies the background of the previous character
@@ -790,6 +783,8 @@ void Editor::on_actionAlignLeft_triggered()
     right->setChecked(false);
     justify->setChecked(false);
 
+    alignFlag=true;
+
     m_textEdit->setAlignment(Qt::AlignLeft);
 }
 
@@ -801,6 +796,8 @@ void Editor::on_actionAlignCenter_triggered()
     left->setChecked(false);
     right->setChecked(false);
     justify->setChecked(false);
+
+    alignFlag=true;
 
     m_textEdit->setAlignment(Qt::AlignCenter);
 }
@@ -814,6 +811,8 @@ void Editor::on_actionAlignRight_triggered()
     left->setChecked(false);
     center->setChecked(false);
     justify->setChecked(false);
+
+    alignFlag=true;
 
     m_textEdit->setAlignment(Qt::AlignRight);
 }
