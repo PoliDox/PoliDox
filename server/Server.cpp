@@ -181,8 +181,7 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
                 QByteArray sendMsgToClient = ServerMessageFactory::createOpenFileReply(false, QString("uri"));
                 signalSender->sendTextMessage(sendMsgToClient);
                 return;
-            }
-            else{
+            } else {
                 Account* loggedAccount = this->socket2account[signalSender];
                 try {
                     this->dbOperations->insertNewPermission(nameDocument, loggedAccount->getSiteId());
@@ -192,7 +191,7 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
                     return;
                 };
 
-                    isFromUri = true;
+                isFromUri = true;
             }
         }
 
@@ -206,14 +205,15 @@ void Server::handleLoggedRequests(const QString& genericRequestString){
                 return;
             };
 
-            if(!isFromUri)
+            if(!isFromUri){
                 try{
                     uri = dbOperations->getUri(nameDocument);
                 } catch (mongocxx::query_exception) {
-                QCoreApplication::removePostedEvents(nullptr);
-                QCoreApplication::exit(EXIT_FAILURE);
-                return;
-            };
+                    QCoreApplication::removePostedEvents(nullptr);
+                    QCoreApplication::exit(EXIT_FAILURE);
+                    return;
+                };
+            }
 
             fileServContr = this->initializeServerController(nameDocument, uri, orderedInserts);
 
@@ -316,6 +316,7 @@ void Server::disconnectAccount(){
         delete (accountToDisconnect);
     }
 
+    disconnect(signalSender, &QWebSocket::disconnected, this, &Server::disconnectAccount);
     delete (signalSender);
 }
 
@@ -324,7 +325,6 @@ Server::~Server() {
     for(QWebSocket* elem : this->socket2account.keys()){
         Account* accToDelete = this->socket2account[elem];
         delete (accToDelete);
-        this->socket2account[elem] = nullptr;
 
         disconnect(elem, &QWebSocket::disconnected, this, &Server::disconnectAccount);
         delete (elem);

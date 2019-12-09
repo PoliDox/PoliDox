@@ -270,8 +270,7 @@ bool DatabaseManager::insertNewPermission(QString& nameDocument, int siteId){
         // in case of fail, it means that the user still has the permission
         // for that  document, so we can simply ignore the exception
         return false;
-    }
-    catch (mongocxx::query_exception e){
+    } catch (mongocxx::query_exception e){
         qDebug() << "[ERROR][DatabaseManager::insertNewPermission] insert_one error, connection to db failed. Server should shutdown.";
         throw;
     }

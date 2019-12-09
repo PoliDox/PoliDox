@@ -193,7 +193,6 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         this->socketsOnDocument.removeOne(signalSender);
         if(this->socketsOnDocument.size() == 0){
             destroyServContr = true;
-            this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
         }
 
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
@@ -201,11 +200,11 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         connect(signalSender, &QWebSocket::textMessageReceived, this->server, &Server::handleLoggedRequests);
         connect(signalSender, &QWebSocket::disconnected, this->server, &Server::disconnectAccount);
 
-        Account* account;
+        Account* accountQuitted;
         QList<QString> nameDocuments;
         try{
-            account = this->server->getAccount(signalSender);
-            nameDocuments = this->server->getDb()->getAllDocuments(account->getSiteId());
+            accountQuitted = this->server->getAccount(signalSender);
+            nameDocuments = this->server->getDb()->getAllDocuments(accountQuitted->getSiteId());
         } catch (mongocxx::query_exception) {
             QCoreApplication::removePostedEvents(nullptr);
             QCoreApplication::exit(EXIT_FAILURE);
@@ -215,16 +214,17 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         QByteArray sendMsgToClientQuitted = ServerMessageFactory::createClosedEditorReply(nameDocuments);
         signalSender->sendTextMessage(sendMsgToClientQuitted);
 
-        Account *accountQuitted = this->server->getAccount(signalSender);
-        QByteArray msgForNotifyOtherSockets = ServerMessageFactory::createClosedEditorRemote(accountQuitted);
-        for(auto otherSocket : this->socketsOnDocument){
-            if(otherSocket != signalSender){
-                otherSocket->sendTextMessage(msgForNotifyOtherSockets);
+        if(destroyServContr){
+            delete (this);
+        } else {
+            QByteArray msgForNotifyOtherSockets = ServerMessageFactory::createClosedEditorRemote(accountQuitted);
+            for(auto otherSocket : this->socketsOnDocument){
+                if(otherSocket != signalSender){
+                    otherSocket->sendTextMessage(msgForNotifyOtherSockets);
+                }
             }
         }
 
-        if(destroyServContr)
-            delete (this);
     } else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
@@ -237,40 +237,40 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
 void ServerController::disconnectAccount(){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
-    Account *accountToDisconnect = this->server->getAccount(signalSender);
+    Account *accountQuitted = this->server->getAccount(signalSender);
 
     bool destroyServContr = false;
     this->socketsOnDocument.removeOne(signalSender);
     if(this->socketsOnDocument.size() == 0){
         destroyServContr = true;
-        this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
-    }
-
-    Account *accountQuitted = this->server->getAccount(signalSender);
-    QByteArray msgForNotifyOtherSockets = ServerMessageFactory::createClosedEditorRemote(accountQuitted);
-    for(auto otherSocket : this->socketsOnDocument){
-        if(otherSocket != signalSender){
-            otherSocket->sendTextMessage(msgForNotifyOtherSockets);
-        }
     }
 
     this->server->removeSocket2AccountPair(signalSender);
 
+    disconnect(signalSender, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
     delete (signalSender);
-    delete (accountToDisconnect);
-    if(destroyServContr)
+
+    if(destroyServContr){
+        delete (accountQuitted);
         delete (this);
+    } else {
+        QByteArray msgForNotifyOtherSockets = ServerMessageFactory::createClosedEditorRemote(accountQuitted);
+        for(auto otherSocket : this->socketsOnDocument){
+            if(otherSocket != signalSender){
+                otherSocket->sendTextMessage(msgForNotifyOtherSockets);
+            }
+        }
+
+        delete (accountQuitted);
+    }
+
+
 }
 
 ServerController::~ServerController(){
-    for(QWebSocket* elem : this->socketsOnDocument){
-        this->server->removeSocket2AccountPair(elem);
-        delete (elem);
-    }
+    this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
 
     delete (this->crdt);
-
-    this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
 }
 
 
