@@ -50,6 +50,9 @@ public:
     void setStyle(QString family, int size, bool bold, bool italic, bool underline, int aligmnent);
     tStyle getStyle() const { return style; }
 
+    friend std::ostream & operator << (std::ostream &out, const Char &c);
+
+
 };
 
 

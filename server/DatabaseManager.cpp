@@ -460,6 +460,10 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
     //It orders according to the order established in Char object,
     //so will be returned a vector in fractionalPosition ascending order
     std::sort(orderedChars.begin(), orderedChars.end());
+    qDebug() << "Vettore di fractionalPos: ";
+    std::for_each(orderedChars.begin(), orderedChars.end(), [](Char c){
+        qDebug() << c.getFractionalPosition();
+    });
     return orderedChars;
 }
 

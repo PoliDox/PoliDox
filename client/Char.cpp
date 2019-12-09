@@ -97,3 +97,8 @@ void Char::setStyle(QString family, int size, bool bold, bool italic, bool under
     style.alignment = al;
 }
 
+std::ostream & operator << (std::ostream &out, const Char &c)
+{
+    out << c.getValue();
+    return out;
+}
