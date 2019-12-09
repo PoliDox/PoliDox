@@ -42,7 +42,6 @@ void ServerController::replicateMessageOnOtherSockets(const QString& messageRece
 void ServerController::addClient(QWebSocket *socketToAdd){
     this->socketsOnDocument.push_back(socketToAdd);
 
-    //connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
     connect(socketToAdd, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
 

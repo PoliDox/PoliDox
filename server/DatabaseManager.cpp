@@ -358,8 +358,6 @@ void DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
                                    QString& family, int size, bool bold, bool italic, bool underline, int alignment) {
     mongocxx::collection insertCollection = (*this->db)["insert"];
 
-    int counterInsert = this->getCounterOfCollection("insert");
-
     auto array_builder = bsoncxx::builder::basic::array{};
     for (int element : fractionalPosition) {
         array_builder.append(element);
@@ -367,8 +365,7 @@ void DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
 
     auto elementBuilder = bsoncxx::builder::stream::document{};
     bsoncxx::document::value symbolToInsert =
-        elementBuilder << "_id"                << counterInsert
-                       << "nameDocument"       << nameDocument.toUtf8().constData()
+        elementBuilder << "nameDocument"       << nameDocument.toUtf8().constData()
                        << "value"              << symbol.toUtf8().constData()
                        << "siteId"             << siteIdOfSymbol
                        << "position"           << array_builder
@@ -460,10 +457,6 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
     //It orders according to the order established in Char object,
     //so will be returned a vector in fractionalPosition ascending order
     std::sort(orderedChars.begin(), orderedChars.end());
-    qDebug() << "Vettore di fractionalPos: ";
-    std::for_each(orderedChars.begin(), orderedChars.end(), [](Char c){
-        qDebug() << c.getFractionalPosition();
-    });
     return orderedChars;
 }
 
