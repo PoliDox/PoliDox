@@ -42,7 +42,6 @@ void ServerController::replicateMessageOnOtherSockets(const QString& messageRece
 void ServerController::addClient(QWebSocket *socketToAdd){
     this->socketsOnDocument.push_back(socketToAdd);
 
-    connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
     connect(socketToAdd, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
     connect(socketToAdd, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
 
@@ -107,7 +106,6 @@ void ServerController::createCrdt(QList<Char>& orderedInserts){
 // base of the operation(insert/delete)
 void ServerController::handleRemoteOperation(const QString& messageReceivedByClient){
     QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
-
     QJsonDocument requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
     if (requestDocJSON.isNull()) {
         // TODO: print some debug
@@ -197,7 +195,7 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     } else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
-
+    this->replicateMessageOnOtherSockets(messageReceivedByClient);
 }
 
 
