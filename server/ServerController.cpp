@@ -16,20 +16,16 @@ ServerController::ServerController(QString& p_nameDocumentAssociated, QString& p
 //   after that he sends a message to the server via socket,
 //   that message has to be duplicated on all the other
 //   clients which will do the remote operation
-void ServerController::replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket) {
+void ServerController::replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket, QWebSocket *signalSender) {
     // The socket of the client which did the local operation
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
+    //QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
     QJsonObject requestObjJSON;
     QJsonDocument requestDocJSON;
     requestDocJSON = QJsonDocument::fromJson(messageReceivedOnSocket.toUtf8());
-    if (requestDocJSON.isNull()) {
-        // TODO: print some debug
-        return;
-    }
     requestObjJSON = requestDocJSON.object();
-    QString header = requestObjJSON["action"].toString();
 
+    QString header = requestObjJSON["action"].toString();
     if (header == "insert" || header == "delete" || header == "cursorMove"){
         for(auto socket : this->socketsOnDocument){
             if(socket != signalSender)
@@ -60,10 +56,20 @@ void ServerController::addClient(QWebSocket *socketToAdd){
     }
 
     QString nameDocument = this->nameDocumentAssociated;
-    //TODO: da sistemare, questa riga qui soto è da togliere: farsi
-    //       restituire direttamente gli account senza passare per i siteid
-    QList<int> allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);
-    QList<Account> allAccountsOfDocument = this->server->getDb()->getAllAccounts(allSiteIdsOfDocument);
+
+    QList<int> allSiteIdsOfDocument;
+    QList<Account> allAccountsOfDocument;
+    try{
+        // otherwise, it is also possible to retrieve directly the accounts
+        // objects, without passing through the site ids.
+        // we choose this solution for sake of robustness.
+        allSiteIdsOfDocument = this->server->getDb()->getAllAccounts(nameDocument);
+        allAccountsOfDocument = this->server->getDb()->getAllAccounts(allSiteIdsOfDocument);
+    } catch (mongocxx::query_exception) {
+        QCoreApplication::removePostedEvents(nullptr);
+        QCoreApplication::exit(EXIT_FAILURE);
+        return;
+    };
 
     for(Account* acc : accountsOnline){
         allAccountsOfDocument.removeOne(*acc);
@@ -102,15 +108,11 @@ void ServerController::createCrdt(QList<Char>& orderedInserts){
 }
 
 
-// The ServerController has to update the his crdt on the
+// The ServerController has to update his crdt on the
 // base of the operation(insert/delete)
 void ServerController::handleRemoteOperation(const QString& messageReceivedByClient){
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
     QJsonDocument requestDocJSON = QJsonDocument::fromJson(messageReceivedByClient.toUtf8());
-    if (requestDocJSON.isNull()) {
-        // TODO: print some debug
-        return;
-    }
     QJsonObject requestObjJSON = requestDocJSON.object();
 
     QString header = requestObjJSON["action"].toString();
@@ -124,11 +126,17 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         int siteId = charObj.getSiteId();
 
         this->crdt->remoteInsert(charObj);
+        try{
+            // evaluate if pass a Char to this function instead of these attributes
+            this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
+                                                charStyle.font_family, charStyle.font_size, charStyle.is_bold,
+                                                charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
+        } catch (mongocxx::bulk_write_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
-        // evaluate if pass a Char to this function instead of these attributes
-        this->server->getDb()->insertSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos,
-                                            charStyle.font_family, charStyle.font_size, charStyle.is_bold,
-                                            charStyle.is_italic, charStyle.is_underline, charStyle.alignment);
     } else if (header == "delete") {
         // evaluate if refactor this part
         QJsonObject charJson = requestObjJSON["char"].toObject();
@@ -139,7 +147,13 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         int siteId = charObj.getSiteId();
 
         this->crdt->remoteDelete(charObj);
-        this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
+        try{
+            this->server->getDb()->deleteSymbol(this->nameDocumentAssociated, charValue, siteId, fractPos);
+        } catch (mongocxx::bulk_write_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
     } else if (header == "cursorMove") {
         // Do Nothing
@@ -148,18 +162,30 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
         QString nameAccount = requestObjJSON["nameAccount"].toString();
         QByteArray newImage = requestObjJSON["newImg"].toString().toLatin1();
 
-        bool result = this->server->getDb()->changeImage(nameAccount, newImage);
+        try{
+            this->server->getDb()->changeImage(nameAccount, newImage);
+        } catch (mongocxx::bulk_write_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
-        QByteArray sendMsgToClient = ServerMessageFactory::createChangeImageReply(result);
+        QByteArray sendMsgToClient = ServerMessageFactory::createChangeImageReply(true);
         signalSender->sendTextMessage(sendMsgToClient);
 
     } else if(header == "changePwdReq"){
         QString nameAccount = requestObjJSON["nameAccount"].toString();
         QString newPassword = requestObjJSON["newPwd"].toString();
 
-        bool result = this->server->getDb()->changePassword(nameAccount, newPassword);
+        try {
+            this->server->getDb()->changePassword(nameAccount, newPassword);
+        } catch (mongocxx::bulk_write_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
-        QByteArray sendMsgToClient = ServerMessageFactory::createChangePasswordReply(result);
+        QByteArray sendMsgToClient = ServerMessageFactory::createChangePasswordReply(true);
         signalSender->sendTextMessage(sendMsgToClient);
 
     } else if (header == "closedEditorReq") {
@@ -170,14 +196,21 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
             this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
         }
 
-        disconnect(signalSender, &QWebSocket::textMessageReceived, this, &ServerController::replicateMessageOnOtherSockets);
         disconnect(signalSender, &QWebSocket::textMessageReceived, this, &ServerController::handleRemoteOperation);
         disconnect(signalSender, &QWebSocket::disconnected, this, &ServerController::disconnectAccount);
         connect(signalSender, &QWebSocket::textMessageReceived, this->server, &Server::handleLoggedRequests);
         connect(signalSender, &QWebSocket::disconnected, this->server, &Server::disconnectAccount);
 
-        Account* account = this->server->getAccount(signalSender);
-        QList<QString> nameDocuments = this->server->getDb()->getAllDocuments(account->getSiteId());
+        Account* account;
+        QList<QString> nameDocuments;
+        try{
+            account = this->server->getAccount(signalSender);
+            nameDocuments = this->server->getDb()->getAllDocuments(account->getSiteId());
+        } catch (mongocxx::query_exception) {
+            QCoreApplication::removePostedEvents(nullptr);
+            QCoreApplication::exit(EXIT_FAILURE);
+            return;
+        };
 
         QByteArray sendMsgToClientQuitted = ServerMessageFactory::createClosedEditorReply(nameDocuments);
         signalSender->sendTextMessage(sendMsgToClientQuitted);
@@ -195,14 +228,14 @@ void ServerController::handleRemoteOperation(const QString& messageReceivedByCli
     } else {
         qWarning() << "Unknown message received: " << requestObjJSON["action"].toString();
     }
-    this->replicateMessageOnOtherSockets(messageReceivedByClient);
+    this->replicateMessageOnOtherSockets(messageReceivedByClient, signalSender);
 }
 
 
 // if I arrive on this slot, is from a socket that in the
 // moment he quits he has an open file
 void ServerController::disconnectAccount(){
-    QWebSocket *signalSender = qobject_cast<QWebSocket *>(sender());
+    QWebSocket *signalSender = qobject_cast<QWebSocket *>(QObject::sender());
 
     Account *accountToDisconnect = this->server->getAccount(signalSender);
 
@@ -223,10 +256,21 @@ void ServerController::disconnectAccount(){
 
     this->server->removeSocket2AccountPair(signalSender);
 
-    signalSender->deleteLater();
+    delete (signalSender);
     delete (accountToDisconnect);
     if(destroyServContr)
         delete (this);
+}
+
+ServerController::~ServerController(){
+    for(QWebSocket* elem : this->socketsOnDocument){
+        this->server->removeSocket2AccountPair(elem);
+        delete (elem);
+    }
+
+    delete (this->crdt);
+
+    this->server->removeFile2ServcontrPair(this->nameDocumentAssociated);
 }
 
 
