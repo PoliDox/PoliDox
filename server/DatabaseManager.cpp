@@ -387,7 +387,7 @@ void DatabaseManager::insertSymbol(QString& nameDocument, QString& symbol, int s
         exit(EXIT_SUCCESS);
     }
 
-    this->incrementCounterOfCollection("insert");
+    //this->incrementCounterOfCollection("insert");
 }
 
 
@@ -436,7 +436,6 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
     // the below type of exception in catch().
     try{
         mongocxx::cursor resultIterator = insertCollection.find(insertsToRetrieveView);
-
         //(.1)Save them in local before ordering
         for (auto elem : resultIterator) {
             QString insert = QString::fromStdString(bsoncxx::to_json(elem));
@@ -445,7 +444,6 @@ QList<Char> DatabaseManager::getAllInserts(QString& nameDocument){
             QJsonObject insertObjJson = stringDocJSON.object();
 
             Char charToInsert = Char::fromJson(insertObjJson);
-
             orderedChars.push_back(charToInsert);
         }
     } catch (mongocxx::query_exception) {

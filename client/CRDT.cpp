@@ -294,16 +294,20 @@ std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatte
     std::vector<std::vector<Char>> result = std::vector<std::vector<Char>>(1);
 
     unsigned int rowIndex = 0;
+    int i=0;
     for(QJsonValue elem : crdtJsonFormatted){
         Char charToAdd = Char::fromJson(elem.toObject());
-
+        std::cout<<"AFTER CHAR JSON: "<<charToAdd.getStyle().font_size <<std::endl;
         result[rowIndex].push_back(charToAdd);
+        std::cout<<"FONT INSIDE RESULT: "<< result[rowIndex].at(0).getStyle().font_size<<std::endl;
 
-        if(charToAdd.getValue() == '\n'){
+        if(charToAdd.getValue() == '\n' && i != crdtJsonFormatted.size()-1){ //TODO sarebbe da togliere la riga vuota dopo ultimo carattere
             rowIndex++;
             //inserts the next row in the matrix
             result.push_back(std::vector<Char>());
         }
+
+        i++;
     }
 
     return result;

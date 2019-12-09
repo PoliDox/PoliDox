@@ -50,10 +50,10 @@ public:
     int textSize();
     void addClient(const Account& user);
     void removeClient(const Account& account);
-    void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
+    void handleRemoteOperation(EditOp op, Char& symbol, int position, int siteId);
     void resetBackgroundColor(int pos, const QColor& color);
     void setCharacterStyle(int index, Char& symbol);
-    void resetActionToggle(int pos);
+    void resetActionToggle();
     void moveCursor(int pos, int siteId);
     void closeEvent(QCloseEvent *event) override;
     void setNewImage(const QPixmap& Pix);
@@ -104,7 +104,8 @@ private:
     void bootContributorsLists(QList<Account> contributorsOnline, QList<Account> contributorsoffline);
     void addOnlineUser(const Account& account);
     void addOfflineUser(const Account& account);
-    void addChar(const Char& p_char, QTextCursor& p_cursor);
+    void addChar(const Char& p_char);
+    void addChar(const Char& p_char,QTextCursor& p_cursor);
     void assignRandomColor(int siteID);
     void setItem(QColor color, QListWidgetItem* item); // Technically not a member function
 

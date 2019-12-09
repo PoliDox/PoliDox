@@ -85,7 +85,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
-        resetActionToggle(pos);
+        resetActionToggle();
         //qDebug() << "Cursor position is now" << pos;
         if (localOperation || handlingOperation)
             localOperation = false;
@@ -132,7 +132,8 @@ void Editor::init(const QVector<Char>& p_text)
 {
     handlingOperation = true;
     for (const Char& symbol : p_text) {
-        addChar(symbol, *m_localCursor);
+        std::cout << "BEFORE ADD CHAR: "<<symbol.getStyle().font_size<<std::endl;
+        addChar(symbol);
     }
     m_textEdit->show();
 
@@ -341,7 +342,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     else
         fmt.setFontFamily(style.font_family);
 
-    fmt.setFontPointSize(style.font_size);
+    fmt.setFontPointSize( p_char.getStyle().font_size ); //BUG 12
 
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
@@ -351,12 +352,56 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     fmt.setFontItalic(style.is_italic);
     fmt.setFontUnderline(style.is_underline);
 
+    p_cursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+    p_cursor.insertText(QString(p_char.getValue()));
+
     QTextBlockFormat textBlockFormat = p_cursor.blockFormat();
     Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
     textBlockFormat.setAlignment(alignment);//or another alignment
     p_cursor.mergeBlockFormat(textBlockFormat);
 
-    p_cursor.insertText(QString(p_char.getValue()));
+    m_textEdit->setTextCursor(p_cursor);
+
+
+}
+
+void Editor::addChar(const Char &p_char)
+{
+    QTextCharFormat fmt;
+    tStyle style = p_char.getStyle();
+
+
+    QTextCursor& localCursor=*m_localCursor;
+
+    if (style.font_family == "")
+        fmt.setFontFamily(DEFAULT_FONT);
+    else
+        fmt.setFontFamily(style.font_family);
+    std::cout << "INSIDE ADD CHAR: "<< p_char.getStyle().font_size << std::endl;
+    fmt.setFontPointSize( p_char.getStyle().font_size ); //BUG 12
+
+    if (style.is_bold)
+        fmt.setFontWeight(QFont::Bold);
+    else
+        fmt.setFontWeight(QFont::Normal);
+
+    fmt.setFontItalic(style.is_italic);
+    fmt.setFontUnderline(style.is_underline);
+
+    localCursor.mergeCharFormat(fmt);
+    m_textEdit->mergeCurrentCharFormat(fmt);
+
+    localCursor.insertText(QString(p_char.getValue()));
+
+    QTextBlockFormat textBlockFormat = localCursor.blockFormat();
+    Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
+    textBlockFormat.setAlignment(alignment);//or another alignment
+    localCursor.mergeBlockFormat(textBlockFormat);
+
+    m_textEdit->setTextCursor(localCursor);
+
 }
 
 void Editor::removeClient(const Account& account){
@@ -440,7 +485,7 @@ void Editor::addClient(const Account& user)
     addOnlineUser(user);
 }
 
-void Editor::handleRemoteOperation(EditOp op, Char symbol, int position, int siteId)
+void Editor::handleRemoteOperation(EditOp op, Char& symbol, int position, int siteId)
 {
     handlingOperation = true;
     QTextCursor& remCursor = m_onlineUsers[siteId].cursor;
@@ -556,8 +601,7 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     std::cout << "INDEX "<< index <<" FONT FAMILY"<< font_fam.toUtf8().constData() << std::endl;
 }
 
-// TODO: not used, delete?
-void Editor::resetActionToggle(int pos){
+void Editor::resetActionToggle(){
 
     QTextCursor cursor=m_textEdit->textCursor();
 

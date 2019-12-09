@@ -79,10 +79,10 @@ Char Char::fromJson(const QJsonObject& charJSON){
                        styleJSON["bold"].toBool(), styleJSON["italic"].toBool(),
                        styleJSON["underline"].toBool(), styleJSON["alignment"].toInt() };
 
-
     Char result(value, siteId, fractionalPosition);
     result.style = l_style;
 
+    std::cout << "FONT SIZEEEE: " << l_style.font_size <<std::endl;
     return result;
 }
 

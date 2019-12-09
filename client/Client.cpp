@@ -113,7 +113,7 @@ void Client::onMessageReceived(const QString &p_msg)
         QString replCode = _JSONobj["response"].toString();
 
         if (replCode == "ok") {
-            //qDebug() << "JSON ARRIVATO:" << p_msg.toUtf8().constData();
+            qDebug() << "JSON ARRIVATO:" << p_msg.toUtf8().constData();
             QString nameDocument = _JSONobj["nameDocument"].toString();
             QString uri = _JSONobj["uri"].toString();
             QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
