@@ -182,7 +182,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
 
     // It could happen that some chars were removed and some others were added at the same time
     for (int i = 0; i < charsRemoved; i++) {
-        m_crdt->localDelete(position);
+        m_crdt->localDelete(static_cast<unsigned int>(position));
 
     }
 
@@ -206,7 +206,7 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         Char symbol(_char,m_crdt->getSiteId());
 
         m_editor->setCharacterStyle(position+i+1,symbol); //Set the character style before forwarding it to local insert
-        m_crdt->localInsert(position+i, symbol);
+        m_crdt->localInsert(static_cast<unsigned int>(position+i), symbol);
     }
 
 }

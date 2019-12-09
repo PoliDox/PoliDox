@@ -540,7 +540,10 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QFontComboBox *fontCombo=static_cast<QFontComboBox*>(ui->textRichToolBar->findChild<QFontComboBox*>("font"));
     QString font_fam=fontCombo->lineEdit()->text();
 
-    symbol.setStyle(font_fam, static_cast<int>(fmt.fontPointSize()), bold, fmt.fontItalic(),
+    QSpinBox *fontSize=static_cast<QSpinBox*>(ui->textRichToolBar->findChild<QSpinBox*>("font_size"));
+    int font_size = fontSize->value();
+
+    symbol.setStyle(font_fam, font_size, bold, fmt.fontItalic(),
                     fmt.fontUnderline(), static_cast<int>(m_textEdit->alignment()));
 
     std::cout << "INDEX "<< index <<" FONT FAMILY"<< font_fam.toUtf8().constData() << std::endl;
