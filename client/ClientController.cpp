@@ -39,13 +39,13 @@ ClientController::ClientController(QWebSocket *p_socket, Account& p_account, con
 
     connect(m_editor, &Editor::quit_editor_new_file, this, &ClientController::docClosedNewFile);
 
-    connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap Pix){
+    connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap& Pix){
         QByteArray jsonString = ClientMessageFactory::createImgUpdate(p_account.getName(), Pix);
-        this->Pix = Pix;
+        this->Pix = std::move(Pix);
         m_socket->sendTextMessage(jsonString);
     });
 
-    connect(m_editor, &Editor::ChangePwdEditor, this, [&](QString Pwd){
+    connect(m_editor, &Editor::ChangePwdEditor, this, [&](QString& Pwd){
         QByteArray jsonString = ClientMessageFactory::createPwdUpdate(p_account.getName(), Pwd);
         m_socket->sendTextMessage(jsonString);
     });

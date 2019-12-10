@@ -65,8 +65,8 @@ signals:
     void cursorPositionChanged(int position);
     void quit_editor();
     void quit_editor_new_file();
-    void ChangeImgEditor(QPixmap pix);
-    void ChangePwdEditor(QString pwd);
+    void ChangeImgEditor(QPixmap& pix);
+    void ChangePwdEditor(QString& pwd);
 
 private slots:
     void on_actionNew_triggered();

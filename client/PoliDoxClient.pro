@@ -18,7 +18,6 @@ HEADERS += \
     Editor.h \
     ClientMessageFactory.h \
     Account.h \
-    ListFiles.h \
     Client.h \
     NewFileDialog.h \
     Profile.h \
@@ -33,7 +32,6 @@ SOURCES += \
     CrdtClient.cpp \
     Creators.cpp \
     Editor.cpp \
-    ListFiles.cpp \
     Account.cpp \
     NewFileDialog.cpp \
     Profile.cpp \
@@ -55,7 +53,6 @@ FORMS += \
     changepwd.ui \
     creators.ui \
     editor.ui \
-    listfiles.ui \
     newfiledialog.ui \
     inserturidialog.ui \
     profile.ui \

@@ -18,7 +18,7 @@ Client::Client() : m_document(nullptr)
         QApplication::quit();
     });
 
-    connect(&loginWindow, &LoginWindow::authDataSubmitted, this, [&](QString p_user, QString p_passw) {
+    connect(&loginWindow, &LoginWindow::authDataSubmitted, this, [&](QString& p_user, QString& p_passw) {
         QByteArray message = ClientMessageFactory::createLoginMessage(p_user, p_passw);
         m_socket.sendTextMessage(message);
     });

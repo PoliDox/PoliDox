@@ -7,7 +7,6 @@
 #include <QListWidgetItem>
 #include <QPixmap>
 #include "Editor.h"
-#include "ListFiles.h"
 #include "NewFileDialog.h"
 #include "InsertUriDialog.h"
 
@@ -26,14 +25,14 @@ public:
 
     void setEditor(Editor *);
 
-    void displayFiles(const QList<QString> p_files);
+    void displayFiles(const QList<QString>& p_files);
     void registrationOk();
     void onClickedFile(QListWidgetItem *item);
 
 signals:
-    void authDataSubmitted(QString p_user, QString p_passw);
+    void authDataSubmitted(QString& p_user, QString& p_passw);
     void signupDataSubmitted(QString p_user, QString p_passw, QPixmap p_pic);
-    void fileSelected(QString p_filename);
+    void fileSelected(const QString& p_filename);
     void newFileSelected(QString& p_filename);
     void uriSelected(QString& p_uri);
 
@@ -41,13 +40,12 @@ private slots:
     void on_pushButton_login_clicked();
     void on_pushButton_register_clicked();
     void sendRegistrationData();
-    void upload_clicked(bool checked);
+    void upload_clicked();
 
 private:
-    Ui::LoginWindow *ui;
-    ListFiles *lf;
-    NewFileDialog *nfd;
-    InsertUriDialog *uriDialog;
+    Ui::LoginWindow *ui = nullptr;
+    NewFileDialog *nfd = nullptr;
+    InsertUriDialog *uriDialog = nullptr;
 
     void createRegistrationForm();
     void cleanRegistrationForm();

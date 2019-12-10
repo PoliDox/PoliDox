@@ -22,11 +22,13 @@ Profile::~Profile()
     delete changePwdDialog;
 }
 
-void Profile::setUsername(const QString& username){
+void Profile::setUsername(const QString& username)
+{
     ui->username->setText(username);
 }
 
-void Profile::setImagePic(const QPixmap &imagePic){
+void Profile::setImagePic(const QPixmap &imagePic)
+{
     ui->image_pic->setPixmap(imagePic.scaled(200, 200));
 }
 

@@ -20,11 +20,7 @@ private slots:
     void on_buttonBox_rejected();
 
 signals:
-<<<<<<< Updated upstream
     void pwdUpdate(QString& pwd);
-=======
-    void PwdUpdate(QString& pwd);
->>>>>>> Stashed changes
 
 private:
     Ui::ChangePwd *ui;

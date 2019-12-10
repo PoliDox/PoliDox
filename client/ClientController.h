@@ -5,7 +5,6 @@
 #include <QWebSocket>
 #include "CrdtClient.h"
 #include "Editor.h"
-#include "ListFiles.h"
 
 class Editor;
 

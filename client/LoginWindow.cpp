@@ -32,15 +32,19 @@ LoginWindow::LoginWindow(QWidget *parent) :
     this->ui->lineEdit_password->setStyleSheet( "background-color:transparent");
     setWindowTitle("PoliDox");
 
-    lf = new ListFiles(); // TODO: never used, delete?
-    nfd = new NewFileDialog(this);
-    uriDialog = new InsertUriDialog(this);
+    try{
+        nfd = new NewFileDialog(this);
+        uriDialog = new InsertUriDialog(this);
+    } catch (std::bad_alloc& e){
+        qDebug() << "[ERROR][LoginWindow::LoginWindow] new operator error." << e.what();
+        throw;
+    }
 
-    connect(nfd, &NewFileDialog::getFileName, this, [&](QString newfilename){
+    connect(nfd, &NewFileDialog::getFileName, this, [&](QString& newfilename){
         emit newFileSelected(newfilename);
     });
 
-    connect(uriDialog, &InsertUriDialog::getUriName, this, [&](QString uri) {
+    connect(uriDialog, &InsertUriDialog::getUriName, this, [&](QString& uri) {
        emit uriSelected(uri);
     });
 
@@ -61,12 +65,8 @@ void LoginWindow::closeEvent(QCloseEvent *event)
 }
 
 
-/* METODO SPOSTATO IN LISTFILES */ // ??
-void LoginWindow::displayFiles(const QList<QString> p_files)
+void LoginWindow::displayFiles(const QList<QString>& p_files)
 {
-    // TODO: replace "SignIn" and "Register" button with a box including all available files
-    // When a file is selected, emit the signal onFileSelected
-
     QObjectList list=this->ui->groupBox->children();
 
     for(auto it=list.begin();it!=list.end();it++)
@@ -80,22 +80,40 @@ void LoginWindow::displayFiles(const QList<QString> p_files)
     QString new_file("Create new file");
     QString fileFromUri("Insert URI");
 
-    QListWidgetItem *separator = new QListWidgetItem();
+    QListWidgetItem *separator = nullptr;
+    try{
+        separator = new QListWidgetItem();
+    } catch(std::bad_alloc& e){
+        qDebug() << "[ERROR][LoginWindow::displayFiles] new operator error on QListWidgetItem. " << e.what();
+        throw;
+    }
+
     separator->setSizeHint(QSize(300, 15));
     separator->setFlags(Qt::NoItemFlags);
     files->addItem(new_file);
     files->addItem(fileFromUri);
     files->addItem(separator);
-    QFrame *frame = new QFrame();
+
+    QFrame *frame = nullptr;
+    try{
+        frame = new QFrame();
+    } catch(std::bad_alloc& e){
+        qDebug() << "[ERROR][LoginWindow::displayFiles] new operator error on QFrame. " << e.what();
+        throw;
+    }
     frame->setFrameShape(QFrame::HLine);
     files->setItemWidget(separator, frame);
     files->addItems(p_files);
 
-    QGridLayout* grid_layout = new QGridLayout(this->ui->groupBox);
+    QGridLayout* grid_layout = nullptr;
+    try {
+        grid_layout = new QGridLayout(this->ui->groupBox);
+    } catch (std::bad_alloc& e) {
+        qDebug() << "[ERROR][LoginWindow::displayFiles] new operator error on QGridLayout. " << e.what();
+        throw;
+    }
     grid_layout->addWidget(files);
     files->show();
-
-
 }
 
 void LoginWindow::on_pushButton_login_clicked()
@@ -104,20 +122,13 @@ void LoginWindow::on_pushButton_login_clicked()
     QString password = ui->lineEdit_password->text();
 
     emit authDataSubmitted(username, password);
-
 }
 
 void LoginWindow::on_pushButton_register_clicked()
 {
-
-    /*QSizePolicy sp_retain = ui->groupBox->sizePolicy();
-    sp_retain.setRetainSizeWhenHidden(true);
-    ui->groupBox->setSizePolicy(sp_retain);*/
-
     hideLoginForm();
 
     createRegistrationForm();
-
 }
 
 
@@ -186,8 +197,15 @@ void LoginWindow::createRegistrationForm(){
 
     ui->groupBox->setFixedSize(330,400);
 
-    QLabel* usr=new QLabel("Username",ui->groupBox);
-    QLabel* pwd=new QLabel("Password",ui->groupBox);
+    QLabel* usr = nullptr;
+    QLabel* pwd = nullptr;
+    try {
+        usr = new QLabel("Username",ui->groupBox);
+        pwd = new QLabel("Password",ui->groupBox);
+    } catch (std::bad_alloc& e) {
+        qDebug() << "[ERROR][LoginWindow::createRegistrationForm] new operator error on QLabel. " << e.what();
+        throw;
+    }
 
     usr->setObjectName("user");
     pwd->setObjectName("pwd");
@@ -195,8 +213,15 @@ void LoginWindow::createRegistrationForm(){
     usr->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     pwd->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
 
-    QLineEdit* usr_form=new QLineEdit(ui->groupBox);
-    QLineEdit* pwd_form=new QLineEdit(ui->groupBox);
+    QLineEdit* usr_form = nullptr;
+    QLineEdit* pwd_form = nullptr;
+    try {
+        usr_form = new QLineEdit(ui->groupBox);
+        pwd_form = new QLineEdit(ui->groupBox);
+    } catch (std::bad_alloc& e) {
+        qDebug() << "[ERROR][LoginWindow::createRegistrationForm] new operator error on QLineEdit. " << e.what();
+        throw;
+    }
     pwd_form->setEchoMode(QLineEdit::Password);
 
     usr_form->setStyleSheet("background-color:transparent;");
@@ -208,18 +233,34 @@ void LoginWindow::createRegistrationForm(){
     usr_form->setPlaceholderText("Insert your username");
     pwd_form->setPlaceholderText("Insert your password");
 
-    QPushButton* submit = new QPushButton("Submit", ui->groupBox);
-    QPushButton* cancel = new QPushButton("Cancel", ui->groupBox);
-
+    QPushButton* submit = nullptr;
+    QPushButton* cancel = nullptr;
+    try {
+        submit = new QPushButton("Submit", ui->groupBox);
+        cancel = new QPushButton("Cancel", ui->groupBox);
+    } catch (std::bad_alloc& e) {
+        qDebug() << "[ERROR][LoginWindow::createRegistrationForm] new operator error on QPushButton. " << e.what();
+        throw;
+    }
 
     submit->setObjectName("submit");
     cancel->setObjectName("cancel");
 
-    QLabel* img_label = new QLabel("Profile pic", ui->groupBox);
-    QLabel* img_path = new QLabel(ui->groupBox);
-    QPushButton* img_selection = new QPushButton("upload file", ui->groupBox);
-    QLabel* img_show = new QLabel(ui->groupBox);
-    QLabel* img_warning = new QLabel(ui->groupBox);
+    QLabel* img_label = nullptr;
+    QLabel* img_path = nullptr;
+    QPushButton* img_selection = nullptr;
+    QLabel* img_show = nullptr;
+    QLabel* img_warning = nullptr;
+    try {
+        img_label = new QLabel("Profile pic", ui->groupBox);
+        img_path = new QLabel(ui->groupBox);
+        img_selection = new QPushButton("upload file", ui->groupBox);
+        img_show = new QLabel(ui->groupBox);
+        img_warning = new QLabel(ui->groupBox);
+    } catch (std::bad_alloc& e) {
+        qDebug() << "[ERROR][LoginWindow::createRegistrationForm] new operator error on QLabel | QPushButton. " << e.what();
+        throw;
+    }
 
     connect(img_selection, &QPushButton::clicked, this, &LoginWindow::upload_clicked);
 
@@ -269,19 +310,18 @@ void LoginWindow::createRegistrationForm(){
     grid_layout->addWidget(img_selection,7,0,nullptr);
     grid_layout->addWidget(img_path,8,0,nullptr);
 
-    // TODO: how do we delete it?
     QSpacerItem* spacer = new QSpacerItem(1,10, QSizePolicy::Expanding, QSizePolicy::Minimum);
     grid_layout->addItem(spacer,9,0);
 
     grid_layout->addWidget(submit,10,0,nullptr);
     grid_layout->addWidget(cancel,10,1,nullptr);
 
-
     connect(submit,&QPushButton::clicked,this,&LoginWindow::sendRegistrationData);
 
     connect(cancel,&QPushButton::clicked,this,&LoginWindow::cleanRegistrationForm);
-
 }
+
+
 void LoginWindow::cleanRegistrationForm(){
 
     QLineEdit* user_linedit=static_cast<QLineEdit*>(ui->groupBox->findChild<QLineEdit*>("user_line"));
@@ -294,11 +334,9 @@ void LoginWindow::cleanRegistrationForm(){
     QLabel* img_show=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_show"));
     QLabel* img_warning=static_cast<QLabel*>(ui->groupBox->findChild<QLabel*>("img_warning"));
 
-
     QPushButton* submit=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("submit"));
     QPushButton* cancel=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("cancel"));
     QPushButton* img_selection=static_cast<QPushButton*>(ui->groupBox->findChild<QPushButton*>("img_selection"));
-
 
     QString username=user_linedit->text();
     QString password=pwd_linedit->text();
@@ -328,14 +366,10 @@ void LoginWindow::cleanRegistrationForm(){
 
     ui->lineEdit_username->setText(username);
     ui->lineEdit_password->setText(password);
-
-    //QVBoxLayout* vertical_layout=static_cast<QVBoxLayout*>(ui->groupBox->layout());
-
 }
 
 void LoginWindow::onClickedFile(QListWidgetItem* item){
-
-    //qDebug() << "SELECTED FILE: "<< item->text();
+    qDebug() << "SELECTED FILE: "<< item->text();
 
     if(item->text().compare("Create new file") == 0){
         nfd->show();
@@ -349,9 +383,7 @@ void LoginWindow::onClickedFile(QListWidgetItem* item){
 
 }
 
-void LoginWindow::upload_clicked(bool checked){
-
-    Q_UNUSED(checked);
+void LoginWindow::upload_clicked(){
     QFileDialog file_selection(ui->groupBox);
     file_selection.setNameFilter(tr("JPEG (*.jpg *.jpeg *.png)"));
 
@@ -372,7 +404,6 @@ void LoginWindow::upload_clicked(bool checked){
     } else {
         img_warning->setStyleSheet("color:green");
         img_warning->setText("File respects dimension costraint");
-
     }
 
     if(filePath.size()>0){
@@ -389,9 +420,6 @@ void LoginWindow::upload_clicked(bool checked){
         #else
             img_show->setPixmap(noPic.scaled(100,100));
         #endif
-
-
-
     }
 
 }
