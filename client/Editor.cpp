@@ -75,7 +75,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     });
 
     connect(m_textDoc, &QTextDocument::cursorPositionChanged, this, [&](){
-        // TODO: Use connect below to update on click?
         int line = ui->textEdit->textCursor().blockNumber()+1;
         int pos = ui->textEdit->textCursor().columnNumber()+1;
         int TLines = ui->textEdit->document()->blockCount();
@@ -86,7 +85,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
         resetActionToggle();
-        //qDebug() << "Cursor position is now" << pos;
         if (localOperation || handlingOperation)
             localOperation = false;
         else
@@ -172,7 +170,6 @@ void Editor::initContributorsLists(){
     QColor color=QColor(assignedColor.value(you));
 
     QListWidgetItem* item = new QListWidgetItem("You", ui->onlineList);
-    //setItem(controller->getAccount().getColor(), item);
     setItem(color,item);
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
@@ -268,7 +265,6 @@ void Editor::highlightUser(QListWidgetItem *item) {
             });
 
             if (offlineHIT == m_offlineUsers.end()) {
-                qWarning() << "PANIC: USER DOES NOT EXIST";
                 return;
             } else {
                 siteID = offlineHIT->getSiteId();
@@ -316,10 +312,8 @@ void Editor::addOnlineUser(const Account& account){
     ui->onlineList->addItem(item);
 }
 
-// WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
 void Editor::addOfflineUser(const Account& account)
 {    
-    // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
     QListWidgetItem* item = new QListWidgetItem(account.getName());
     QColor color(assignedColor.value(account.getSiteId()));
     setItem(color,item);
@@ -336,7 +330,7 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     else
         fmt.setFontFamily(style.font_family);
 
-    fmt.setFontPointSize( p_char.getStyle().font_size ); //BUG 12
+    fmt.setFontPointSize( p_char.getStyle().font_size );
 
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
@@ -374,7 +368,7 @@ void Editor::addChar(const Char &p_char)
     else
         fmt.setFontFamily(style.font_family);
 
-    fmt.setFontPointSize( p_char.getStyle().font_size ); //BUG 12
+    fmt.setFontPointSize( p_char.getStyle().font_size );
 
     if (style.is_bold)
         fmt.setFontWeight(QFont::Bold);
