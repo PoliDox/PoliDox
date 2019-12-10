@@ -28,6 +28,8 @@ public slots:
     void onMessageReceived(const QString& p_msg);
     void onDocClosed();
     void onDocClosedNewFile();
+    void onConnectionClosed();
+    void onQuit();
 };
 
 #endif // CLIENT_H
