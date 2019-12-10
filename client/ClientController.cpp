@@ -24,7 +24,6 @@ ClientController::ClientController(QWebSocket *p_socket, Account& p_account, con
     connect(m_crdt, &CrdtClient::onLocalDelete, this, [&](Char symbol){
 
         QByteArray jsonString = ClientMessageFactory::createDeleteMessage(symbol, m_siteId);
-        //std::cout << jsonString.toUtf8().constData() <<std::endl;
         m_socket->sendTextMessage(jsonString);
     });
 
@@ -73,7 +72,6 @@ void ClientController::init(const QJsonArray& p_crdt) {
         for(Char symbol : elem)
             text += symbol;
 
-    std::cout << "DIMENSIONNNN: "<<text.size()<<std::endl;
     m_editor->init(text);
 }
 
@@ -90,7 +88,6 @@ QVector<int> ClientController::getUserChars(int p_siteId)
    ______________________________________________________________________________________ */
 void ClientController::onTextMessageReceived(const QString &_JSONstring)
 {
-    //std::cout<< "Message received" << std::endl;
 
     QJsonObject _JSONobj;
     QJsonDocument _JSONdoc;    

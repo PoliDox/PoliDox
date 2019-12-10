@@ -113,7 +113,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
     empty2->setFixedSize(1,1);
     ui->toolBar_2->addWidget(empty2);
 
-    connect(account,&QAction::triggered,this,&Editor::on_actionAccount_triggered);
+    connect(account,&QAction::triggered,this,&Editor::actionAccount_triggered);
 
     connect(profile, &Profile::changeImage, this, &Editor::ChangeImgEditor);
 
@@ -124,7 +124,6 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 Editor::~Editor()
 {    
     // All other objects are destroyed with the widget tree
-    // TODO: QListWidgetItems are not deleted: should we do it here?
     delete ui;
 }
 
@@ -132,7 +131,6 @@ void Editor::init(const QVector<Char>& p_text)
 {
     handlingOperation = true;
     for (const Char& symbol : p_text) {
-        std::cout << "BEFORE ADD CHAR: "<<symbol.getStyle().font_size<<std::endl;
         addChar(symbol);
     }
     m_textEdit->show();
@@ -296,14 +294,11 @@ void Editor::addOnlineUser(const Account& account){
     QList<QListWidgetItem*> items = ui->offlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
     if(items.size()==0)
-        std::cout << "NEW USER FOR THIS FILE"<< std::endl;
-    else if(items.size()>1)
-        std::cout << "PANIC! MORE USER WITH SAME USERNAME"<< std::endl;
+        qDebug() << "NEW USER FOR THIS FILE";
     else if(items.size()==1)
-         _dItem=items.at(0); //there should be always one item in this list
+         _dItem=items.at(0);
 
     //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACKGROUND CHANGE
-    // TODO: How do we delete it?
     QListWidgetItem* item= new QListWidgetItem(account.getName());
 
     QColor color(assignedColor.value(account.getSiteId()));
@@ -319,7 +314,6 @@ void Editor::addOnlineUser(const Account& account){
     }
 
     ui->onlineList->addItem(item);
-
 }
 
 // WARNING: la vecchia addOfflineUser è stata rinominata in removeClient!!
@@ -415,12 +409,7 @@ void Editor::removeClient(const Account& account){
     QListWidgetItem* _dItem=nullptr;
     QList<QListWidgetItem*> items = ui->onlineList->findItems(account.getName(), Qt::MatchFlag::MatchExactly);
 
-    if (items.size()==0)
-        std::cout << "PANIC! USER NOT FOUND"<< std::endl;
-    else if (items.size()>1)
-        std::cout << "PANIC! MORE USER WITH SAME USERNAME"<< std::endl;
-    else if (items.size()==1)
-         _dItem=items.at(0); //there should be always one item in this list
+    _dItem=items.at(0); //there should be always one item in this list
 
     QListWidgetItem* item= new QListWidgetItem(account.getName()); //DON'T SET THE PARENT HERE OTHERWISE ITEM CHANGHED WILL BE TRIGGERED WHEN BACGROUND CHANGE
 
@@ -597,8 +586,6 @@ void Editor::setCharacterStyle(int index, Char &symbol){
 
     symbol.setStyle(font_fam, font_size, bold, fmt.fontItalic(),
                     fmt.fontUnderline(), static_cast<int>(m_textEdit->alignment()));
-
-    std::cout << "INDEX "<< index <<" FONT FAMILY"<< font_fam.toUtf8().constData() << std::endl;
 }
 
 void Editor::resetActionToggle(){
@@ -728,7 +715,6 @@ QColor Editor::userSelected(int siteId){
 
     if(items.at(0)->checkState() == Qt::Checked){
         QColor color(assignedColor[siteId]);
-        std::cout << color.name().toUtf8().constData() << std::endl;
         color.setAlpha(80);
         return color;
     }
@@ -899,7 +885,7 @@ void Editor::on_actionURI_triggered()
     this->m_showUriDialog->show();
 }
 
-void Editor::on_actionAccount_triggered(bool checked)
+void Editor::actionAccount_triggered(bool checked)
 {
     Q_UNUSED(checked)
     profile->show();
