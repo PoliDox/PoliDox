@@ -24,7 +24,7 @@ private:
     QString newFileName;
 
 signals:
-    void getFileName(QString newfilename);
+    void getFileName(QString& newfilename);
 };
 
 #endif // NEWFILEDIALOG_H

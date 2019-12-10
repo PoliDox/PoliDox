@@ -85,7 +85,7 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, [&](){
         int pos = m_textEdit->textCursor().position();
-        resetActionToggle(pos);
+        resetActionToggle();
         //qDebug() << "Cursor position is now" << pos;
         if (localOperation || handlingOperation)
             localOperation = false;
@@ -556,8 +556,8 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     std::cout << "INDEX "<< index <<" FONT FAMILY"<< font_fam.toUtf8().constData() << std::endl;
 }
 
-// TODO: not used, delete?
-void Editor::resetActionToggle(int pos){
+
+void Editor::resetActionToggle(){
 
     QTextCursor cursor=m_textEdit->textCursor();
 

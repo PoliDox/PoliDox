@@ -53,7 +53,7 @@ public:
     void handleRemoteOperation(EditOp op, Char symbol, int position, int siteId);
     void resetBackgroundColor(int pos, const QColor& color);
     void setCharacterStyle(int index, Char& symbol);
-    void resetActionToggle(int pos);
+    void resetActionToggle();
     void moveCursor(int pos, int siteId);
     void closeEvent(QCloseEvent *event) override;
     void setNewImage(const QPixmap& Pix);

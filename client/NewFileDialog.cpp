@@ -21,7 +21,7 @@ void NewFileDialog::on_buttonBox_accepted()
         QMessageBox::warning(this, "New File", "Please insert the file name");
     }else{
         newFileName = ui->inputName->text();
-        emit getFileName(getNewFileName());
+        emit getFileName(newFileName);
     }
 }
 

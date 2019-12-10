@@ -23,7 +23,7 @@ private:
     QString uriName;
 
 signals:
-    void getUriName(QString newfilename);
+    void getUriName(QString& newfilename);
 };
 
 

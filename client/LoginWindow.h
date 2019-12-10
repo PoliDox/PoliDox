@@ -34,8 +34,8 @@ signals:
     void authDataSubmitted(QString p_user, QString p_passw);
     void signupDataSubmitted(QString p_user, QString p_passw, QPixmap p_pic);
     void fileSelected(QString p_filename);
-    void newFileSelected(QString p_filename);
-    void uriSelected(QString p_uri);
+    void newFileSelected(QString& p_filename);
+    void uriSelected(QString& p_uri);
 
 private slots:
     void on_pushButton_login_clicked();
