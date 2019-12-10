@@ -13,6 +13,11 @@ Client::Client() : m_document(nullptr)
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
+    connect(&m_socket, &QWebSocket::disconnected, this, [&]() {
+        QMessageBox::critical(&loginWindow, "Connection error", "Connection lost. Click OK to close the application.");
+        QApplication::quit();
+    });
+
     connect(&loginWindow, &LoginWindow::authDataSubmitted, this, [&](QString p_user, QString p_passw) {
         QByteArray message = ClientMessageFactory::createLoginMessage(p_user, p_passw);
         m_socket.sendTextMessage(message);
