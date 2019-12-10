@@ -11,9 +11,6 @@ Char::Char(ushort p_value, int p_siteId) : value(p_value), siteId(p_siteId)
 {}
 
 
-Char::~Char(){ }
-
-
 void Char::setFractionalPosition(std::vector<int>& newFractPos) {
     this->fractionalPosition = newFractPos;
 }

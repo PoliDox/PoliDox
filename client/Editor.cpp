@@ -379,7 +379,7 @@ void Editor::addChar(const Char &p_char)
         fmt.setFontFamily(DEFAULT_FONT);
     else
         fmt.setFontFamily(style.font_family);
-    std::cout << "INSIDE ADD CHAR: "<< p_char.getStyle().font_size << std::endl;
+
     fmt.setFontPointSize( p_char.getStyle().font_size ); //BUG 12
 
     if (style.is_bold)
