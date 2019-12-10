@@ -350,9 +350,6 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     textBlockFormat.setAlignment(alignment);//or another alignment
     p_cursor.mergeBlockFormat(textBlockFormat);
 
-    m_textEdit->setTextCursor(p_cursor);
-
-
 }
 
 void Editor::addChar(const Char &p_char)
@@ -387,8 +384,6 @@ void Editor::addChar(const Char &p_char)
     Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
     textBlockFormat.setAlignment(alignment);//or another alignment
     localCursor.mergeBlockFormat(textBlockFormat);
-
-    m_textEdit->setTextCursor(localCursor);
 
 }
 
