@@ -356,9 +356,6 @@ void Editor::addChar(const Char &p_char, QTextCursor& p_cursor)
     textBlockFormat.setAlignment(alignment);//or another alignment
     p_cursor.mergeBlockFormat(textBlockFormat);
 
-    m_textEdit->setTextCursor(p_cursor);
-
-
 }
 
 void Editor::addChar(const Char &p_char)
@@ -393,8 +390,6 @@ void Editor::addChar(const Char &p_char)
     Qt::Alignment alignment = static_cast<Qt::Alignment>(style.alignment);
     textBlockFormat.setAlignment(alignment);//or another alignment
     localCursor.mergeBlockFormat(textBlockFormat);
-
-    m_textEdit->setTextCursor(localCursor);
 
 }
 
@@ -456,7 +451,7 @@ void Editor::addClient(const Account& user)
     remoteCursor.setPosition(0);
     QRect curCoord = m_textEdit->cursorRect(remoteCursor);
     int height = curCoord.bottom()-curCoord.top();
-    remoteLabel->resize(remoteLabel->width(), height+5);
+    remoteLabel->resize(1000, height+5);
 
     /* update label dimension according to remote cursor position */
     QFont l_font=remoteLabel->font();
@@ -630,7 +625,7 @@ void Editor::updateCursors()
         User& user = it.value();
         QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
         int height = remoteCoord.bottom()-remoteCoord.top();
-        user.label->resize(user.label->width(), height+5);
+        user.label->resize(1000, height+5);
 
         /* update label dimension according to remote cursor position */
         QFont l_font=user.label->font();
@@ -652,7 +647,7 @@ void Editor::moveCursor(int pos, int siteId)
     user.cursor.setPosition(pos);
     QRect remoteCoord = m_textEdit->cursorRect(user.cursor);
     int height = remoteCoord.bottom()-remoteCoord.top();
-    user.label->resize(user.label->width(), height+5);
+    user.label->resize(1000, height+5);
 
     /* update label dimension according to remote cursor position */
     QFont l_font=user.label->font();
