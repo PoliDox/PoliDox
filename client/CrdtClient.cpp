@@ -98,9 +98,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
 
     //preceding è finito ma following ancora no
-
     bool precedingIsFinish = i==precedingSize;
-    //bool followingIsFinish = i==followingSize;
 
     if(precedingIsFinish){
         for(; i<followingSize; i++) {
@@ -144,9 +142,9 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
 
     this->_toMatrix(position,&row,&index);
 
-    /************************* !!! SOLUTION TO 2ND BUG ON LOCAL INSERT !!! **********************
-    Se la row è maggiore della dimensione della matrice allora stiamo inserendo in una nuova riga.
-    *********************************************************************************************/
+    // Se la row è maggiore della dimensione della matrice
+    // allora stiamo inserendo in una nuova riga.
+
 
     if(row>=this->_symbols.size()){
         this->_symbols.insert(this->_symbols.begin() + (row), std::vector<Char>());

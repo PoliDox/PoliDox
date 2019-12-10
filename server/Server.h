@@ -28,6 +28,7 @@ private:
 
 public:
     explicit Server(QObject *parent = nullptr);
+    ~Server();
     Account* getAccount(QWebSocket *socketOfAccount);
     DatabaseManager* getDb();
     void removeSocket2AccountPair(QWebSocket *socketOfAccount);
@@ -35,13 +36,8 @@ public:
     QString generateUri(QString nameAccount, QString& nameDocument);
     Server(const Server& other) = delete ;
     Server(const Server&& other) = delete ;
-    virtual ~Server();
 
-/* ======================================================================
-   The slot is connected to the newConnection signal emitted by the
-   QTwebSocket when a new client connects.
-   ======================================================================
-*/
+
 public slots:
     void onNewConnection();
     void handleNotLoggedRequests(const QString& genericRequestString);

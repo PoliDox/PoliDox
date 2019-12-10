@@ -18,7 +18,8 @@ public:
     void setUri(QString uri);
 
 private:
-    Ui::UriDialog *ui = nullptr;
+    Ui::UriDialog *ui = nullptr
+            ;
 };
 
 #endif // URIDIALOG_H
