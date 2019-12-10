@@ -6,9 +6,9 @@
 #include <QTimer>
 #include <QApplication>
 
-Client::Client() : m_document(nullptr)
+Client::Client(QString& ip_address) : m_document(nullptr)
 {
-    QString url = QString("ws://") + SERVER_IP + QString(":") + QString::number(PORT_NUMBER);
+    QString url = QString("ws://") + ip_address + QString(":") + QString::number(PORT_NUMBER);
     m_socket.open(QUrl(url));
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
