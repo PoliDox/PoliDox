@@ -7,7 +7,6 @@
 #include "LoginWindow.h"
 #include <QList>
 
-#define SERVER_IP "172.22.117.116"
 #define PORT_NUMBER 5678
 
 class Client : public QObject
@@ -21,7 +20,7 @@ private:
     LoginWindow loginWindow;
 
 public:
-    Client();
+    Client(QString& ip_address);
     ~Client();
 
 public slots:
