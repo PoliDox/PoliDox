@@ -12,12 +12,9 @@ void CRDT::setSymbols(std::vector<std::vector<Char>>& toSet){
     this->_symbols = toSet;
 }
 
-
 std::vector<std::vector<Char>> CRDT::getSymbols(){
     return this->_symbols;
 }
-
-
 
 void CRDT::mergeRows(std::vector<Char>& current,std::vector<Char>& next){
 
@@ -73,14 +70,9 @@ void CRDT::searchEqualSymbol(Char& symbol,unsigned int& _row,unsigned int& _inde
            return false;
     });
 
-
-
 }
 
 void CRDT::searchGreaterSymbol(Char& symbol,unsigned int& _row,unsigned int& _index,int& _LINECOUNTER,std::vector<std::vector<Char>>::iterator& _ROWhit,std::vector<Char>::iterator& _INDEXhit){
-
-    //qDebug() << "Before getValue";
-    //qDebug() << "value: " << symbol.getValue();
 
     _ROWhit = std::find_if(this->_symbols.begin(), this->_symbols.end(), [&](std::vector<Char>& row) -> bool{
             _index=0; //newline
@@ -272,13 +264,8 @@ QJsonArray CRDT::toJson() const {
     QJsonArray crdtToReturn;
 
     for (std::vector<Char> rowElem : this->_symbols) {
-        for (Char columnOfRowElem : rowElem) {
-            //da ricontrollare, vederne l'output
-            QJsonObject charFormattedJson = columnOfRowElem.toJson();
-            //QJsonDocument json_doc(charFormattedJson);
-            //QString json_string = json_doc.toJson();
-
-            //crdtToReturn.push_back( QJsonValue(json_string) );
+        for (Char columnOfRowElem : rowElem) {            
+            QJsonObject charFormattedJson = columnOfRowElem.toJson();            
             crdtToReturn.push_back( QJsonValue(charFormattedJson) );
         }
     }
@@ -308,15 +295,6 @@ std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatte
     return result;
 }
 
-
-// - For the list that comes from the db
-//   by means of the method DatabaseManager::getAllInserts
-//   called in Server::handleLoggedRequests.
-// - PAY ATTENTION that the list "crdtJsonFormatted" MUST
-//   arrived here ALREADY ORDERED by fractionalPosition(that is inside
-//   Char object) in ascending order.
-//   Furthermore, no one can access the array
-//   this->_symbols while this function is in execution.
 void CRDT::fromDatabase(const QList<Char>& crdtJsonFormatted){
     this->_symbols = std::vector<std::vector<Char>>(1);
 
@@ -332,5 +310,3 @@ void CRDT::fromDatabase(const QList<Char>& crdtJsonFormatted){
        }       
     }
 }
-
-

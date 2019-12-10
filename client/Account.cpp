@@ -43,7 +43,7 @@ Account Account::fromJson(const QJsonObject& accountJSON, bool isFromDb) {
     int l_siteId = accountJSON["siteId"].toInt();
     QString l_name = accountJSON["name"].toString();
     if(l_name == "")
-        l_name = accountJSON["_id"].toString(); // do not delete: it is used for the conversion from db
+        l_name = accountJSON["_id"].toString();
 
     QByteArray l_image;
     if(!isFromDb){

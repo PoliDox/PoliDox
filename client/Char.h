@@ -29,7 +29,7 @@ class Char {
 private:
     ushort value;
     std::vector<int> fractionalPosition;
-    int siteId;  // DO NOT DELETE: it is used to move the cursors in remote operations
+    int siteId;
     tStyle style;
 
 public:

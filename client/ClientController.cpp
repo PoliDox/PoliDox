@@ -17,7 +17,6 @@ ClientController::ClientController(QWebSocket *p_socket, Account& p_account, con
     connect(m_crdt, &CrdtClient::onLocalInsert, this, [&](Char symbol){
 
         QByteArray jsonString = ClientMessageFactory::createInsertMessage(symbol, m_siteId);
-        //qDebug() << "Sending local insert: " << QString(jsonString).toUtf8().constData();
         m_socket->sendTextMessage(jsonString);
     });
 
@@ -59,8 +58,6 @@ ClientController::~ClientController()
     delete m_editor;
 }
 
-
-//TODO: da ottimizzare, evire le copie, soprattutto sui vettori
 void ClientController::init(const QJsonArray& p_crdt) {
 
     std::vector<std::vector<Char>> symbolsOfOpenedDocument = CRDT::fromJson(p_crdt);
@@ -81,11 +78,6 @@ QVector<int> ClientController::getUserChars(int p_siteId)
     return QVector<int>::fromStdVector(userChars);
 }
 
-
-/* ______________________________________________________________________________________
-   SOCKETsignal connected to CLIENTcontroller lambda in order to catch messages forwarded
-   by server.
-   ______________________________________________________________________________________ */
 void ClientController::onTextMessageReceived(const QString &_JSONstring)
 {
 
@@ -103,7 +95,6 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
 
     QString l_header = _JSONobj["action"].toString();
     if (l_header == "insert") {
-        //qDebug() << "REMOTE INSERT:" << _JSONstring.toUtf8().constData();
         QJsonObject charObj = _JSONobj["char"].toObject();
         Char symbol = Char::fromJson(charObj);
         int linPos = m_crdt->remoteInsert(symbol);
@@ -125,8 +116,7 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "newClient") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
         Account newUser = Account::fromJson(accountObj);
-        m_editor->addClient(newUser);        
-        //qDebug() << "New client with siteId" << newUser.getSiteId();
+        m_editor->addClient(newUser);
 
     } else if (l_header == "closedEditorRemote") {
         QJsonObject accountObj = _JSONobj["account"].toObject();
@@ -161,18 +151,6 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
 
     qDebug() << "Chars added: " << charsAdded << ", chars removed: " << charsRemoved << " at position: "<<position;
 
-    /*
-    if (charsAdded > 1 && position == 0 &&
-            m_editor->at(0) != QChar::ParagraphSeparator) {
-        // When copying to the beginning everything is deleted and copied anew
-        charsAdded--;
-        if (!charsRemoved) {
-            //qWarning() << "ATTENTION: the assumption at the beginning of this block is wrong!";
-        }
-        charsRemoved--;
-    }
-    */
-
     // It could happen that some chars were removed and some others were added at the same time
     for (int i = 0; i < charsRemoved; i++) {
         m_crdt->localDelete(static_cast<unsigned int>(position));
@@ -190,7 +168,6 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         QChar qchar = m_editor->at(position+i);
         ushort _char;
         if (qchar == QChar::ParagraphSeparator) {
-            //qDebug() << "ParagraphSeparator";
             _char = '\n';
         } else {
             _char =  qchar.unicode();

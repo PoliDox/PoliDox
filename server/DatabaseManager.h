@@ -21,8 +21,6 @@
 
 #include "Char.h"
 
-
-
 class DatabaseManager {
 
 private:
@@ -59,7 +57,5 @@ public:
     DatabaseManager(const DatabaseManager&& other) = delete;
     ~DatabaseManager();
 };
-
-
 
 #endif // DATABASEMANAGER_H

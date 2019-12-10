@@ -107,7 +107,7 @@ private:
     void addChar(const Char& p_char);
     void addChar(const Char& p_char,QTextCursor& p_cursor);
     void assignRandomColor(int siteID);
-    void setItem(QColor color, QListWidgetItem* item); // Technically not a member function
+    void setItem(QColor color, QListWidgetItem* item);
 
     ClientController *controller = nullptr;
     QTextEdit *m_textEdit = nullptr;

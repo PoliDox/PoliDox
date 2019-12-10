@@ -432,7 +432,7 @@ void Editor::addClient(const Account& user)
         assignRandomColor(siteId);
 
     // 1. Add user to the map of remote users
-    QFont font("American Typewriter", 10, QFont::Bold); // TODO: if first line is small this is wrong! use top and botton instead
+    QFont font("American Typewriter", 10, QFont::Bold);
     QLabel *remoteLabel = new QLabel(QString(user.getName()+"\n"), m_textEdit);
     QColor color(assignedColor.value(siteId));
     remoteLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -458,7 +458,7 @@ void Editor::addClient(const Account& user)
 
     remoteLabel->move(curCoord.left(), curCoord.top()-(remoteLabel->fontInfo().pointSize()/3));
     remoteLabel->setVisible(true);
-    remoteLabel->raise(); /* FIXED BUG HIDDEN LABEL */
+    remoteLabel->raise();
 
     addOnlineUser(user);
 }
@@ -566,7 +566,6 @@ void Editor::setCharacterStyle(int index, Char &symbol){
     QTextCharFormat fmt=cursor.charFormat();  
     bold = (fmt.fontWeight() == QFont::Bold);
 
-    /* BUG? Can't take font name from cursor and related fmt, why? bypass this by taking the font name from the FontComboBox */
     QFontComboBox *fontCombo=static_cast<QFontComboBox*>(ui->textRichToolBar->findChild<QFontComboBox*>("font"));
     QString font_fam=fontCombo->lineEdit()->text();
 
