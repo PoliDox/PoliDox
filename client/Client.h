@@ -10,7 +10,6 @@
 #define SERVER_IP "127.0.0.1"
 #define PORT_NUMBER 5678
 
-
 class Client : public QObject
 {
     Q_OBJECT
@@ -29,6 +28,8 @@ public slots:
     void onMessageReceived(const QString& p_msg);
     void onDocClosed();
     void onDocClosedNewFile();
+    void onConnectionClosed();
+    void onQuit();
 };
 
 #endif // CLIENT_H

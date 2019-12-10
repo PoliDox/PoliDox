@@ -36,6 +36,7 @@ signals:
     void fileSelected(QString p_filename);
     void newFileSelected(QString p_filename);
     void uriSelected(QString p_uri);
+    void closed();
 
 private slots:
     void on_pushButton_login_clicked();

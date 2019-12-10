@@ -27,8 +27,8 @@ private:
     ChangePwd *changePwdDialog;
 
 signals:
-    void ChangeImage(QPixmap);
-    void ChangePassword(QString);
+    void changeImage(QPixmap);
+    void changePassword(QString&);
 
 };
 

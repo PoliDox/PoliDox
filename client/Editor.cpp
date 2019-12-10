@@ -115,9 +115,9 @@ Editor::Editor(ClientController *p_controller, QWidget *parent, const QList<Acco
 
     connect(account,&QAction::triggered,this,&Editor::on_actionAccount_triggered);
 
-    connect(profile, &Profile::ChangeImage, this, &Editor::ChangeImgEditor);
+    connect(profile, &Profile::changeImage, this, &Editor::ChangeImgEditor);
 
-    connect(profile, &Profile::ChangePassword, this, &Editor::ChangePwdEditor);
+    connect(profile, &Profile::changePassword, this, &Editor::ChangePwdEditor);
 
 }
 
