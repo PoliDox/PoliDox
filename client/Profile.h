@@ -23,8 +23,8 @@ private slots:
     void on_changeImage_clicked();
 
 private:
-    Ui::Profile *ui;
-    ChangePwd *changePwdDialog;
+    Ui::Profile *ui = nullptr;
+    ChangePwd *changePwdDialog = nullptr;
 
 signals:
     void changeImage(QPixmap&);

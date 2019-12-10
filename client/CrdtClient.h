@@ -11,7 +11,6 @@
 
 class ClientController;
 
-/* modella un'istanza di un editor condiviso */
 class CrdtClient : public QObject, public CRDT{
     Q_OBJECT
 
@@ -23,7 +22,6 @@ public:
     CrdtClient(int p_siteId);
     void localInsert(unsigned int position, Char symbolToInsert);
     void localDelete(unsigned int index);
-    //void printDebugChars();
     int getSiteId() const;
     void setSiteId(int siteId);
     std::vector<int> getUserPositions(int siteId);

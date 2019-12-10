@@ -22,13 +22,14 @@ private:
 
 public:
     ServerController(QString &p_nameDocumentAssociated, QString &p_uriAssociated, Server *p_server);
+    ~ServerController();
     void addClient(QWebSocket *socketToAdd);
     void notifyOtherClients(QWebSocket *newSocket);
     void createCrdt(QList<Char>& orderedInserts);
     CRDT* getCrdt();
     ServerController(const ServerController& other) = delete;
     ServerController(const ServerController&& other) = delete;
-    ~ServerController();
+
     void replicateMessageOnOtherSockets(const QString& messageReceivedOnSocket, QWebSocket *signalSender);
 
 public slots:

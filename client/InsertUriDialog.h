@@ -19,12 +19,11 @@ private slots:
     void on_buttonBox_accepted();
 
 private:
-    Ui::InsertUriDialog *ui;
+    Ui::InsertUriDialog *ui = nullptr;
     QString uriName;
 
 signals:
     void getUriName(QString& newfilename);
 };
-
 
 #endif // INSERTURIDIALOG_H

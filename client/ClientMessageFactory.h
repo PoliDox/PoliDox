@@ -20,7 +20,6 @@ public:
     static QByteArray createImgUpdate(const QString& p_user, const QPixmap& p_pic);
     static QByteArray createPwdUpdate(const QString& p_user, const QString& p_pwd);
     static QByteArray createCloseEditorMessage();
-
 };
 
 #endif // MESSAGEFACTORY_H

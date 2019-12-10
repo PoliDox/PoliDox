@@ -16,7 +16,7 @@ public:
     ~Creators();
 
 private:
-    Ui::Creators *ui;
+    Ui::Creators *ui = nullptr;
 };
 
 #endif // CREATORS_H

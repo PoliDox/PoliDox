@@ -15,7 +15,7 @@ class Client : public QObject
     Q_OBJECT
 
 private:
-    ClientController *m_document;
+    ClientController *m_document = nullptr;
     QWebSocket m_socket;
     Account m_user;
     LoginWindow loginWindow;

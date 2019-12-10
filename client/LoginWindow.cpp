@@ -22,7 +22,6 @@ LoginWindow::LoginWindow(QWidget *parent) :
     setWindowIcon(QIcon("://images/images/logo_small.png"));
 
     this->ui->pushButton_register->setStyleSheet("color:crimson");
-    //this->ui->pushButton_login->setStyleSheet("background-color:#4d79ff;color:white");
 
     this->ui->line->setStyleSheet("background-color:#003879");
     this->ui->label->setStyleSheet( "background-color:transparent;color:#003879");
@@ -267,7 +266,6 @@ void LoginWindow::createRegistrationForm(){
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
     img_path->setStyleSheet("background-color:transparent;"); //border: 1px solid #8d918d
     img_label->setStyleSheet("background-color:transparent;\ncolor:#003879;font-weight:bold;font-family:Courier;font-size:16px");
-    //img_show->setStyleSheet("border: 1px solid #8d918d");
     img_warning->setStyleSheet("color:red");
 
     img_warning->setText("Image must be smaller than 2MB");
