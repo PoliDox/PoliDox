@@ -6,6 +6,7 @@ QT += sql
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 ################################################################
 # to find external libraries about mongocxx driver for mongodb #

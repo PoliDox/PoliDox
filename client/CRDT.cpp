@@ -256,9 +256,6 @@ int CRDT::remoteDelete(Char& symbol) {
          if(this->_symbols[_row].size()==0 && this->_symbols.size()>1) //editor empty=one empty row so don't clear last row
              deleteRowAt(_row);
     }
-    else
-        std::cout << "DELETE ANDATA A VUOTO" << std::endl;
-
 
     _LINEARpos=_toLinear(_row,_index);
 
@@ -297,9 +294,7 @@ std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatte
     int i=0;
     for(QJsonValue elem : crdtJsonFormatted){
         Char charToAdd = Char::fromJson(elem.toObject());
-        std::cout<<"AFTER CHAR JSON: "<<charToAdd.getStyle().font_size <<std::endl;
         result[rowIndex].push_back(charToAdd);
-        std::cout<<"FONT INSIDE RESULT: "<< result[rowIndex].at(0).getStyle().font_size<<std::endl;
 
         if(charToAdd.getValue() == '\n' && i != crdtJsonFormatted.size()-1){ //TODO sarebbe da togliere la riga vuota dopo ultimo carattere
             rowIndex++;

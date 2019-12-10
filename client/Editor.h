@@ -84,7 +84,7 @@ private slots:
     void on_actionAlignCenter_triggered();
     void on_actionAlignRight_triggered();
     void on_actionJustify_triggered(); 
-    void on_actionAccount_triggered(bool);
+    void actionAccount_triggered(bool checked=false);
 
     void onFontSizeChanged(int i);
     void onFontFamilyChanged(const QFont& font);

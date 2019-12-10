@@ -7,6 +7,8 @@ QT += gui websockets core
 
 INSTALLS += target
 
+CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
 HEADERS += \
     CRDT.h \
     Changepwd.h \

@@ -14,7 +14,7 @@
 //#define DEBUG_OUTPUT
 
 CrdtClient::CrdtClient(int p_siteId) : siteId(p_siteId)
-{ std::cout << MAXNUM/2 <<std::endl;}
+{}
 
 int CrdtClient::getSiteId() const {
     return this->siteId;

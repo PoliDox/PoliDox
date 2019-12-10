@@ -79,7 +79,6 @@ Char Char::fromJson(const QJsonObject& charJSON){
     Char result(value, siteId, fractionalPosition);
     result.style = l_style;
 
-    std::cout << "FONT SIZEEEE: " << l_style.font_size <<std::endl;
     return result;
 }
 
