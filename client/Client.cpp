@@ -61,7 +61,10 @@ Client::~Client()
 {
     if (m_document != nullptr) {
         // editor is open
-        //delete m_document;
+        qDebug() << "m_document NOT null";
+        delete m_document;
+    } else {
+        qDebug() << "m_document null";
     }
 }
 
@@ -161,6 +164,7 @@ void Client::onMessageReceived(const QString &p_msg)
 void Client::onDocClosed()
 {    
     m_document->deleteLater(); // not delete: there could be a message for the client in the event queue
+    m_document = nullptr; //  Qt safely deletes the object, since it has already stored the address
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
     QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
