@@ -5,7 +5,7 @@
 #include "ClientMessageFactory.h"
 
 
-ClientController::ClientController(QWebSocket *p_socket, const Account& p_account, const QString& p_fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
+ClientController::ClientController(QWebSocket *p_socket, Account& p_account, const QString& p_fileName, const QString& p_uri, QList<Account>& contributorsOnline, QList<Account>& contributorsOffline) :
     m_socket(p_socket), m_account(p_account), m_filename(p_fileName), m_uri(p_uri)
 {        
     m_siteId = p_account.getSiteId();

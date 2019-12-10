@@ -15,6 +15,7 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 #include <mongocxx/exception/query_exception.hpp>
+#include <mongocxx/exception/operation_exception.hpp>
 #include <mongocxx/exception/bulk_write_exception.hpp>
 #include "Account.h"
 
@@ -38,8 +39,8 @@ private:
 public:
     DatabaseManager();
     int registerUser(QString& name, QString& password, QByteArray& image);
-    bool changeImage(QString& nameAccount, QByteArray& newImage);
-    bool changePassword(QString& nameAccount, QString& password);
+    void changeImage(QString& nameAccount, QByteArray& newImage);
+    void changePassword(QString& nameAccount, QString& password);
     int checkPassword(QString& name, QString& password, QByteArray& imageToReturn);
     bool insertNewDocument(QString& documentName, QString& uri);
     QString getUri(QString& documentName);
@@ -54,6 +55,8 @@ public:
     QList<Account> getAllAccounts(QList<int>& siteIdAccounts);
     Account getAccount(int siteId);
     mongocxx::database getDb();
+    DatabaseManager(const DatabaseManager& other) = delete;
+    DatabaseManager(const DatabaseManager&& other) = delete;
     ~DatabaseManager();
 };
 
