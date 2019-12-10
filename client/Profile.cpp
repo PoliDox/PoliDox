@@ -13,8 +13,7 @@ Profile::Profile(QWidget *parent) :
     this->changePwdDialog = new ChangePwd(this);
     setWindowTitle("Profile");
 
-    connect(changePwdDialog, &ChangePwd::PwdUpdate, this, &Profile::ChangePassword);
-
+    connect(changePwdDialog, &ChangePwd::pwdUpdate, this, &Profile::changePassword);
 }
 
 Profile::~Profile()
@@ -54,9 +53,9 @@ void Profile::on_changeImage_clicked()
         // Don't send message
         return;
     } else if (img.size() > 2000000){
-        QMessageBox::warning(this, "ImgWarning", "The file's dimension is greater than 2MB!");
+        QMessageBox::warning(this, "Warning", "The file's dimension is greater than 2MB!");
         return;
     }
 
-    emit ChangeImage(pix);
+    emit changeImage(pix);
 }

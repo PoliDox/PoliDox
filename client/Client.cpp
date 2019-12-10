@@ -34,9 +34,7 @@ Client::Client() : m_document(nullptr)
 
     connect(&loginWindow, &LoginWindow::fileSelected, this, [&](const QString& p_filename) {
         QByteArray message = ClientMessageFactory::createOpenFileMessage(p_filename);
-        m_socket.sendTextMessage(message);
-        // TODO: delete this, c_fileName should be filled at openFileRepl
-        //c_fileName = p_filename;
+        m_socket.sendTextMessage(message);        
     });
 
     connect(&loginWindow, &LoginWindow::uriSelected, this, [&](const QString& p_uri) {
@@ -54,7 +52,6 @@ Client::Client() : m_document(nullptr)
             QMessageBox::critical(&loginWindow, "Connection error", "Couldn't connect to server. Please close the application and retry.");
             QApplication::quit();
         }
-
     });
 
     loginWindow.show();
@@ -118,7 +115,6 @@ void Client::onMessageReceived(const QString &p_msg)
         QString replCode = _JSONobj["response"].toString();
 
         if (replCode == "ok") {
-            //qDebug() << "JSON ARRIVATO:" << p_msg.toUtf8().constData();
             QString nameDocument = _JSONobj["nameDocument"].toString();
             QString uri = _JSONobj["uri"].toString();
             QJsonArray JSONcrdt = _JSONobj["crdt"].toArray();
@@ -139,7 +135,6 @@ void Client::onMessageReceived(const QString &p_msg)
             disconnect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
             connect(m_document, &ClientController::docClosed, this, &Client::onDocClosed);
-
             connect(m_document, &ClientController::docClosedNewFile, this, &Client::onDocClosedNewFile);
 
         } else if (replCode == "fail create") {

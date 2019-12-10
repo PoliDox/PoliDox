@@ -4,7 +4,7 @@
 #include <QDialog>
 
 namespace Ui {
-class ChangePwd;
+    class ChangePwd;
 }
 
 class ChangePwd : public QDialog
@@ -16,13 +16,11 @@ public:
     ~ChangePwd();
 
 private slots:
-
-
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 
 signals:
-    void PwdUpdate(QString pwd);
+    void pwdUpdate(QString& pwd);
 
 private:
     Ui::ChangePwd *ui;
