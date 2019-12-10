@@ -109,19 +109,18 @@ private:
     void assignRandomColor(int siteID);
     void setItem(QColor color, QListWidgetItem* item); // Technically not a member function
 
-    ClientController *controller;
-
-    QTextEdit *m_textEdit;
-    QTextDocument *m_textDoc;
-    QTextCursor *m_localCursor;    
+    ClientController *controller = nullptr;
+    QTextEdit *m_textEdit = nullptr;
+    QTextDocument *m_textDoc = nullptr;
+    QTextCursor *m_localCursor = nullptr;
 
     QMap<int, User> m_onlineUsers; // maps siteIds to a struct identifying a remote user
     QMap<int,QString> assignedColor;
     QList<Account> m_offlineUsers;
 
-    ShowUriDialog *m_showUriDialog;
-    Profile *profile;
-    Ui::Editor *ui;
+    ShowUriDialog *m_showUriDialog = nullptr;
+    Profile *profile = nullptr;
+    Ui::Editor *ui = nullptr;
 
     bool handlingOperation;
     bool localOperation;

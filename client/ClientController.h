@@ -22,9 +22,9 @@ public:
     Account getAccount() { return m_account; }
 
 private:
-    Editor *m_editor;
-    CrdtClient *m_crdt;
-    QWebSocket *m_socket;
+    Editor *m_editor = nullptr;
+    CrdtClient *m_crdt = nullptr;
+    QWebSocket *m_socket = nullptr;
     Account &m_account;
     int m_siteId; // equivalent to m_account.getSiteId()
     QString m_filename;

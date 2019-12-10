@@ -20,7 +20,7 @@ private slots:
     void on_buttonBox_accepted();
 
 private:
-    Ui::NewFileDialog *ui;
+    Ui::NewFileDialog *ui = nullptr;
     QString newFileName;
 
 signals:

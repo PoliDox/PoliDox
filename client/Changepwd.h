@@ -23,7 +23,7 @@ signals:
     void pwdUpdate(QString& pwd);
 
 private:
-    Ui::ChangePwd *ui;
+    Ui::ChangePwd *ui = nullptr;
 };
 
 #endif // CHANGEPWD_H
