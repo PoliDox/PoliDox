@@ -11,9 +11,6 @@ Char::Char(ushort p_value, int p_siteId) : value(p_value), siteId(p_siteId)
 {}
 
 
-Char::~Char(){ }
-
-
 void Char::setFractionalPosition(std::vector<int>& newFractPos) {
     this->fractionalPosition = newFractPos;
 }
@@ -79,10 +76,10 @@ Char Char::fromJson(const QJsonObject& charJSON){
                        styleJSON["bold"].toBool(), styleJSON["italic"].toBool(),
                        styleJSON["underline"].toBool(), styleJSON["alignment"].toInt() };
 
-
     Char result(value, siteId, fractionalPosition);
     result.style = l_style;
 
+    std::cout << "FONT SIZEEEE: " << l_style.font_size <<std::endl;
     return result;
 }
 

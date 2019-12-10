@@ -73,6 +73,7 @@ void ClientController::init(const QJsonArray& p_crdt) {
         for(Char symbol : elem)
             text += symbol;
 
+    std::cout << "DIMENSIONNNN: "<<text.size()<<std::endl;
     m_editor->init(text);
 }
 

@@ -61,7 +61,7 @@ LoginWindow::~LoginWindow()
 void LoginWindow::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event);
-    QApplication::quit();
+    emit closed();
 }
 
 

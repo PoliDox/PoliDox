@@ -13,10 +13,9 @@ Client::Client() : m_document(nullptr)
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
 
-    connect(&m_socket, &QWebSocket::disconnected, this, [&]() {
-        QMessageBox::critical(&loginWindow, "Connection error", "Connection lost. Click OK to close the application.");
-        QApplication::quit();
-    });
+    connect(&m_socket, &QWebSocket::disconnected, this, &Client::onConnectionClosed);
+
+    connect(&loginWindow, &LoginWindow::closed, this, &Client::onQuit);
 
     connect(&loginWindow, &LoginWindow::authDataSubmitted, this, [&](QString& p_user, QString& p_passw) {
         QByteArray message = ClientMessageFactory::createLoginMessage(p_user, p_passw);
@@ -62,7 +61,10 @@ Client::~Client()
 {
     if (m_document != nullptr) {
         // editor is open
-        //delete m_document;
+        qDebug() << "m_document NOT null";
+        delete m_document;
+    } else {
+        qDebug() << "m_document null";
     }
 }
 
@@ -162,6 +164,7 @@ void Client::onMessageReceived(const QString &p_msg)
 void Client::onDocClosed()
 {    
     m_document->deleteLater(); // not delete: there could be a message for the client in the event queue
+    m_document = nullptr; //  Qt safely deletes the object, since it has already stored the address
 
     connect(&m_socket, &QWebSocket::textMessageReceived, this, &Client::onMessageReceived);
     QByteArray jsonString = ClientMessageFactory::createCloseEditorMessage();
@@ -175,4 +178,16 @@ void Client::onDocClosedNewFile()
     onDocClosed();
     QListWidgetItem *NewFile = new QListWidgetItem("Create new file");
     loginWindow.onClickedFile(NewFile);
+}
+
+void Client::onConnectionClosed()
+{
+    QMessageBox::critical(&loginWindow, "Connection error", "Connection lost. Click OK to close the application.");
+    QApplication::quit();
+}
+
+void Client::onQuit()
+{
+    disconnect(&m_socket, &QWebSocket::disconnected, this, &Client::onConnectionClosed);
+    QApplication::quit();
 }

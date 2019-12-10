@@ -25,7 +25,7 @@ void CRDT::mergeRows(std::vector<Char>& current,std::vector<Char>& next){
     current.insert(current.end(),next.begin(),next.end());
 }
 
-void CRDT::splitRows(std::vector<Char>& current,const unsigned int& row,const unsigned int& index){
+void CRDT::splitRows(std::vector<Char>& current, unsigned int row, unsigned int index){
     std::vector<Char> _VETT(current.begin()+index+1,current.end());
     this->_symbols.insert(this->_symbols.begin()+row+1,_VETT);
     //current.erase(current.begin()+index+1,current.end()); //WHY CURRENT INVALID AFTER INSERT, NOT AN ITERATOR. PROBABLY HEAP REALLOCATION ???
@@ -141,7 +141,7 @@ void CRDT::_toMatrix(unsigned int position,unsigned int* row,unsigned int* index
 
 }
 
-int CRDT::_toLinear(int row,int index){
+int CRDT::_toLinear(unsigned int row,unsigned int index){
 
 
     int position=0;
@@ -176,7 +176,7 @@ int CRDT::remoteInsert(Char& symbol){
 
     int _LINEARpos=0;
 
-    char _CHAR=symbol.getValue();
+    ushort _CHAR=symbol.getValue();
 
     searchGreaterSymbol(symbol,_row,_index,_LINECOUNTER,_ROWhit,_INDEXhit);
 
@@ -192,7 +192,7 @@ int CRDT::remoteInsert(Char& symbol){
     }
     else // se non ho trovato nulla, row e index non hanno significato, li setto dopo!
         {
-             char _LASTCHAR=((this->_symbols.end()-1)->end()-1)->getValue();
+             ushort _LASTCHAR=((this->_symbols.end()-1)->end()-1)->getValue();
             _NOTFOUND=true;
 
             if(_LASTCHAR=='\n'){
@@ -201,12 +201,12 @@ int CRDT::remoteInsert(Char& symbol){
                 inserRowAtEnd(_NEWROW);
             }
             else{
-                insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,(this->_symbols.end()-1)->size());
+                insertSymbolAt(this->_symbols[this->_symbols.size()-1],symbol,static_cast<unsigned int>((this->_symbols.end()-1)->size()));
             }
         }
 
     if(_NOTFOUND && _NEWLINE){
-       _row=this->_symbols.size()-1;
+       _row=static_cast<unsigned int>(this->_symbols.size()-1);
        _index=0;
     }
 
@@ -239,12 +239,12 @@ int CRDT::remoteDelete(Char& symbol) {
 
     int _LINEARpos=0;
 
-    unsigned int _NROWS=this->_symbols.size();
+    unsigned int _NROWS = static_cast<unsigned int>(this->_symbols.size());
 
     searchEqualSymbol(symbol, _row, _index, _rowHIT,_indexHIT);
 
     if(_rowHIT!=this->_symbols.end()) { //if i found something
-        char _CHAR=this->_symbols[_row][_index].getValue();
+        ushort _CHAR=this->_symbols[_row][_index].getValue();
 
         if(_CHAR=='\n' && _NROWS!=1 && _row!=_NROWS-1){
          mergeRows(this->_symbols[_row],this->_symbols[_row+1]);
@@ -294,16 +294,20 @@ std::vector<std::vector<Char>> CRDT::fromJson(const QJsonArray& crdtJsonFormatte
     std::vector<std::vector<Char>> result = std::vector<std::vector<Char>>(1);
 
     unsigned int rowIndex = 0;
+    int i=0;
     for(QJsonValue elem : crdtJsonFormatted){
         Char charToAdd = Char::fromJson(elem.toObject());
-
+        std::cout<<"AFTER CHAR JSON: "<<charToAdd.getStyle().font_size <<std::endl;
         result[rowIndex].push_back(charToAdd);
+        std::cout<<"FONT INSIDE RESULT: "<< result[rowIndex].at(0).getStyle().font_size<<std::endl;
 
-        if(charToAdd.getValue() == '\n'){
+        if(charToAdd.getValue() == '\n' && i != crdtJsonFormatted.size()-1){ //TODO sarebbe da togliere la riga vuota dopo ultimo carattere
             rowIndex++;
             //inserts the next row in the matrix
             result.push_back(std::vector<Char>());
         }
+
+        i++;
     }
 
     return result;

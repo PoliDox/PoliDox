@@ -47,8 +47,6 @@ bool existsPositionInVector(unsigned int position, std::vector<int> vector) {
     return position < vector.size();
 }
 
-/* assumo che sia preceding che following
- * abbiamo almeno un elemento    */
 std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::vector<int> following){
 
     std::vector<int> middle;
@@ -75,9 +73,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
         else {
             middle.push_back(preceding[i]);
             if(difference == 1){
-                //qui terminerÃ² sicuro, devo solo trovare un numero piÃ¹
-                //grande di preceding da poter inserire
-                if( existsPositionInVector(i+1, preceding) ) {
+                if( existsPositionInVector(i+1, preceding) ) {  //devo trovare elemento più grande di precedeing
                     for(j=i+1; j<precedingSize; j++) {
                         if (preceding[j] <= (MAXNUM - 2)) {
                             int middleElement = (MAXNUM - preceding[j]) / DIVISORE;
@@ -85,9 +81,7 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
                             middle.push_back(middleElement);
                             return middle;
                         } else {
-                            //copia preceding finchÃ© non trovi
-                            //un elemento i-esimo piÃ¹ grande da poter inserire.
-                            middle.push_back(preceding[j]);
+                            middle.push_back(preceding[j]);     //copia preceding finchè non trovi elemento più grande da inserire
                         }
                     }
                     middle.push_back(MAXNUM/2);
@@ -102,22 +96,15 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
 
     }
 
-    //se arrivo qui Ã¨ perchÃ© sicuramente
-    //preceding Ã¨ finito e following ancora no!!
-    //TODO da confermare se Ã¨ vero
+
+    //preceding è finito ma following ancora no
 
     bool precedingIsFinish = i==precedingSize;
-    bool followingIsFinish = i==followingSize;
-
-    if( precedingIsFinish && followingIsFinish){
-        std::cout << "ERRORE\n"; //NON DOVREI MIA ENTRARE QUI
-        exit(10);  //10: numero a caso
-    }
+    //bool followingIsFinish = i==followingSize;
 
     if(precedingIsFinish){
-        //preceding Ã¨ finito e following no
         for(; i<followingSize; i++) {
-            if (following[i] == 0) {  //puÃ² essere sia 1 che zero
+            if (following[i] == 0) {
                 middle.push_back(following[i]);
             }
             else {
@@ -136,13 +123,11 @@ std::vector<int> createMiddleFractionalNumber(std::vector<int> preceding, std::v
     }
 
     //NON DOVREI MAI ARRIVARE QUI
-    std::cout << "ERRORE\n"; //NON DOVREI MIA ENTRARE QUI
-    exit(10);  //10: numero a caso
+    qCritical() << "ERRORE\n"; //NON DOVREI MIA ENTRARE QUI
+    throw std::exception();
 
 }
 
-
-/* position Ã¨ il valore restituito dall'editor QT, va convertito in row e index della matrice CRDT */
 
 void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
 
@@ -153,14 +138,16 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
 
     unsigned long rowSize=0;
 
-    char value=symbolToInsert.getValue();
+    ushort value;
 
-    //QDateTime asd(QDateTime::currentDateTime());
-    //uint unixTime = asd.toTime_t();
+    value=symbolToInsert.getValue();
 
     this->_toMatrix(position,&row,&index);
 
-    /* !!! SOLUTION TO 2ND BUG ON LOCAL INSERT !!! */
+    /************************* !!! SOLUTION TO 2ND BUG ON LOCAL INSERT !!! **********************
+    Se la row è maggiore della dimensione della matrice allora stiamo inserendo in una nuova riga.
+    *********************************************************************************************/
+
     if(row>=this->_symbols.size()){
         this->_symbols.insert(this->_symbols.begin() + (row), std::vector<Char>());
     }
@@ -172,26 +159,23 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
         std::cout << "[LOCAL INSERT]@ [" << row << "][" << index << "]\t"<< value <<"\tLINEAR POSITION " << position << std::endl;
 #endif
 
-    // symbolToInsert(value, siteId);
-
     int siteID=symbolToInsert.getSiteId();
     int random=rand();
 
     rowSize=this->_symbols[row].size();
 
     if(value=='\n'){
-        if (index != this->_symbols[row].size())
+        if (index != this->_symbols[row].size())        //newline in mezzo ad una riga
             middleNewLine=1;
     }
 
-    if(index == 0){
-        if(rowSize == 0){
+    if(index == 0){                                     //primo elemento della riga
+        if(rowSize == 0){                               //primo della riga e nessuno dopo di me
             std::vector<int> precedingFractionalNumber;
-            //è il primo elemento che inserisco
             std::vector<int> firstElem{MAXNUM/2};
             std::vector<int> fakeVector{MAXNUM};
 
-            if(row!=0){
+            if(row!=0){                                 //primo della riga ma non riga 0 e nessuno dopo di me
                 precedingFractionalNumber = this->_symbols[row - 1].at(this->_symbols[row - 1].size() - 1).getFractionalPosition();
                 std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber,fakeVector);
                 newFractionalPosition.push_back(siteID);
@@ -199,20 +183,19 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
                 symbolToInsert.setFractionalPosition(newFractionalPosition);
                 this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
 
-            }else{
+            }else{                                      //primo della riga e siamo su riga 0 e nessuno dopo di me
                 firstElem.push_back(siteID);
                 firstElem.push_back(random);
                 symbolToInsert.setFractionalPosition(firstElem);
                 this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
             }
         }
-        else {
-            //ho degli elementi dopo di me
+        else {                                          //primo della riga ma ho qualcuno dopo di me
             std::vector<int> precedingFractionalNumber;
-            if(row!=0)
+            if(row!=0)                                  //primo della riga, qualcuno dopo di me, riga !=0
                 precedingFractionalNumber = this->_symbols[row-1].at(this->_symbols[row-1].size()-1).getFractionalPosition();
-            else
-                 precedingFractionalNumber.push_back(0); //sarebbe il fake vector
+            else                                        //primo della riga, qualcuno dopo di me, riga 0
+                 precedingFractionalNumber.push_back(0);
 
             std::vector<int> followingFractionalNumber = this->_symbols[row].at(0).getFractionalPosition();
             std::vector<int> newFractionalPosition = createMiddleFractionalNumber(precedingFractionalNumber, followingFractionalNumber);
@@ -222,11 +205,9 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
             this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
     }
-    else {
-        //sicuramente avrà un simbolo prima di me
-        if(index >= rowSize){  //TODO controllare bene il confronto
-            //non ho nessuno dopo di me
-            index = rowSize;  //inserisco in append
+    else {                                              //non sono il primo della riga
+        if(index >= rowSize){                           //non ho nessuno dopo di me
+            index = static_cast<unsigned int>(rowSize);
             std::vector<int> precedingFractionalNumber = this->_symbols[row].at(index-1).getFractionalPosition();
             std::vector<int> fakeVector{MAXNUM};
 
@@ -236,8 +217,7 @@ void CrdtClient::localInsert(unsigned int position, Char symbolToInsert) {
             symbolToInsert.setFractionalPosition(newFractionalPosition);
             this->_symbols[row].insert(this->_symbols[row].begin()+index, symbolToInsert);
         }
-        else {
-            //sono fra due simboli
+        else {                                          //sono in mezzo a due simboli
             std::vector<int> precedingFractionalNumber = this->_symbols[row].at(index-1).getFractionalPosition();
             std::vector<int> followingFractionalNumber = this->_symbols[row].at(index).getFractionalPosition();
 
@@ -266,7 +246,7 @@ void CrdtClient::localDelete(unsigned int position){
 
     unsigned int row=0,
                  index=0,
-                 _NROWS=this->_symbols.size();
+                 _NROWS=static_cast<unsigned int>(this->_symbols.size());
 
     this->_toMatrix(position,&row,&index);
 
@@ -274,7 +254,7 @@ void CrdtClient::localDelete(unsigned int position){
         return;
 
     Char _Dsymbol=this->_symbols[row][index];
-    char _CHAR=_Dsymbol.getValue();
+    ushort _CHAR=_Dsymbol.getValue();
 
     if(_CHAR=='\n' &&_NROWS!=1 && row!=_NROWS-1){
         mergeRows(this->_symbols[row],this->_symbols[row+1]);
@@ -298,20 +278,4 @@ void CrdtClient::localDelete(unsigned int position){
 
 }
 
-/*
-void CrdtClient::printDebugChars(){
-    std::for_each(_symbols.begin(), _symbols.end(), [](std::vector<Char> row){
-        std::for_each(row.begin(), row.end(), [](Char val){
-            std::cout << "Valore: " << val.getValue() << " Fractional: [";
-            for(int i = 0; i < (int) val.getFractionalPosition().size(); i++){
-                std::cout << val.getFractionalPosition()[i] << " ";
-            }
-            std::cout << "]" << std::endl;
 
-            //std::for_each(val.getFractionalPosition().begin(), val.getFractionalPosition().end(), [](auto i){
-            //    qDebug() << i;
-            //});
-        });
-    });
-}
-*/

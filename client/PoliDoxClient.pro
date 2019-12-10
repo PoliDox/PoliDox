@@ -12,7 +12,6 @@ HEADERS += \
     Changepwd.h \
     ClientController.h \
     CrdtClient.h \
-    CrdtClient.h \
     Char.h \
     Creators.h \
     Editor.h \

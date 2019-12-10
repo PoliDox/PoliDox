@@ -40,7 +40,6 @@ public:
     void setFractionalPosition(std::vector<int>& fractionalPosition);
     ushort getValue() const;
     bool operator < (const Char& other) const;
-    ~Char();
     int getSiteId();
 
     // used by the CLIENTcontroller to create the message to be sent to the server
