@@ -120,7 +120,13 @@ void LoginWindow::on_pushButton_login_clicked()
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_password->text();
 
-    emit authDataSubmitted(username, password);
+    if ( username.size() == 0 || password.size() == 0 ) {
+        QMessageBox::warning(this, "PoliDox", "Username and password cannot be empty");
+
+    } else {
+        emit authDataSubmitted(username, password);
+    }
+
 }
 
 void LoginWindow::on_pushButton_register_clicked()
@@ -162,8 +168,10 @@ void LoginWindow::sendRegistrationData(){
     QString password=pwd_linedit->text();
     QString imagePath=file_path->text();
 
-    if ( password.size() == 0 ){
+    if ( password.size() == 0 || username.size() == 0 ){
         QMessageBox::warning(this, "PoliDox", "Username and password cannot be empty");
+        return;
+
     } else {        
         if (imagePath.size() == 0) {
             // If no image is provided we use the default image

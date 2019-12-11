@@ -60,11 +60,8 @@ Client::Client(QString& ip_address) : m_document(nullptr)
 Client::~Client()
 {
     if (m_document != nullptr) {
-        // editor is open
-        qDebug() << "m_document NOT null";
+        // editor is open        
         delete m_document;
-    } else {
-        qDebug() << "m_document null";
     }
 }
 
