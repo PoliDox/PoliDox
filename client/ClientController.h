@@ -29,7 +29,7 @@ private:
     int m_siteId; // equivalent to m_account.getSiteId()
     QString m_filename;
     QString m_uri;
-    QPixmap Pix;
+    QPixmap m_pix;
 
 public slots:
     void onTextMessageReceived(const QString& _JSONstring);

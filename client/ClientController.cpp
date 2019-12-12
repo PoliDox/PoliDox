@@ -37,9 +37,9 @@ ClientController::ClientController(QWebSocket *p_socket, Account& p_account, con
 
     connect(m_editor, &Editor::quit_editor_new_file, this, &ClientController::docClosedNewFile);
 
-    connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap& Pix){
+    connect(m_editor, &Editor::ChangeImgEditor, this, [&](QPixmap& m_pix){
         QByteArray jsonString = ClientMessageFactory::createImgUpdate(p_account.getName(), Pix);
-        this->Pix = std::move(Pix);
+        this->m_pix = std::move(Pix);
         m_socket->sendTextMessage(jsonString);
     });
 
@@ -133,8 +133,8 @@ void ClientController::onTextMessageReceived(const QString &_JSONstring)
     } else if (l_header == "changeImgRepl") {
         QString response = _JSONobj["response"].toString();
         if ( response == "ok") {
-            m_account.setImage(Pix);
-            m_editor->setNewImage(Pix);
+            m_account.setImage(m_pix);
+            m_editor->setNewImage(m_pix);
             QMessageBox::information(m_editor->getProfilePtr(), "PoliDox", "Image correctly updated");
             m_editor->getProfilePtr()->raise();
         } else {

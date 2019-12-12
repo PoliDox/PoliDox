@@ -26,7 +26,6 @@ struct User
     Account account;
     QLabel *label;
     QTextCursor cursor;
-    // TODO: Add colors here (or maybe we should hard-code them in a vector?)
 };
 
 enum EditOp
