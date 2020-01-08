@@ -167,11 +167,6 @@ void ClientController::onTextChanged(int position, int charsRemoved, int charsAd
         /************************************************************************************************/
         QChar qchar = m_editor->at(position+i);
         ushort _char;
-        if (qchar == QChar::ParagraphSeparator) {
-            _char = '\n';
-        } else {
-            _char =  qchar.unicode();
-        }
 
         Char symbol(_char,m_crdt->getSiteId());
 
